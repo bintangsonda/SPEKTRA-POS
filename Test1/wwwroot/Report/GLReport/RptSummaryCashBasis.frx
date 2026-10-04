@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="10/28/2025 15:42:02" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4TjJwFFlYL1UeOSEhSa5+tA">
+      <ProcedureDataSource Name="GLRepCashBases" DataType="System.Int32" Enabled="true" TableName="GLRepCashBases" SelectCommand="GLRepCashBases">
+        <Column Name="mn" DataType="System.String"/>
+        <Column Name="acc" DataType="System.String"/>
+        <Column Name="branchcode" DataType="System.String"/>
+        <Column Name="name" DataType="System.String"/>
+        <Column Name="debit" DataType="System.Decimal"/>
+        <Column Name="credit" DataType="System.Decimal"/>
+        <Column Name="BICODE" DataType="System.String"/>
+        <Column Name="AT" DataType="System.Byte"/>
+        <Column Name="CCY" DataType="System.String"/>
+        <Column Name="debitbalance" DataType="System.Decimal"/>
+        <Column Name="creditbalance" DataType="System.Decimal"/>
+        <ProcedureParameter Name="@BranchCode" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@Period" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@PeriodTo" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@tipe" DataType="20" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPFrom" DataType="System.String" AsString=""/>
+    <Parameter Name="RPTo" DataType="System.String" AsString=""/>
+    <Parameter Name="RPisPrintZero" DataType="System.Boolean" AsString=""/>
+    <Total Name="sumdebit" Expression="[GLRepCashBases.debit]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="sumcredit" Expression="[GLRepCashBases.credit]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="sumdebitbalance" Expression="[GLRepCashBases.debitbalance]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="sumcreditbalance" Expression="[GLRepCashBases.creditbalance]" Evaluator="Data1" PrintOn="DataFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="1088.64" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="319.41" Top="9.45" Width="449.82" Height="22.68" Text="Summary Cash Basis" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="966.41" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="956.96" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="956.96" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text66" Left="420.01" Top="32.13" Width="128.52" Height="22.68" Text="From: [RPFrom]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text67" Left="-9450" Top="-9450" Width="449.82" Height="22.68" Text="Transaction Listing By Account" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text68" Left="556.45" Top="32.13" Width="119.07" Height="22.68" Text="To: [RPTo]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <ChildBand Name="Child1" Top="70.71" Width="1088.64" Height="15.57" Border.Lines="Top">
+        <TextObject Name="Text79" Left="676.05" Width="205.04" Height="15.12" Text="Transaction" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text80" Left="881.85" Width="205.04" Height="15.12" Text="Balance" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <ChildBand Name="Child2" Top="88.94" Width="1088.64" Height="15.12" Border.Lines="Bottom">
+          <TextObject Name="Text73" Width="59.15" Height="15.12" Text="ACC No" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text74" Left="881.85" Width="103.03" Height="15.12" Text="Debit" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text75" Left="984.88" Width="103.03" Height="15.12" Text="Kredit" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text76" Left="676.05" Width="103.03" Height="15.12" Text="Debit" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text77" Left="779.08" Width="103.03" Height="15.12" Text="Kredit" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text78" Left="59.15" Width="616.57" Height="15.12" Text="Account Name" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        </ChildBand>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="106.73" Width="1088.64" Height="15.12" DataSource="GLRepCashBases">
+      <TextObject Name="Text81" Width="59.15" Height="15.12" Text="[GLRepCashBases.acc]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text82" Left="59.15" Width="616.57" Height="15.12" Text="[GLRepCashBases.name]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text83" Left="676.05" Width="103.03" Height="15.12" Text="[GLRepCashBases.debit]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text84" Left="779.08" Width="103.03" Height="15.12" Text="[GLRepCashBases.credit]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text85" Left="881.85" Width="103.03" Height="15.12" Text="[GLRepCashBases.debitbalance]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text86" Left="984.88" Width="103.03" Height="15.12" Text="[GLRepCashBases.creditbalance]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <DataFooterBand Name="DataFooter1" Top="124.52" Width="1088.64" Height="15.12" Border.Lines="Top, Bottom">
+        <TextObject Name="Text87" Left="59.15" Width="616.57" Height="15.12" Text="Total:" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text88" Left="676.05" Width="103.03" Height="15.12" Text="[sumdebit]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text89" Left="779.08" Width="103.03" Height="15.12" Text="[sumcredit]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text90" Left="881.85" Width="103.03" Height="15.12" Text="[sumdebitbalance]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text91" Left="984.88" Width="103.03" Height="15.12" Text="[sumcreditbalance]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </DataFooterBand>
+    </DataBand>
+  </ReportPage>
+</Report>

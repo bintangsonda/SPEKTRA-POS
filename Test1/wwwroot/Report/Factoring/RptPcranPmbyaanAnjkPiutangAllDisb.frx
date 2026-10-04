@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="11/10/2025 15:29:31" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    int rowNumber = 0;
+   
+    private void Data1_BeforePrint(object sender, EventArgs e)
+    {
+      if(!Report.Engine.FinalPass){
+        return;
+      }
+      ++rowNumber;
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4Ti/kSla9DlcaS+I4fBY/Eo">
+      <ProcedureDataSource Name="Sp_GetRptPencairanAnjakPiutang" DataType="System.Int32" PropName="_1Sp_GetRptPencairanAnjakPiutang" Enabled="true" TableName="Sp_GetRptPencairanAnjakPiutang" SelectCommand="Sp_GetRptPencairanAnjakPiutang">
+        <Column Name="ClientID" DataType="System.String"/>
+        <Column Name="AgreementNo" DataType="System.String"/>
+        <Column Name="LesseeFullName" DataType="System.String"/>
+        <Column Name="CreditLimit" DataType="System.Decimal"/>
+        <Column Name="DisbAmt" DataType="System.Decimal"/>
+        <Column Name="IntPercentage" DataType="System.Double"/>
+        <Column Name="ProvisionAmt" DataType="System.Decimal"/>
+        <Column Name="FactStatus" DataType="System.Byte"/>
+        <Column Name="InvNo" DataType="System.String"/>
+        <Column Name="LastInvAmt" DataType="System.Decimal"/>
+        <Column Name="FromDue" DataType="System.DateTime"/>
+        <Column Name="ToDue" DataType="System.DateTime"/>
+        <Column Name="LegalProvince" DataType="System.String"/>
+        <Column Name="ProvinceName" DataType="System.String"/>
+        <Column Name="IndusCode" DataType="System.String"/>
+        <Column Name="IndusName" DataType="System.String"/>
+        <Column Name="Relationship" DataType="System.Byte"/>
+        <Column Name="CreditTenor" DataType="System.Int32"/>
+        <Column Name="RevolveNew" DataType="System.String"/>
+        <ProcedureParameter Name="@From" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@To" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@Type" DataType="20" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPFrom" DataType="System.String" AsString=""/>
+    <Parameter Name="RPTo" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="1088.64" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="319.41" Top="9.45" Width="449.82" Height="22.68" Text="Disbursement Factoring All Disbursement" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="966.41" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="956.96" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="956.96" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text66" Left="420.01" Top="32.13" Width="128.52" Height="22.68" Text="From: [RPFrom]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text67" Left="-9450" Top="-9450" Width="449.82" Height="22.68" Text="Transaction Listing By Account" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text68" Left="556.45" Top="32.13" Width="119.07" Height="22.68" Text="To: [RPTo]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <ChildBand Name="Child1" Top="71.24" Width="1088.64" Height="21.97" Border.Lines="All">
+        <TextObject Name="Text20" Top="0.45" Width="23.15" Height="20.72" Border.Lines="Right" Text="No" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text72" Left="23.15" Top="0.45" Width="98.35" Height="20.72" Border.Lines="Right" Text="No Fasilitas" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text75" Left="121.5" Top="0.45" Width="83.15" Height="20.72" Border.Lines="Right" Text="Nama Perusahaan" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text76" Left="204.65" Top="0.45" Width="84.75" Height="20.72" Border.Lines="Right" Text="Limit Fasilitas" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text77" Left="289.4" Top="0.45" Width="41.55" Height="20.72" Border.Lines="Right" Text="Suku Bunga" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text78" Left="330.95" Top="0.45" Width="72.75" Height="20.72" Border.Lines="Right" Text="Provisi" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text79" Left="403.7" Top="0.45" Width="114.35" Height="20.72" Border.Lines="Right" Text="No. SOA" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text80" Left="518.05" Top="0.45" Width="81.55" Height="20.72" Border.Lines="Right" Text="Pokok Pembiayaan" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text81" Left="599.6" Top="0.45" Width="71.95" Height="20.72" Border.Lines="Right" Text="Jaminan Invoice" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text82" Left="671.55" Top="0.45" Width="58.35" Height="20.72" Border.Lines="Right" Text="Mulai Pembiayaan" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text83" Left="729.9" Top="0.45" Width="58.35" Height="20.72" Border.Lines="Right" Text="Akhir Pembiayaan" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text84" Left="788.25" Top="0.45" Width="47.15" Height="20.72" Border.Lines="Right" Text="Letak Geografis" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text85" Left="835.4" Top="0.45" Width="115.15" Height="20.72" Border.Lines="Right" Text="Sektor Ekonomi" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text86" Left="1036.05" Top="0.45" Width="51.95" Height="20.72" Text="Revolving / New" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text87" Left="1004.25" Top="0.45" Width="31.95" Height="20.72" Border.Lines="Right" Text="Tenor Kredit" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+        <TextObject Name="Text88" Left="950.6" Top="0.45" Width="53.55" Height="20.72" Border.Lines="Right" Text="Status Keterkaitan" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 6pt, style=Bold"/>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="96.41" Width="1088.64" Height="15.12" Border.Lines="Left, Right, Bottom" CanGrow="true" BeforePrintEvent="Data1_BeforePrint" DataSource="Sp_GetRptPencairanAnjakPiutang">
+      <TextObject Name="Text89" Width="23.15" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[rowNumber]" Padding="1, 1, 1, 1" HorzAlign="Right" Font="Arial, 6pt"/>
+      <TextObject Name="Text90" Left="23.15" Width="98.35" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.ClientID]" Padding="1, 1, 1, 1" Font="Arial, 6pt"/>
+      <TextObject Name="Text91" Left="121.5" Width="83.15" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.LesseeFullName]" Padding="1, 1, 1, 1" Font="Arial, 6pt"/>
+      <TextObject Name="Text92" Left="204.65" Width="84.75" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.CreditLimit]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 6pt"/>
+      <TextObject Name="Text93" Left="289.4" Width="41.55" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.IntPercentage] %" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="1" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 6pt"/>
+      <TextObject Name="Text94" Left="330.95" Width="72.75" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.ProvisionAmt]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 6pt"/>
+      <TextObject Name="Text95" Left="403.7" Width="114.35" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.InvNo]" Padding="1, 1, 1, 1" Font="Arial, 6pt"/>
+      <TextObject Name="Text96" Left="518.05" Width="81.55" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.DisbAmt]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 6pt"/>
+      <TextObject Name="Text97" Left="599.6" Width="71.95" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.LastInvAmt]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 6pt"/>
+      <TextObject Name="Text98" Left="671.55" Width="58.35" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.FromDue]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" Font="Arial, 6pt"/>
+      <TextObject Name="Text99" Left="729.9" Width="58.35" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.ToDue]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" Font="Arial, 6pt"/>
+      <TextObject Name="Text100" Left="788.25" Width="47.15" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.ProvinceName]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" Font="Arial, 6pt"/>
+      <TextObject Name="Text101" Left="835.4" Width="115.15" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.IndusName]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" Font="Arial, 6pt"/>
+      <TextObject Name="Text102" Left="950.6" Width="53.55" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[IIf([Sp_GetRptPencairanAnjakPiutang.Relationship]==1,&quot;Terkait&quot;,&quot;Tidak Terkait&quot;)]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" Font="Arial, 6pt"/>
+      <TextObject Name="Text103" Left="1004.25" Width="31.95" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.CreditTenor]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 6pt"/>
+      <TextObject Name="Text104" Left="1036.05" Width="51.95" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[Sp_GetRptPencairanAnjakPiutang.RevolveNew]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" Font="Arial, 6pt"/>
+      <Sort>
+        <Sort Expression="[Sp_GetRptPencairanAnjakPiutang.ClientID]"/>
+      </Sort>
+    </DataBand>
+  </ReportPage>
+</Report>

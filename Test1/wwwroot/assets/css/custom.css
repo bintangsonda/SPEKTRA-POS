@@ -1,0 +1,141 @@
+﻿label {
+    font-size: 11px !important;
+}
+
+.label-select {
+    font-size: 11px !important;
+}
+
+.select2-container .select2-results__options {
+    font-size: 11px !important;
+}
+
+.form-floating > .form-control, .form-floating > .form-control-plaintext, .form-floating > .form-select {
+    height: 2.5000625rem !important;
+    min-height: 2.5000625rem !important;
+}
+
+.select2-container {
+    --bs-select-height: 2.5000625rem !important;
+}
+
+.select2-selection__rendered {
+    font-size: 11px;
+}
+
+.form-control {
+    font-size: 11px !important;
+}
+
+.form-control-sm {
+    font-size: 11px !important;
+}
+
+.form-floating > textarea.form-control {
+    height: 120px !important;
+}
+
+table.table.dataTable > tbody > tr {
+    background-color: transparent;
+    font-size: 11px;
+}
+
+.datatables-custom thead th {
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.add-new {
+    background-color: var(--bs-primary) !important;
+}
+
+#tableData {
+    table-layout: fixed;
+}
+
+.datatables-custom th,
+.datatables-custom td {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 12px;
+    vertical-align: middle; /* supaya teks tidak nempel atas */
+    background-color:red;
+}
+
+
+
+#tableData .btn {
+    padding: 2px 4px !important;
+    line-height: 1 !important;
+    height: auto !important;
+}
+
+.table tbody td.statuss span {
+    position: relative;
+    border-radius: 30px;
+    padding: 4px 10px 4px 25px;
+}
+
+    .table tbody td.statuss span:after {
+        position: absolute;
+        top: 9px;
+        left: 10px;
+        width: 10px;
+        height: 10px;
+        content: '';
+        border-radius: 50%;
+    }
+
+.table tbody td.statuss .active {
+    background: #cff6dd;
+    color: #1fa750;
+}
+
+    .table tbody td.statuss .active:after {
+        background: #23bd5a;
+    }
+
+.table tbody td.statuss .waiting {
+    background: #fdf5dd;
+    color: #cfa00c;
+}
+
+    .table tbody td.statuss .waiting:after {
+        background: #f2be1d;
+    }
+
+.table tbody td.statuss .disburst {
+    background: #dfdbf4;
+    color: #ff003b;
+}
+
+    .table tbody td.statuss .disburst:after {
+        background: #23bd5a;
+    }
+
+.table tbody td.statuss .active {
+    background: #cff6dd;
+    color: #1fa750;
+}
+
+    .table tbody td.statuss .active:after {
+        background: #23bd5a;
+    }
+
+.table tbody td.statuss .waiting {
+    background: #fdf5dd;
+    color: #cfa00c;
+}
+
+    .table tbody td.statuss .waiting:after {
+        background: #f2be1d;
+    }
+
+#tableData .btn {
+    padding: 2px 4px !important;
+    line-height: 1 !important;
+    height: auto !important;
+}
+

@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="11/19/2025 08:46:05" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+   
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4T//OvKT3oKVamG6LxHyvC6">
+      <ProcedureDataSource Name="SP_GetSaldoPembiayaanReportOutstanding" DataType="System.Int32" PropName="_1SP_GetSaldoPembiayaanReportOutstanding" Enabled="true" TableName="SP_GetSaldoPembiayaanReportOutstanding" SelectCommand="SP_GetSaldoPembiayaanReportOutstanding">
+        <Column Name="DATACATEGORY" DataType="System.String"/>
+        <Column Name="Lancar" DataType="System.Decimal"/>
+        <Column Name="DalamPerhatianKhusus" DataType="System.Decimal"/>
+        <Column Name="KurangLancar" DataType="System.Decimal"/>
+        <Column Name="Diragukan" DataType="System.Decimal"/>
+        <Column Name="MACET" DataType="System.Decimal"/>
+        <ProcedureParameter Name="@ExDate" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@Period" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@Type" DataType="8" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPPeriod" DataType="System.String" AsString=""/>
+    <Parameter Name="RPType" DataType="System.String" AsString=""/>
+    <Total Name="TotalLancar" Expression="[SP_GetSaldoPembiayaanReportOutstanding.Lancar]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="TotalKhusus" Expression="[SP_GetSaldoPembiayaanReportOutstanding.DalamPerhatianKhusus]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="TotalKurangLancar" Expression="[SP_GetSaldoPembiayaanReportOutstanding.KurangLancar]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="TotalDiragukan" Expression="[SP_GetSaldoPembiayaanReportOutstanding.Diragukan]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="TotalMacet" Expression="[SP_GetSaldoPembiayaanReportOutstanding.MACET]" Evaluator="Data1" PrintOn="DataFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="759.78" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="192.78" Top="9.9" Width="374.22" Height="22.68" Text="Outstanding Factoring By Category" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="637.26" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="627.81" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="627.81" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text40" Left="192.78" Top="32.58" Width="374.22" Height="17.55" Text="Period: [RPPeriod]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <ChildBand Name="Child1" Top="71.24" Width="759.78" Height="22.68" Border.Lines="All">
+        <TextObject Name="Text20" Width="146.35" Height="22.68" Border.Lines="Right" Text="Jenis Penggunaan" Padding="1, 1, 1, 1" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text42" Left="636.75" Width="122.5" Height="22.68" Text="Macet&#13;&#10;&gt;180 Hari" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text43" Left="514.25" Width="122.5" Height="22.68" Border.Lines="Right" Text="Diragukan&#13;&#10;121-180 Hari" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text44" Left="391.75" Width="122.5" Height="22.68" Border.Lines="Right" Text="Kurang Lancar&#13;&#10;91-120 Hari" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text45" Left="269.25" Width="122.5" Height="22.68" Border.Lines="Right" Text="Dalam Perhatian Khusus&#13;&#10;11-90 Hari" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text46" Left="146.75" Width="122.5" Height="22.68" Border.Lines="Right" Text="Lancar&#13;&#10;1-10 Hari" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <ChildBand Name="Child2" Top="97.12" Width="759.78" Height="15.12" Border.Lines="All">
+          <TextObject Name="Text47" Width="498.35" Height="15.12" Text="Pembiayaan Berdasarkan [RPType]" Padding="1, 1, 1, 1" Font="Arial, 7pt, style=Bold"/>
+        </ChildBand>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="115.44" Width="759.78" Height="15.12" Border.Lines="All" CanGrow="true" DataSource="SP_GetSaldoPembiayaanReportOutstanding">
+      <TextObject Name="Text48" Width="146.35" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[SP_GetSaldoPembiayaanReportOutstanding.DATACATEGORY]" Padding="1, 1, 1, 1" Font="Arial, 7pt"/>
+      <TextObject Name="Text49" Left="146.75" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[SP_GetSaldoPembiayaanReportOutstanding.Lancar]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text50" Left="269.25" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[SP_GetSaldoPembiayaanReportOutstanding.DalamPerhatianKhusus]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text51" Left="391.75" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[SP_GetSaldoPembiayaanReportOutstanding.KurangLancar]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text52" Left="514.25" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[SP_GetSaldoPembiayaanReportOutstanding.Diragukan]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text53" Left="636.75" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" GrowToBottom="true" Text="[SP_GetSaldoPembiayaanReportOutstanding.MACET]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <DataFooterBand Name="DataFooter1" Top="133.76" Width="759.78" Height="15.12" Border.Lines="All">
+        <TextObject Name="Text54" Width="146.35" Height="15.12" Border.Lines="Right" CanGrow="true" Text="Total Saldo" Padding="1, 1, 1, 1" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text55" Left="146.75" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" Text="[TotalLancar]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text56" Left="269.25" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" Text="[TotalKhusus]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text57" Left="391.75" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" Text="[TotalKurangLancar]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text58" Left="514.25" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" Text="[TotalDiragukan]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text59" Left="636.75" Width="122.5" Height="15.12" Border.Lines="Right" CanGrow="true" Text="[TotalMacet]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt, style=Bold"/>
+      </DataFooterBand>
+    </DataBand>
+  </ReportPage>
+</Report>

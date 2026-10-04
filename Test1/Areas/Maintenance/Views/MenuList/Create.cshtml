@@ -1,0 +1,323 @@
+﻿
+
+@model IDS.Maintenance.UserMenu
+
+<style type="text/css">
+    .select2-container {
+        width: 100% !important;
+    }
+</style>
+
+<div class="modal fade" id="CreateEditForm" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalTitle"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Get, new { @id = "formCreateEdit" }))
+                {
+                @Html.AntiForgeryToken()
+
+                @Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+                @Html.Hidden("FormSave", "0");
+
+                <script type="text/javascript">
+                    $('form#formCreateEdit').removeData("validator");
+                    $('form#formCreateEdit').removeData("unobtrusiveValidation");
+                    $.validator.unobtrusive.parse($('form#formCreateEdit'));
+                </script>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.MenuCode, "Menu Code", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.EditorFor(model => model.MenuCode, new { htmlAttributes = new { @class = "form-control form-control-sm", @maxlength = 50, placeholder = "Menu Code" } })
+                        @Html.ValidationMessageFor(model => model.MenuCode, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                if (Convert.ToInt32(ViewData["FormAction"]) == 2)
+                {
+                @Html.HiddenFor(m => m.MenuProject)
+                }
+
+                <div class="form-group row" id="project">
+                    @Html.LabelFor(model => model.MenuProject, "Project", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-md-9">
+
+                        @Html.DropDownListFor(model => model.MenuProject, (SelectList)ViewData["SelectListProject"], " ", new { @id = "cboProject", @class = "form-control select2DDList" })
+                        @Html.ValidationMessageFor(model => model.MenuProject, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row" id="level">
+                    @Html.LabelFor(model => model.MenuLevel, "Menu Level", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.DropDownListFor(model => model.MenuLevel, new SelectList(ViewData["MenuLevel"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
+                            , "Value", "Text"), "", new { @id = "cboMenuLevel", @class = "form-control select2DDList" })
+                            @Html.ValidationMessageFor(model => model.MenuLevel, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row" id="parent">
+                    @Html.LabelFor(model => model.MenuParentCode, htmlAttributes: new { @class = "control-label col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.DropDownListFor(model => model.MenuParentCode, new SelectList(ViewData["ParentMenu"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
+                            , "Value", "Text"), "", new { @id = "cboParentMenuCode", @class = "form-control select2DDList" })
+                            @Html.ValidationMessageFor(model => model.MenuParentCode, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.MenuName, "Menu Name", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.EditorFor(model => model.MenuName, new { htmlAttributes = new { @class = "form-control form-control-sm", @maxlength = 50, placeholder = "Menu Name" } })
+                        @Html.ValidationMessageFor(model => model.MenuName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.MenuURL, "Menu Url", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.EditorFor(model => model.MenuURL, new { htmlAttributes = new { @class = "form-control form-control-sm", @maxlength = 50, placeholder = "Menu Url" } })
+                        @Html.ValidationMessageFor(model => model.MenuURL, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.MenuToolTip, "Menu ToolTip", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.EditorFor(model => model.MenuToolTip, new { htmlAttributes = new { @class = "form-control form-control-sm", @maxlength = 50, placeholder = "Menu ToolTip" } })
+                        @Html.ValidationMessageFor(model => model.MenuToolTip, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                <div class="form-group row" id="ControllerDiv">
+                    @Html.LabelFor(model => model.Controller, "Controller", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.EditorFor(model => model.Controller, new { htmlAttributes = new { @class = "form-control form-control-sm", @maxlength = 50, placeholder = "Controller" } })
+                        @Html.ValidationMessageFor(model => model.Controller, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row" id="AreaDiv">
+                    @Html.LabelFor(model => model.Area, "Area", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.EditorFor(model => model.Area, new { htmlAttributes = new { @class = "form-control form-control-sm", @maxlength = 50, placeholder = "Area" } })
+                        @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Icon, "Menu Icon", htmlAttributes: new { @class = "col-form-label-sm col-sm-3" })
+                    <div class="col-sm-9">
+                        @Html.EditorFor(model => model.Icon, new { htmlAttributes = new { @class = "form-control form-control-sm", @maxlength = 50, placeholder = "Menu Icon" } })
+                        @Html.ValidationMessageFor(model => model.Icon, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+
+
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" title="Input New Menu" id="btnAddNew">Add New</button>
+                <button type="button" class="btn btn-primary" title="Save Menu" id="btnSave">Save</button>
+                <button type="button" class="btn btn-danger" title="Close This Form" id="btnClose" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/Scripts/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".select2DDList").select2();
+        $("#MenuCode").attr('readonly', 'true');
+
+        if ($('#FormAction').val() == "2")
+        {
+            $("#cboProject").attr('disabled', 'true');
+            $("#cboMenuLevel").attr('disabled', 'true');
+            $("#cboParentMenuCode").attr('disabled', 'true');
+            $("#MenuURL").attr('disabled', 'true');
+        }
+        $("#btnSave").click(function () {
+            if(!$("form#formCreateEdit").valid())
+            {
+                return false;
+            }
+            if ($('#cboMenuLevel').val() > 0 && $('#cboParentMenuCode').val() != "" || $('#cboMenuLevel').val() == 0 && $('#cboParentMenuCode').val() == "" )
+            {
+                 var confirmText = "";
+            if ($("#FormAction").val() == 1) {
+                confirmText = ("Are you sure want to save data ?");
+            } else {
+                confirmText = ("Are you sure want to edit Menu Code : " + $("#MenuCode").val() + " ?");
+            }
+
+            var answer = confirm(confirmText);
+            if (answer) {
+                if ($("#FormAction").val() == 1) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Create", "MenuList", new { Area = "Maintenance" })',
+                        processData: false,
+                        data: $("#formCreateEdit").serialize(),
+                        success: function (respond) {
+                            LoadData();
+                            $("#FormSave").val("1");
+                            if (respond.length < 18)
+                            {
+                                $("#MenuCode").val(respond);
+                                alert("Success!");
+                            }
+                            else
+                            {
+                                alert(respond);
+                            }
+
+                        }
+                    });
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Edit", "MenuList", new { Area = "Maintenance" })',
+                        processData: false,
+                        data: $("#formCreateEdit").serialize(),
+                        success: function (respond) {
+                            LoadData();
+                            $("#FormSave").val("1");
+                            alert(respond);
+                        }
+                    });
+                }
+            }
+            }
+            else
+            {
+                alert("Parent Code Cant be null");
+            }
+
+
+        }),
+
+        $("#btnClose, .close").click(function () {
+            $("#CreateEditForm").modal('hide');
+            $('#loadingModal').modal('hide');
+            if ($("#FormSave").val() == "1") {
+                @*window.location.href = '@Url.Action("index", "Bank", new { Area = "GeneralTable" })';*@
+                //LoadData();
+            }
+        }),
+
+        $("#btnAddNew").click(function () {
+            if (!$('#MenuCode, #MenuName').val() == "") {
+                var answer = confirm("Are you sure want to clear this form ?");
+
+                if (answer) {
+                    $("form#formCreateEdit").trigger("reset");
+                    $(':input', '#formCreateEdit').not(':button, :submit, :reset, :hidden').val('');
+                    $("#cboProject").removeAttr('disabled');
+                    $("#cboMenuLevel").removeAttr('disabled');
+                    $("#cboParentMenuCode").removeAttr('disabled');
+                    $("#MenuURL").removeAttr('disabled');
+                    $("#cboProject").val('').select2();
+                    $("#FormAction").val("1");
+                    $("#FormSave").val("1");
+                }
+                else {
+                    e.preventDefault();
+                }
+            }
+            else {
+                e.preventDefault();
+            }
+        })
+
+             $('#cboProject, #cboMenuLevel').on('change', function () {
+                 if ($('#cboProject').val() != null && $('#cboProject').val() !== undefined) {
+                     if ($('#cboMenuLevel').val() != "")
+                     {
+
+                    var menuProject = $('#cboProject').val();
+                    var menulevel = $('#cboMenuLevel').val();
+
+                    if (menuProject == "Reports") {
+                        $('#ControllerDiv').hide();
+                        $('#AreaDiv').hide();
+                        $("#MenuURL").prop('readonly', false);
+                    }
+                    else {
+                        $('#ControllerDiv').show();
+                        $('#AreaDiv').show();
+                        $("#MenuURL").prop('readonly', true);
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("GetMenuParent", "MenuList", new { Area = "Maintenance" })',
+                        dataType: 'json',
+                        data:
+                            {
+                                MenuProject: menuProject,
+                                level: menulevel
+                            },
+                        success: function (respond) {
+                            $('#cboParentMenuCode').empty();
+                            $('#cboParentMenuCode').append('<option value = "">-- Please Select --</option>');
+                            $.each(respond, function (i, item) {
+                                $('#cboParentMenuCode').append('<option value = "' + item.MenuCode + '">' + item.MenuName + '</option>');
+                            });
+                        },
+                        error: function (err) {
+                            $('#cboParentMenuCode').empty();
+                            $('#cboParentMenuCode').append('<option value = "">-- Please Select --</option>');
+                            console.log("error", err);
+                            alert(err);
+                        }
+                    });
+                     }
+                }
+             }),
+
+			 $('#cboProject').on('change', function () {
+                 if ($('#cboProject').val() != null && $('#cboProject').val() !== undefined) {
+
+
+                    var menuProject = $('#cboProject').val();
+
+
+                    if (menuProject == "Reports") {
+                        $('#ControllerDiv').hide();
+                        $('#AreaDiv').hide();
+                        $("#MenuURL").prop('readonly', false);
+                    }
+                    else {
+                        $('#ControllerDiv').show();
+                        $('#AreaDiv').show();
+                        $("#MenuURL").prop('readonly', true);
+                    }
+
+
+
+                     }
+             })
+
+
+    });
+
+    $('#CreateEditForm').on('hidden.bs.modal', function (e) {
+        $('#loadingModal').modal('hide');
+    })
+
+</script>

@@ -1,0 +1,94 @@
+﻿<style>
+    .payment-sticky {
+        position: sticky;
+        bottom: 0;
+        padding: 10px;
+        z-index: 10;
+    }
+
+    .icon-fixed {
+        font-size: 18px !important;
+        line-height: 1;
+    }
+</style>
+
+<div class="trans-header d-flex flex-column flex-lg-row gap-2 align-items-lg-center justify-content-between">
+
+    <!-- LEFT : TRANSACTION ID -->
+    <div class="trans-id">
+        ID: <span class="TransactionCode">@Model.TransCode</span>
+    </div>
+
+    <!-- RIGHT : ACTION BUTTONS -->
+    <div class="d-flex gap-2 flex-wrap justify-content-start justify-content-md-end">
+        <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">
+            <i class="ri ri-user-line me-1 icon-18px"></i>
+            <span class="d-none d-sm-inline">Customer</span>
+        </button>
+
+        <button type="button" class="btn btn-info btn-sm" data-bs-dismiss="modal" onclick="ListBill()">
+            <i class="ri ri-bill-line me-1 icon-18px"></i>
+            Bill
+        </button>
+    </div>
+
+</div>
+
+<div class="bill">
+
+    <div class="bill-header">
+        <span>Qty</span>
+        <span>Item</span>
+        <span class="text-end">Price</span>
+        <span></span>
+    </div>
+
+    <div class="bill-list" id="BillList"></div>
+
+    <div class="summary">
+        <div class="bill-row total-row">
+            <span>Sub Total</span>
+            <span class="SubTotal">0</span>
+        </div>
+        <div class="bill-row total-row bold">
+            <span>Total</span>
+            <span class="Total">0</span>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-2 mt-3 cart-action">
+
+    <div class="col-6 col-md-4">
+        <button class="btn btn-dark w-100">
+            <i class="ri ri-printer-line me-1 icon-fixed"></i> Print
+        </button>
+    </div>
+
+    <div class="col-6 col-md-4">
+        <button class="btn btn-danger w-100" onclick="DeleteBill()">
+            <i class="ri ri-delete-bin-6-line me-1 icon-fixed"></i> Delete
+        </button>
+    </div>
+
+    <div class="col-6 col-md-4">
+        <button class="btn btn-info w-100" onclick="SaveBillPayment(0)">
+            <i class="ri ri-bill-line me-1 icon-fixed"></i> Save
+        </button>
+    </div>
+
+    <!-- Payment khusus mobile -->
+    <div class="col-6 d-md-none">
+        <button class="btn btn-success w-100" onclick="ShowModalPayment()">
+            <i class="ri ri-refund-2-line me-1 icon-fixed"></i> Payment
+        </button>
+    </div>
+
+</div>
+
+<button type="button"
+        class="btn btn-success w-100 d-none d-md-block mt-2"
+        onclick="ShowModalPayment()">
+    <i class="ri ri-refund-2-line me-1 icon-fixed"></i> Payment
+</button>

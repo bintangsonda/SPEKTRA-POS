@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="10/25/2025 08:04:03" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    string GetIndentedName(int tl, string name)
+    {
+      int indentSpaces = 0;
+
+      switch (tl)
+      {
+        case 1: indentSpaces = 16; break;
+        case 2: indentSpaces = 14; break;
+        case 3: indentSpaces = 12; break;
+        case 4: indentSpaces = 10; break;
+        case 5: indentSpaces = 8; break;
+        case 6: indentSpaces = 6; break;
+        case 7: indentSpaces = 4; break;
+        case 8: indentSpaces = 2; break;
+        case 9: indentSpaces = 0; break;
+      }
+
+      return new string(' ', indentSpaces) + name;
+    }
+
+    private void Text19_BeforePrint(object sender, EventArgs e)
+    {
+      var band = Report.GetColumnValue(&quot;ACFGLMH.TL&quot;);
+      int tl = Convert.ToInt32(band);
+
+      // TL &gt;= 2 = bold
+      if (tl &gt;= 2)
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Bold);
+      else
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Regular);
+    }
+
+    private void Text18_BeforePrint(object sender, EventArgs e)
+    {
+      var band = Report.GetColumnValue(&quot;ACFGLMH.TL&quot;);
+      int tl = Convert.ToInt32(band);
+
+      // TL &gt;= 2 = bold
+      if (tl &gt;= 2)
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Bold);
+      else
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Regular);
+      
+    }
+
+    private void Text34_BeforePrint(object sender, EventArgs e)
+    {
+      var band = Report.GetColumnValue(&quot;ACFGLMH.TL&quot;);
+      int tl = Convert.ToInt32(band);
+
+      // TL &gt;= 2 = bold
+      if (tl &gt;= 2)
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Bold);
+      else
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Regular); 
+    }
+
+    private void Text35_BeforePrint(object sender, EventArgs e)
+    {
+      var band = Report.GetColumnValue(&quot;ACFGLMH.TL&quot;);
+      int tl = Convert.ToInt32(band);
+
+      // TL &gt;= 2 = bold
+      if (tl &gt;= 2)
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Bold);
+      else
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Regular);
+    }
+
+    private void Text39_BeforePrint(object sender, EventArgs e)
+    {
+      var band = Report.GetColumnValue(&quot;ACFGLMH.TL&quot;);
+      int tl = Convert.ToInt32(band);
+
+      // TL &gt;= 2 = bold
+      if (tl &gt;= 2)
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Bold);
+      else
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Regular);
+    }
+
+    private void Text37_BeforePrint(object sender, EventArgs e)
+    {
+      var band = Report.GetColumnValue(&quot;ACFGLMH.TL&quot;);
+      int tl = Convert.ToInt32(band);
+
+      // TL &gt;= 2 = bold
+      if (tl &gt;= 2)
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Bold);
+      else
+        (sender as TextObject).Font = new Font((sender as TextObject).Font, FontStyle.Regular);
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4RNs71igaGtSk3Wn6gH+qJp">
+      <TableDataSource Name="ACFGLMH" DataType="System.Int32" Enabled="true" TableName="ACFGLMH">
+        <Column Name="ACC" DataType="System.String"/>
+        <Column Name="CCY" DataType="System.String"/>
+        <Column Name="CHName" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="TL" DataType="System.Byte"/>
+        <Column Name="AT" DataType="System.Byte"/>
+        <Column Name="AG" DataType="System.Byte"/>
+        <Column Name="PROTECTACC" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="CASHACC" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="OPERATORID" DataType="System.String"/>
+        <Column Name="LASTUPD" DataType="System.DateTime"/>
+        <Column Name="ENTRYUSER" DataType="System.String"/>
+        <Column Name="ENTRYDATE" DataType="System.DateTime"/>
+      </TableDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15" OtherPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="759.78" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="201.28" Top="9.45" Width="374.22" Height="22.68" Text="Charts Of Accounts" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="637.26" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="627.81" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="627.81" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <ChildBand Name="Child1" Top="70.71" Width="759.78" Height="15.57" Border.Lines="Top, Bottom">
+        <TextObject Name="Text20" Top="0.45" Width="59.15" Height="15.12" Text="ACC No" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text21" Left="88.75" Top="0.45" Width="444.95" Height="15.12" Text="Name" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text22" Left="534.95" Top="0.45" Width="140.2" Height="15.12" Text="Acc Description" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text24" Left="706.95" Top="0.45" Width="49.15" Height="15.12" Text="Acc Type" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text25" Left="59.6" Top="0.45" Width="28.02" Height="15.12" Text="CCY" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text38" Left="676.15" Top="0.45" Width="28.8" Height="15.12" Text="Level" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="88.94" Width="759.78" Height="15.24" CanGrow="true" CanBreak="true" DataSource="ACFGLMH">
+      <TextObject Name="Text18" Top="0.12" Width="59.15" Height="15.12" BeforePrintEvent="Text18_BeforePrint" Text="[ACFGLMH.ACC]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text19" Left="59.6" Top="0.12" Width="28.02" Height="15.12" BeforePrintEvent="Text19_BeforePrint" Text="[ACFGLMH.CCY]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text34" Left="88.75" Top="0.12" Width="444.95" Height="15.12" CanGrow="true" BeforePrintEvent="Text34_BeforePrint" Text="[GetIndentedName([ACFGLMH.TL], [ACFGLMH.NAME])]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 6pt" Clip="false"/>
+      <TextObject Name="Text35" Left="534.95" Top="0.12" Width="140.2" Height="15.12" BeforePrintEvent="Text35_BeforePrint" Text="[Switch([ACFGLMH.AG]==1, &quot;ASSETS&quot;, [ACFGLMH.AG]==2, &quot;LIALIBILITIES AND CAPITAL&quot;, [ACFGLMH.AG]==3, &quot;INCOME&quot;, [ACFGLMH.AG]==4, &quot;EXPENSE&quot;, [ACFGLMH.AG]==5, &quot;ADM&quot;)]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text37" Left="706.95" Top="0.12" Width="49.15" Height="15.12" BeforePrintEvent="Text37_BeforePrint" Text="[ACFGLMH.AT]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text39" Left="676.15" Top="0.12" Width="28.8" Height="15.12" BeforePrintEvent="Text39_BeforePrint" Text="[ACFGLMH.TL]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+    </DataBand>
+  </ReportPage>
+</Report>

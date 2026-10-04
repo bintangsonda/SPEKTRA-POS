@@ -1,0 +1,166 @@
+﻿@model List<IDS.Maintenance.AuditTrail>
+@{
+    Layout = null;
+    ViewBag.Title = "Audit";
+}
+<style>
+    .modal-body p{
+        font-size : 11px;
+    }
+    .h6{
+        font-size: 12px;
+    }
+</style>
+<div class="modal fade" id="CreateEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle"></h5>
+            </div>
+            <div class="modal-body">
+                    <div class="card">
+                    <div class="card-body">
+                        <ul class="timeline timeline-outline mb-0" id="auditTimeline">
+                            @foreach (var log in Model.Take(4))
+                            {
+                                <li class="timeline-item timeline-item-transparent border-dashed">
+                                    @if (log.Status == "INSERT")
+                                    {
+                                        <span class="timeline-point timeline-point-primary"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="timeline-point timeline-point-success"></span>
+                                    }
+
+                                    <div class="timeline-event">
+                                        <div class="timeline-header mb-3">
+                                            <h6 class="mb-0">Data has been @log.Status</h6>
+                                            <small class="text-body-secondary">@log.UpdatedDate.ToString("dd-MMM-yyyy HH:mm")</small>
+                                        </div>
+
+                                        @if (log.Status == "INSERT")
+                                        {
+                                            <p class="mb-2"><b>@log.UserId</b> successfully insert data.</p>
+                                            @foreach (var detail in log.Details)
+                                            {
+                                                <p class="mb-2">@detail.ColumnName : <del>@detail.OldValue</del> → @detail.NewValue</p>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-2">Successfully update data.</p>
+                                            @foreach (var detail in log.Details)
+                                            {
+                                                <p class="mb-2">@detail.ColumnName : <del>@detail.OldValue</del> → @detail.NewValue</p>
+                                            }
+                                            <div class="d-flex justify-content-between flex-wrap gap-2 mb-2">
+                                                <div class="d-flex flex-wrap align-items-center mb-50">
+                                                    <div class="avatar avatar-sm me-2">
+                                                        <img src="~/assets/img/avatars/1.png" alt="Avatar" class="rounded-circle" />
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-0 small fw-medium">By : @log.UserId</p>
+                                                        <small>Key : @log.Key</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+
+                        <!-- Hidden LI untuk load berikutnya -->
+                        <ul id="hiddenTimelineItems" class="timeline timeline-outline mb-0">
+                            @foreach (var log in Model.Skip(4))
+                            {
+                                <li class="timeline-item timeline-item-transparent border-dashed" style="display:none;">
+                                    @if (log.Status == "INSERT")
+                                    {
+                                        <span class="timeline-point timeline-point-primary"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="timeline-point timeline-point-success"></span>
+                                    }
+
+                                    <div class="timeline-event">
+                                        <div class="timeline-header mb-3">
+                                            <h6 class="mb-0">Data has been @log.Status</h6>
+                                            <small class="text-body-secondary">@log.UpdatedDate.ToString("dd-MMM-yyyy HH:mm")</small>
+                                        </div>
+
+                                        @if (log.Status == "INSERT")
+                                        {
+                                            <p class="mb-2"><b>@log.UserId</b> successfully insert data.</p>
+                                            @foreach (var detail in log.Details)
+                                            {
+                                                <p class="mb-2">@detail.ColumnName : <del>@detail.OldValue</del> → @detail.NewValue</p>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-2">Successfully update data.</p>
+                                            @foreach (var detail in log.Details)
+                                            {
+                                                <p class="mb-2">@detail.ColumnName : <del>@detail.OldValue</del> → @detail.NewValue</p>
+                                            }
+                                            <div class="d-flex justify-content-between flex-wrap gap-2 mb-2">
+                                                <div class="d-flex flex-wrap align-items-center mb-50">
+                                                    <div class="avatar avatar-sm me-2">
+                                                        <img src="~/assets/img/avatars/1.png" alt="Avatar" class="rounded-circle" />
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-0 small fw-medium">By : @log.UserId</p>
+                                                        <small>Key : @log.Key</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+
+                        <!-- Tombol Load More -->
+                        <div class="text-center mt-3">
+                            <button id="btnLoadMore" class="btn btn-sm btn-outline-primary">Load More</button>
+                        </div>
+
+                       
+                    </div>
+
+                    </div>
+
+
+
+                @* <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="btnClose" data-dismiss="modal">Close</button>
+                </div> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        var $btn = $('#btnLoadMore');
+        var $hiddenItems = $('#hiddenTimelineItems li');
+        var $target = $('#auditTimeline');
+
+        $btn.on('click', function () {
+            var $nextItems = $hiddenItems.filter(':hidden').slice(0, 4);
+
+            if ($nextItems.length === 0) {
+                $btn.prop('disabled', true).text('All data loaded');
+                return;
+            }
+
+            $nextItems.appendTo($target).slideDown(200);
+        });
+    });
+</script>

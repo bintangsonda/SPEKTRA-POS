@@ -1,0 +1,163 @@
+﻿@model IDS.Maintenance.CustomViewModel
+
+@{
+    ViewBag.Title = "View History";
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/Content/historyPrint.css" />
+
+<div class="modal fade" id="CreateEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalTitle"></h4>
+
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body printableArea">
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <div class="form-group mb-2">
+                            @Html.LabelFor(model => model.Id, "Id: ", new { @class = "col-form-label-sm pt-0 pb-0 mb-0" })
+                            @Html.DisplayFor(model => model.Id, new { @class = "mb-0 form-control form-control-sm" })
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group mb-0">
+                            @Html.LabelFor(model => model.UserName, "User Name: ", new { @class = "col-form-label-sm pt-0 pb-0 mb-0" })
+                            @Html.DisplayFor(model => model.UserName, new { htmlAttributes = new { @class = "mb-0 form-control form-control-sm" } })
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group mb-0">
+                            @Html.LabelFor(model => model.DateUpdated, "Updated. Date: ", new { @class = "col-form-label-sm pt-0 pb-0 mb-0" })
+                            @Html.DisplayFor(model => model.DateUpdated, new { htmlAttributes = new { @class = "mb-0 form-control form-control-sm" } })
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group mb-0">
+                            @Html.LabelFor(model => model.TableName, "Table Name: ", new { @class = "col-form-label-sm pt-0 pb-0 mb-0" })
+                            @Html.DisplayFor(model => model.TableName, new { htmlAttributes = new { @class = "mb-0 form-control form-control-sm" } })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <div class="form-group mb-0" style="font-size: 16px;">
+                            @Html.LabelFor(model => model.Status, "Status: ", new { @class = "col-form-label-sm pt-0 pb-0 mb-0", @style = "font-size: 16px;" })
+                            @Html.DisplayFor(model => model.Status, new { @class = "mb-0" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive table-responsive-sm bg-white border">
+                    <table class="table table-bordered table-hover table-striped">
+                        <tr>
+                            <th style="background-color: #CCC;">Old Value</th>
+                            <th style="background-color: #CCC;">New Value</th>
+
+                        </tr>
+                        @if (Model.Status == "INSERT")
+                        {
+                            for (int i = 0; i < Model.newValue.Count(); i++)
+                            {
+                                <tr>
+                                    <td style="background-color: #1ab98f"></td>
+                                    <td style="background-color: #1ab98f">@Model.newValue[i]</td>
+
+                                </tr>
+                            }
+                        }
+                        else if (Model.Status == "UPDATE")
+                        {
+                            int count = Model.newValue.Count();
+                            if (count < Model.oldValue.Count())
+                            {
+                                count = Model.oldValue.Count();
+                            }
+                            for (int i = 0; i < count; i++)
+                            {
+                                <tr>
+                                    @if (i >= Model.oldValue.Count() || i >= Model.newValue.Count())
+                                    {
+                                        if (i < Model.oldValue.Count())
+                                        {
+                                            <td style="background-color: #1ab98f">@Model.oldValue[i]</td>
+                                            <td style="background-color: #1ab98f"></td>
+                                        }
+                                        else if (i < Model.newValue.Count())
+                                        {
+                                            <td style="background-color: #1ab98f"></td>
+                                            <td style="background-color: #1ab98f">@Model.newValue[i]</td>
+                                        }
+                                    }
+                                    else if (Model.oldValue[i] != Model.newValue[i])
+                                    {
+                                        <td style="background-color: #1ab98f">@Model.oldValue[i]</td>
+                                        <td style="background-color: #1ab98f">@Model.newValue[i]</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@Model.oldValue[i]</td>
+                                        <td>@Model.newValue[i]</td>
+
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < Model.oldValue.Count(); i++)
+                            {
+                                <tr>
+                                    <td style="background-color: #1ab98f">@Model.oldValue[i]</td>
+                                    <td style="background-color: #1ab98f"></td>
+
+                                </tr>
+                            }
+                        }
+
+                    </table>
+                </div>
+                @*//Commented By Renaldi 13 March 2025*@
+                @*<div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="download">Print</button>
+                    <button type="button" class="btn btn-default" id="btnClose" data-dismiss="modal">Close</button>
+                </div>*@
+                @*//End Edited*@
+            </div>
+
+            @*//Add By Renaldi 13 March 2025*@
+            <div class="modal-footer mt-2">
+                <button type="button" class="btn btn-default" id="download">Print</button>
+                <button type="button" class="btn btn-default" id="btnClose" data-dismiss="modal">Close</button>
+            </div>
+            @*//End Add*@
+        </div>
+    </div>
+</div>
+
+<style>
+    div.printableArea {
+        position: relative;
+        width: 100%;
+        top: 3em;
+        left: 0px;
+        right: 0px;
+    }
+</style>
+<script type="text/javascript" src="~/Scripts/jquery.PrintArea.js"></script>
+<script>
+    $('#download').click(function () {
+        var mode = 'iframe'; //popup
+        var close = mode == "popup";
+        var options = {
+            mode: mode,
+            popClose: close
+        };
+        $("div.printableArea").printArea(options);
+    });
+
+</script>

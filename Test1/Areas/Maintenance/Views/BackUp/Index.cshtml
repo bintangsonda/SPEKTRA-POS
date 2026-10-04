@@ -1,0 +1,218 @@
+﻿@{
+    ViewBag.Title = "Backup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/Select2/css/select2.min.css">
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <section class="col-lg-12 connectedSortable">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="btnjf1" class="card-title">
+                            <!--  <i class="fas fa-user mr-1" style="color:#4cff00 !important;"></i>-->
+                            @ViewBag.Title
+                        </h3>
+                        <div class="card-tools">
+
+                        </div>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content p-0">
+                            <!-- Mulai Backup -->
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-database me-2"></i>
+                                        Server Login
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <section class="col-lg-9 connectedSortable ui-sortable">
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label for='txthostserver' class='col-sm-2 col-form-label col-form-label-sm'>Host/Server</label>
+                                                <div class='col-sm-7'>
+                                                    @Html.DropDownList("txthostserver", (SelectList)ViewData["SelectALLServerName"], new { @id = "txthostserver", @class = "form-control form-control-sm select2DDList" })
+                                                </div>
+                                            </div>
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label for='txthostUsername' class='col-sm-2 col-form-label col-form-label-sm'>Login User</label>
+                                                <div class='col-sm-7'>
+                                                    <input type='text' class='form-control form-control-sm' id='txthostUsername' required>
+                                                </div>
+                                            </div>
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label for='txthostpass' class='col-sm-2 col-form-label col-form-label-sm'>Login Password</label>
+                                                <div class='col-sm-7'>
+                                                    <input type='password' class='form-control form-control-sm' id='txthostpass' required>
+                                                </div>
+                                            </div>
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <div class='col-sm-9 text-right'>
+                                                    <button type='button' class='btn btn-sm btn-primary' id='btnlogin'><i class="fa fa-link me-2"></i>Connect Data Base</button>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <section class="col-lg-3 connectedSortable ui-sortable">
+                                            <i class="fas fa-database fa-10x"></i>
+                                            <!-- <img src="~/Content/AdminLTE/img/avatar5.png" style="width:70%;height:70%" class="product-image" alt="Product Image">-->
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-info me-2"></i>
+                                        Database Information
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <section class="col-lg-6 connectedSortable ui-sortable">
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label for='txtinfodatabase' class='col-sm-2 col-form-label col-form-label-sm'>Database</label>
+                                                <div class='col-sm-7'>
+                                                    @Html.DropDownList("txtinfodatabase", (SelectList)ViewData["SelectAllDatabase"], new { @id = "txtinfodatabase", @class = "form-control form-control-sm select2DDList" })
+                                                    <!--<input type='text' class='form-control form-control-sm' id='txtinfodatabase' required>-->
+                                                </div>
+                                            </div>
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label for='txtbackupName' class='col-sm-2 col-form-label col-form-label-sm'>Backup Name</label>
+                                                <div class='col-sm-7'>
+                                                    <input type='text' class='form-control form-control-sm' id='txtbackupName' required>
+                                                </div>
+                                            </div>
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label id="lblresponse" class='col-sm-5 col-form-label col-form-label-sm text-right'>.</label>
+                                                <div class='col-sm-4 text-right'>
+                                                    <button type='button' class='btn btn-sm btn-primary' id='btnBackupD' onclick="BackupData()"><i class="fa fa-hdd me-2"></i>Backup DataBase</button>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <section class="col-lg-6 connectedSortable ui-sortable">
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label for='txtNamaBackupfile' class='col-sm-2 col-form-label col-form-label-sm'>Database Name </label>
+                                                <div class='col-sm-7'>
+                                                    @Html.DropDownList("txtNamaBackupfile", (SelectList)ViewData["GEtAllBackUpFile"], new { @id = "txtNamaBackupfile", @class = "form-control form-control-sm select2DDList" })
+                                                    <!-- <input type='text' class='form-control form-control-sm' id='txtusername' required>-->
+                                                </div>
+                                            </div>
+                                            <div class='row pb-0 col-sm-12 mb-1'>
+                                                <label id="lblresponsee" class='col-sm-5 col-form-label col-form-label-sm text-right'>.</label>
+                                                <div class='col-sm-4 text-right'>
+                                                    <button type='button' class='btn btn-sm btn-primary' id='btnRestoreDatabse' onclick="restoreDatabase()"><i class="fa fa-undo me-2"></i>Restore Database</button>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Mulai Backup selesai -->
+                            <div class="ribbon-wrapper ribbon-lg">
+                                <div class="ribbon bg-success text-md">
+                                    LOGIN FORM
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /.card-body -->
+                </div>
+            </section>
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+
+@section Scripts{
+    <script type="text/javascript" src="~/Content/Select2/js/select2.full.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".select2DDList").select2({ width: 'resolve' });
+        })
+
+        function BackupData() {
+            SpinerButtonStart($('#btnBackupD'),'Wait For Backup..');
+            $('#lblresponse').text(".");
+            var dbName = $("#txtinfodatabase").val();
+            var filename=$("#txtbackupName").val();
+            var hasil = dbName + '\n' + filename;
+            //console.log(hasil);
+            $.ajax({
+                url: '@Url.Action("BackuPDatabase", "Backup", new { Area = "Maintenance" })',
+                type: 'POST',
+                data: JSON.stringify({ 'dbnamefurename': dbName, 'dbfilename': filename }),
+                dataType: 'json',
+                success: function (data) {
+                    SpinerButtonStop($('#btnBackupD'))
+                    switch (data.status) {
+                        case 'success':
+                            $('#lblresponse').text(data.msg);
+                            $('#lblresponse').css('color', 'green');
+                            break;
+                        case 'error':
+                            $('#lblresponse').text(data.msg);
+                            $('#lblresponse').css('color', 'red');
+                            break;
+                    }
+                 },
+                error: function (request, error) {
+                    SpinerButtonStop($('#btnBackupD'));
+                    console.log(request);
+                }
+            });
+        }
+        function restoreDatabase() {
+            var cboexp = $('#txthostUsername');
+            if (!cboexp.val()) {
+                CreateErrorMessage(cboexp);
+                return;
+            }
+
+            var cboexp = $('#txthostpass');
+            if (!cboexp.val()) {
+                CreateErrorMessage(cboexp);
+                return;
+            }
+
+            SpinerButtonStart($('#btnRestoreDatabse'), 'Wait For Restore..');
+            $('#lblresponsee').text(".");
+            $.ajax({
+                url: '@Url.Action("RestoreDatabaseWithName", "Backup", new { Area = "Maintenance" })',
+                type: 'POST',
+                data: JSON.stringify({ 'dbname': $('#txtNamaBackupfile').val(), 'username': $('#txthostUsername').val(), 'password': $('#txthostpass').val(), 'host': $('#txthostserver').val() }),
+                dataType: 'json',
+                success: function (data) {
+                    SpinerButtonStop($('#btnRestoreDatabse'), 'Wait For Restore..');
+                    switch (data.status) {
+                        case 'success':
+                            $('#lblresponsee').text(data.msg);
+                            $('#lblresponsee').css('color', 'green');
+                            break;
+                        case 'error':
+                            $('#lblresponsee').text(data.msg);
+                            $('#lblresponsee').css('color', 'red');
+                            break;
+                    }
+                },
+                error: function (request, error) {
+                    SpinerButtonStop($('#btnRestoreDatabse'), 'Wait For Restore..');
+                    console.log(request);
+                }
+            });
+
+        }
+
+        function CreateErrorMessage(elements) {
+            elements.addClass("is-invalid");
+            elements.focus();
+            elements.click(function () {
+                elements.removeClass('is-invalid');
+            });
+        }
+    </script>
+}

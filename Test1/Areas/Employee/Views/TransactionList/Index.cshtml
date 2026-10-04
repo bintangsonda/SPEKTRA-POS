@@ -1,0 +1,351 @@
+﻿@model Transaction.Employee.CashierH
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Transaction List";
+}
+<style>
+
+
+
+
+</style>
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/assets/css/custom.css" />
+
+}
+@Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
+@Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
+@Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
+@Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+
+<!--Table Data-->
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+            <i class="ri ri-restaurant-2-line me-2 text-primary" style="font-size: 1.5rem;"></i>
+            <h4 class="card-title mb-0 fw-semibold text-primary">
+                @ViewBag.Title
+            </h4>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-filter p-3">
+        <div class="row g-2 align-items-end">
+
+            <!-- FROM DATE -->
+            <div class="col-6 col-md-2">
+                <div class="form-floating form-floating-outline">
+                    @Html.TextBox(
+                        "FromDate",
+                        new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
+                                .ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                            new {
+                                id = "txtFromDate",
+                                @class = "form-control form-control-sm",
+                                type = "text",
+                                placeholder = "dd/mmm/yyyy"
+                        }
+                    )
+                    <label for="txtFromDate">From</label>
+                </div>
+            </div>
+
+            <!-- TO DATE -->
+            <div class="col-6 col-md-2">
+                <div class="form-floating form-floating-outline">
+                    @Html.TextBox(
+                        "ToDate",
+                        DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                        new {
+                            id = "txtToDate",
+                            @class = "form-control form-control-sm",
+                            type = "text",
+                            placeholder = "dd/mmm/yyyy"
+                        }
+                    )
+                    <label for="txtToDate">To</label>
+                </div>
+            </div>
+
+            <!-- PAY METHOD -->
+            <div class="col-12 col-md-2">
+                <div class="form-floating form-floating-outline">
+                    @Html.DropDownList(
+                        "TransMethod",
+                        ViewData["MethodList"] as SelectList,
+                        "All Method",
+                        new {
+                            @class = "form-control form-control-sm select2",
+                            data_placeholder = "Select Method"
+                        }
+                    )
+                    <label>Pay Method</label>
+                </div>
+            </div>
+
+            <!-- CUSTOMER -->
+            <div class="col-12 col-md-3">
+                <div class="form-floating form-floating-outline">
+                    @Html.DropDownList(
+                        "CustomerName",
+                        ViewData["CustNameList"] as SelectList,
+                        "All Customer",
+                        new {
+                            @class = "form-control form-control-sm select2",
+                            data_placeholder = "Select Customer"
+                        }
+                    )
+                    <label>Customer Name</label>
+                </div>
+            </div>
+             <div class="col-12 col-md-1">
+            <button type="button" class="btn btn-info" onclick="getData()">
+                    <i class="icon-base ri ri-search-line icon-sm text-white"></i>       
+            </button>
+
+        </div>
+    </div>        <div class="card-datatable">
+            <table id="tableData" class="datatables-custom table table-responsive table-sm w-100">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Code</th>
+                        <th>Time</th>
+                        <th>Customer</th>
+                        <th class="text-end">Amount</th>
+                        <th>Method</th>
+                        <th>Type</th>
+                        <th>Remark</th>
+                        <th>Create By</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
+<!--Table Data-->
+<!-- Loading Page -->
+<div id="loading" style="display:none; height:100%; width:100%">
+    <div class="loading-wave" id="loading-content">
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+    </div>
+    <div class="loading loading07">
+        <span data-text="S">S</span>
+        <span data-text="P">P</span>
+        <span data-text="E">E</span>
+        <span data-text="K">K</span>
+        <span data-text="T">T</span>
+        <span data-text="R">R</span>
+        <span data-text="A">A</span>
+    </div>
+</div>
+<!-- Loading Page -->
+
+<div id="PartialSection">
+</div>
+
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/select2/select2.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/popular.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/auto-focus.js"></script>
+    <script src="~/assets/vendor/libs/cleave-zen/cleave-zen.js"></script>
+    <script src="~/assets/js/forms-selects.js"></script>
+    <script src="~/assets/vendor/libs/tagify/tagify.js"></script>
+    <script src="~/assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="~/assets/vendor/libs/bloodhound/bloodhound.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script type="text/javascript">
+        const token = $('input[name="__RequestVerificationToken"]').val();
+        const getDataUrl = '@Url.Action("GetData", "TransactionList", new { area = "Employee" })';
+
+        var table = null;
+        var nilaiTampung = "";
+        $('.select2').select2();
+
+        $(document).ready(function () {
+            flatpickr("#txtFromDate", {
+                dateFormat: "d/M/Y",
+                disableMobile: true,
+                static: true,
+            });
+            flatpickr("#txtToDate", {
+                dateFormat: "d/M/Y",
+                disableMobile: true,
+                static: true,
+            });
+            table=getData();
+            $('#TransMethod,#CustomerName').select2({
+                placeholder: 'All',
+                allowClear: true,
+                width: '100%'
+            });
+        });
+
+        function getData() {
+            return $('#tableData').DataTable({
+                bDestroy: true,
+                processing: true,
+                serverSide: true,
+                "bAutoWidth": true,
+                scrollX: true,
+                ajax: {
+                    url: getDataUrl,
+                    type: 'POST',
+                    dataType: "JSON",
+                    data:{
+                        "TransDateFrom":$("#txtFromDate").val(),
+                        "TransDateTo":$("#txtToDate").val(),
+                        "TransMethod":$("#TransMethod").val(),
+                        "CustName":$("#CustomerName").val(),
+                    }
+                },
+                columns: [
+                    { data: 'action', name: 'action', orderable: false },
+                    { data: "TransCode", name: "TransCode" },
+                     {
+                        "data": "TransDate", "name": "TransDate",
+                        "render": function (data, type, row, meta) {
+                            return moment(row.TransDate).format('DD/MMM/YYYY HH:mm:ss');
+                        }
+                    },
+                    { "data": "CustID", "name": "CustID"},
+                    {
+                        data: "TransTotalAmt",
+                        name: "TransTotalAmt",
+                        render: function (data) {
+                            return Number(data).toLocaleString('id-ID');
+                        }
+                    },
+                    { "data": "TransPayMtd", "name": "TransPayMtd" },
+                    { "data": "TransPayType", "name": "TransPayType" },
+                    { "data": "TransRemark", "name": "TransRemark" },
+                    { "data": "OperatorID", "name": "OperatorID" },
+                   
+                ],
+                columnDefs: [
+                    {
+                        targets: [0],
+                        title: 'Actions',
+                        searchable: false,
+                        orderable: false,
+                        render: (data, type, full, meta) => {
+                            return `
+                        <div class="d-flex align-items-center">
+                            
+                            <a href="javascript:;"
+                               class="btn btn-icon btn-text-warning rounded-pill edit-record"
+                               data-code="${full.TransCode}">
+                                <i class="icon-base ri ri-pencil-line icon-md text-warning"></i>
+                            </a>
+
+
+                        </div>
+                    `;
+                        }
+                    },
+
+
+                    {
+                        "targets": [1]
+                    },
+                    {
+                        "targets": [2]
+                    },
+                    {
+                        "targets": [3]
+                    },
+                    {
+                        class:"text-end",
+                        "targets": [4]
+                    },
+                    {
+                        "targets": [5]
+                    },
+                    {
+                        "targets": [6]
+                    },
+                    {
+                        "targets": [7]
+                    },
+                    {
+                        "targets": [8]
+                    },
+
+                ],
+                select: {
+                    style: 'os',
+                },
+                order: [[2, 'desc']],
+                layout: {
+                    topStart: {
+                        rowClass: 'row m-2 my-0 mt-0 justify-content-between',
+                        features: [
+                            {
+                                pageLength: {
+                                    menu: [[1, 10, 25, 50, 100, 1000, -1], [1, 10, 25, 50, 100, 1000, "All"]],
+                                    text: 'Show _MENU_ entries'
+                                }
+                            },
+                        ]
+                    },
+                    topEnd: {
+                        features: [
+                            {
+                                search: {
+                                    placeholder: 'Search User',
+                                    text: '_INPUT_'
+                                }
+                            },
+
+                        ]
+                    },
+                    bottomStart: {
+                        rowClass: 'row mx-3 justify-content-between',
+                        features: ['info']
+                    },
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    paginate: {
+                        next: '<i class="icon-base ri ri-arrow-right-s-line scaleX-n1-rtl icon-22px"></i>',
+                        previous: '<i class="icon-base ri ri-arrow-left-s-line scaleX-n1-rtl icon-22px"></i>',
+                        first: '<i class="icon-base ri ri-skip-back-mini-line scaleX-n1-rtl icon-22px"></i>',
+                        last: '<i class="icon-base ri ri-skip-forward-mini-line scaleX-n1-rtl icon-22px"></i>'
+                    }
+                },
+
+
+            });
+
+
+        }
+
+        $('.datatables-custom').on('click', '.edit-record', function () {
+            const code = $(this).data('code');
+            var url = '@Url.Action("Edit", "TransactionList", new { area = "Employee" })' 
+              + '?TransCode=' + code;
+
+            window.location.href = url;
+
+        });
+
+
+
+
+
+    </script>
+}

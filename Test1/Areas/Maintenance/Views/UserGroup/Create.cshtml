@@ -1,0 +1,779 @@
+﻿@model IEnumerable<IDS.Maintenance.UserGroup>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "User Group List";
+}
+
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    @* <link rel="stylesheet" type="text/css" href="~/Content/loader.css" /> *@
+    <style>
+        table.table.dataTable > tbody > tr {
+            background-color: transparent;
+            font-size: 11px;
+        }
+
+        .datatables-users thead th {
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .datatables-users th,
+        .datatables-users td {
+            padding-top: 3px;
+            padding-bottom: 3px;
+            padding-left: 12px;
+            padding-right: 12px;
+            font-size: 12px;
+            vertical-align: middle; /* supaya teks tidak nempel atas */
+        }
+    </style>
+}
+<div id="loading" style="display:none; height:100%; width:100%">
+    <div class="loading-wave " id="loading-content">
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+    </div>
+    <div class="loading loading07">
+        <span data-text="I">I</span>
+        <span data-text="N">N</span>
+        <span data-text="T">T</span>
+        <span data-text="I">I</span>
+        <span data-text="D">D</span>
+        <span data-text="A">A</span>
+        <span data-text="T">T</span>
+        <span data-text="A">A</span>
+    </div>
+</div>
+
+
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+
+
+
+    <div class="alert alert-solid-success" role="alert">
+        This is a success solid alert — check it out!
+    </div>
+    <!-- Users List Table -->
+    <div class="card">
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">User Group</h5>
+            <div class="d-flex justify-content-between align-items-center row gx-5 pt-4 gap-5 gap-md-0">
+                <div class="col-md-4 user_role"></div>
+                <div class="col-md-4 user_plan"></div>
+                <div class="col-md-4 user_status"></div>
+            </div>
+        </div>
+        <div class="card-datatable">
+            <table id="tableData" class="datatables-users table table-sm">
+                <thead>
+                    <tr>
+                        <th>User Group Code</th>
+                        <th>User Group Name</th>
+                        <th>User Group Parent</th>
+                        <th>Operator ID</th>
+                        <th>Last Update</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="offcanvas offcanvas-end"
+             tabindex="-1"
+             id="offcanvasAddUser"
+             aria-labelledby="offcanvasAddUserLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Add User</h5>
+                <button type="button"
+                        class="btn-close text-reset"
+                        data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+            </div>
+            @* <div class="offcanvas-body mx-0 flex-grow-0 h-100">
+            @using (Html.BeginForm(null, null, FormMethod.Get, new { @id = "formCreateEdit" }))
+            {
+            @Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+            @Html.Hidden("FormSave", "0")
+            ;
+            @Html.AntiForgeryToken()
+            <script type="text/javascript">
+            $('form#formCreateEdit').removeData("validator");
+            $('form#formCreateEdit').removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse($('form#formCreateEdit'));
+            </script>
+            <div class="form-floating form-floating-outline mb-1">
+            @Html.EditorFor(model => model.UserID, new
+            {
+            htmlAttributes = new
+            {
+            @class = "form-control form-control-sm",
+            @id = "txtUserID",
+            @placeholder = "User ID",
+            @maxlength = "20",
+            @aria_label = "User ID"
+            }
+            })
+            @Html.ValidationMessageFor(model => model.UserID, "", new { @class = "text-danger" })
+            <label for="txtUserID">User ID</label>
+            </div>
+            <div class="form-floating form-floating-outline mb-3">
+            @Html.EditorFor(model => model.UserName, new
+            {
+            htmlAttributes = new
+            {
+            @class = "form-control form-control-sm",
+            @id = "txtUserName",
+            @placeholder = "User Name",
+            @maxlength = "20",
+            @aria_label = "User Name"
+            }
+            })
+            @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+            <label for="txtUserName">User Name</label>
+            </div>
+            <div class="form-floating form-floating-outline mb-3">
+            @Html.EditorFor(model => model.Password, new
+            {
+            htmlAttributes = new
+            {
+            @class = "form-control form-control-sm",
+            @id = "txtPassword",
+            @placeholder = "Password",
+            @maxlength = "20",
+            @aria_label = "Password"
+            }
+            })
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            <label for="txtUserName">Password</label>
+            </div>
+            <div class="form-floating form-floating-outline mb-3">
+            @Html.EditorFor(model => model.ConfirmPassword, new
+            {
+            htmlAttributes = new
+            {
+            @class = "form-control form-control-sm",
+            @id = "txtConfirmPassword",
+            @placeholder = "Confirm Password",
+            @maxlength = "20",
+            @aria_label = "Confirm Password"
+            }
+            })
+            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+            <label for="txtUserName">Confirm Password</label>
+            </div>
+
+            <div class="form-floating form-floating-outline mb-3">
+            @Html.DropDownListFor(model => model.Branch.BranchCode,
+            (SelectList)ViewData["SelectListBranch"],
+            "", // untuk opsi kosong di atas
+            new
+            {
+            @id = "cboBranch",
+            @class = "form-select select2DDList",
+            })
+            <label for="cboBranch">Branch</label>
+            @Html.ValidationMessageFor(model => model.Branch.BranchCode, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating form-floating-outline mb-3">
+            @Html.DropDownListFor(model => model.UserGroup.GroupCode,
+            (SelectList)ViewData["SelectListGroup"],
+            "", // untuk opsi kosong di atas
+            new
+            {
+            @id = "cboUserGroup",
+            @class = "form-select select2DDList",
+            })
+            <label for="cboUserGroup">User Group</label>
+            @Html.ValidationMessageFor(model => model.UserGroup.GroupCode, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating form-floating-outline mb-3">
+            @Html.EditorFor(model => model.EmailAddress, new
+            {
+            htmlAttributes = new
+            {
+            @class = "form-control form-control-sm",
+            @id = "txtEmailAddress",
+            @placeholder = "Email Address",
+            @maxlength = "120",
+            @aria_label = "Email Address"
+            }
+            })
+            @Html.ValidationMessageFor(model => model.EmailAddress, "", new { @class = "text-danger" })
+            <label for="txtEmailAddress">Email</label>
+            </div>
+            <div class="form-floating form-floating-outline mb-5">
+            @Html.DropDownListFor(model => model.Status,
+            (SelectList)ViewData["SelectListStatus"],
+            "", // untuk opsi kosong di atas
+            new
+            {
+            @id = "cboStatus",
+            @class = "form-select select2DDList",
+            })
+            <label for="cboBranch">Status</label>
+            @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+            </div>
+            }
+            <button type="submit" class="btn btn-primary me-sm-3 me-1 data-submit" id="btnSave">Submit</button>
+            <button type="reset" class="btn btn-outline-danger" data-bs-dismiss="offcanvas">Cancel</button>
+            </div> *@
+        </div>
+    </div>
+</div>
+
+
+<div id="PartialSection">
+</div>
+
+@section Scripts {
+
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+
+    <script type="text/javascript">
+        $('.select2DDList').select2({
+            width: 'resolve' // important to make it follow the 100% style
+        });
+
+        $(document).ready(function () {
+            RefreshUserGroup();
+        });
+
+        function RefreshUserGroup() {
+             $('#tableData').DataTable({
+                "bDestroy": true,
+                "columnDefs": [
+                    {
+                        "targets": 'no-sort',
+                        "orderable": false,
+                    },
+
+                    {
+                        "width": "150px",
+                        "orderable": true,
+                        "targets": [0]
+                    },
+                    {
+                        "width": "180px",
+                        "orderable": true,
+                        "targets": [1]
+                    },
+                    {
+                        "width": "180px",
+                        "orderable": true,
+                        "targets": [2]
+                    },
+                    {
+                        "width": "110px",
+                        "orderable": true,
+                        "targets": [3]
+                    },
+                    {
+                        "width": "150px",
+                        "orderable": true,
+                        "targets": [4]
+                    },
+                    {
+                         "width": "100px",
+                         "orderable": false,
+                         "targets":[5]
+                    },
+
+                ],
+                "select": {
+                    "style": 'os'
+                },
+                "language":
+                {
+                    "search": "",
+                    "searchPlaceholder": "Search...",
+                    "emptyTable": "No record found.",
+                    "processing": "<div class='overlay custom-loader-background' style='background: transparent !important;'><i class='fa fa-spinner fa-spin custom-loader-color' style='font-size:30px;color:#2196F3'></i></div>"
+                },
+                "processing": "true",
+                "order": [[1, "asc"]],
+                 layout: {
+                    topStart: {
+                        rowClass: 'row m-2 my-0 mt-0 justify-content-between',
+                        features: [
+                            {
+                                buttons: [
+                                    {
+                                        extend: 'collection',
+                                        className: 'btn btn-outline-secondary dropdown-toggle waves-effect',
+                                        text: '<span class="d-flex align-items-center gap-2"><i class="icon-base ri ri-upload-2-line icon-16px me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span></span>',
+                                        buttons: [
+                                            {
+                                                extend: 'print',
+                                                text: `<span class="d-flex align-items-center"><i class="icon-base ri ri-printer-line me-1"></i>Print</span>`,
+                                                exportOptions: {
+                                                    columns: [0,1,2,3,4],
+                                                    format: {
+                                                        body: function (inner, coldex, rowdex) {
+                                                            if (inner.length <= 0) return inner;
+                                                            const el = new DOMParser().parseFromString(inner, 'text/html').body.childNodes;
+                                                            let result = '';
+                                                            el.forEach(item => {
+                                                                if (item.classList && item.classList.contains('user-name')) {
+                                                                    result += item.lastChild.firstChild.textContent;
+                                                                } else {
+                                                                    result += item.textContent || item.innerText || '';
+                                                                }
+                                                            });
+                                                            return result;
+                                                        }
+                                                    }
+                                                },
+                                                customize: function (win) {
+                                                    win.document.body.style.color = config.colors.headingColor;
+                                                    win.document.body.style.borderColor = config.colors.borderColor;
+                                                    win.document.body.style.backgroundColor = config.colors.bodyBg;
+                                                    const table = win.document.body.querySelector('table');
+                                                    table.classList.add('compact');
+                                                    table.style.color = 'inherit';
+                                                    table.style.borderColor = 'inherit';
+                                                    table.style.backgroundColor = 'inherit';
+                                                }
+                                            },
+                                            {
+                                                extend: 'csv',
+                                                text: `<span class="d-flex align-items-center"><i class="icon-base ri ri-file-text-line me-1"></i>Csv</span>`,
+                                                exportOptions: {
+                                                    columns: [0,1,2,3,4],
+                                                    format: {
+                                                        body: function (inner, coldex, rowdex) {
+                                                            if (inner.length <= 0) return inner;
+                                                            const el = new DOMParser().parseFromString(inner, 'text/html').body.childNodes;
+                                                            let result = '';
+                                                            el.forEach(item => {
+                                                                if (item.classList && item.classList.contains('user-name')) {
+                                                                    result += item.lastChild.firstChild.textContent;
+                                                                } else {
+                                                                    result += item.textContent || item.innerText || '';
+                                                                }
+                                                            });
+                                                            return result;
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                extend: 'excel',
+                                                text: `<span class="d-flex align-items-center"><i class="icon-base ri ri-file-excel-line me-1"></i>Excel</span>`,
+                                                exportOptions: {
+                                                    columns: [0,1,2,3,4],
+                                                    format: {
+                                                        body: function (inner, coldex, rowdex) {
+                                                            if (inner.length <= 0) return inner;
+                                                            const el = new DOMParser().parseFromString(inner, 'text/html').body.childNodes;
+                                                            let result = '';
+                                                            el.forEach(item => {
+                                                                if (item.classList && item.classList.contains('user-name')) {
+                                                                    result += item.lastChild.firstChild.textContent;
+                                                                } else {
+                                                                    result += item.textContent || item.innerText || '';
+                                                                }
+                                                            });
+                                                            return result;
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                extend: 'pdf',
+                                                text: `<span class="d-flex align-items-center"><i class="icon-base ri ri-file-pdf-line me-1"></i>Pdf</span>`,
+                                                exportOptions: {
+                                                    columns: [0,1,2,3,4],
+                                                    format: {
+                                                        body: function (inner, coldex, rowdex) {
+                                                            if (inner.length <= 0) return inner;
+                                                            const el = new DOMParser().parseFromString(inner, 'text/html').body.childNodes;
+                                                            let result = '';
+                                                            el.forEach(item => {
+                                                                if (item.classList && item.classList.contains('user-name')) {
+                                                                    result += item.lastChild.firstChild.textContent;
+                                                                } else {
+                                                                    result += item.textContent || item.innerText || '';
+                                                                }
+                                                            });
+                                                            return result;
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                extend: 'copy',
+                                                text: `<i class="icon-base ri ri-file-copy-line me-1"></i>Copy`,
+                                                exportOptions: {
+                                                    columns: [0,1,2,3,4],
+                                                    format: {
+                                                        body: function (inner, coldex, rowdex) {
+                                                            if (inner.length <= 0) return inner;
+                                                            const el = new DOMParser().parseFromString(inner, 'text/html').body.childNodes;
+                                                            let result = '';
+                                                            el.forEach(item => {
+                                                                if (item.classList && item.classList.contains('user-name')) {
+                                                                    result += item.lastChild.firstChild.textContent;
+                                                                } else {
+                                                                    result += item.textContent || item.innerText || '';
+                                                                }
+                                                            });
+                                                            return result;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    topEnd: {
+                        features: [
+                            {
+                                search: {
+                                    placeholder: 'Search User',
+                                    text: '_INPUT_'
+                                }
+                            },
+                            {
+                                buttons: [
+                                    {
+                                        text: '<i class="icon-base ri ri-add-line icon-sm me-0 me-sm-2 d-sm-none d-inline-block"></i><span class="d-none d-sm-inline-block">Add New User</span>',
+                                        className: 'add-new btn btn-primary',
+                                        attr: {
+                                            'data-bs-toggle': 'offcanvas',
+                                            'data-bs-target': '#offcanvasAddUser'
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    bottomStart: {
+                        rowClass: 'row mx-3 justify-content-between',
+                        features: ['info']
+                    },
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    paginate: {
+                        next: '<i class="icon-base ri ri-arrow-right-s-line scaleX-n1-rtl icon-22px"></i>',
+                        previous: '<i class="icon-base ri ri-arrow-left-s-line scaleX-n1-rtl icon-22px"></i>',
+                        first: '<i class="icon-base ri ri-skip-back-mini-line scaleX-n1-rtl icon-22px"></i>',
+                        last: '<i class="icon-base ri ri-skip-forward-mini-line scaleX-n1-rtl icon-22px"></i>'
+                    }
+                },
+                "serverSide": "true",
+                "lengthMenu": [[1, 10, 20, 50, 100, 1000, -1], [1, 10, 20, 50, 100, 1000, "All"]],
+                "pageLength": 10,
+                "ajax":
+                {
+                    "url": '@Url.Action("GetData", "UserGroup", new { Area = "Maintenance" })',
+                    "type": "POST",
+                    "dataType": "JSON",
+                        "dataSrc": function (json) {
+            console.log(json); // Check what structure you're getting
+            return json.data;
+        }
+                },
+                "columns": [
+                    { "data": "GroupCode", "name": "GroupCode" },
+                    { "data": "GroupName", "name": "GroupName" },
+                    { "data": "GroupParent", "name": "GroupParent" },
+                    { "data": "OperatorID", "name": "OperatorID" },
+                    {
+                        "data": "LastUpdate", "name": "LastUpdate",
+                        "render": function (data, type, row, meta) {
+                            return moment(row.LastUpdate).format('DD/MMM/YYYY HH:mm:ss');
+                        }
+                    },
+                    {
+                        "data": "GroupCode", "name": "GroupCode",
+                        "render": function (data, type, row, meta) {
+                            return `<div class="d-flex align-items-center">
+                        <a href="javascript:;" class="btn btn-icon btn-text-secondary rounded-pill delete-record">
+                          <i class="icon-base ri ri-delete-bin-7-line icon-md"></i>
+                        </a>
+                        <a href="" class="btn btn-icon btn-text-secondary rounded-pill">
+                          <i class="icon-base ri ri-eye-line icon-md"></i>
+                        </a>
+                        <a href="javascript:;" class="btn btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                          <i class="icon-base ri ri-more-2-line icon-md"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end m-0">
+                          <a href="javascript:;" class="dropdown-item">Edit</a>
+                          <a href="javascript:;" class="dropdown-item">Suspend</a>
+                        </div>
+                      </div>`;
+                        }
+                    },
+
+                ]
+            });
+        }
+
+        function LoadCreateNewForm() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("Create", "UserGroup", new { Area = "Maintenance" })',
+                contentType: 'application/html; charset=utf-8',
+                dataType: 'html',
+                success: function (result) {
+                    $('#loadingModal').modal('hide');
+                    $('#PartialSection').empty();
+                    $("#PartialSection").html(result);
+                    //$("form#formCreateEdit")[0].reset();
+                    $("#modalTitle").html("Create Data");
+                    $("#CreateEditForm").modal('show');
+                    $('.select2DDList').select2();
+                },
+                error: function (status) {
+                    $('#loadingModal').modal('hide');
+                    alert('');
+                }
+            });
+        }
+
+
+
+        function LoadEditForm() {
+            var form = this;
+            var table = $('#tableData').DataTable();
+            var selRow = table.rows('.selected').data();
+            var data = null;
+
+            if (selRow.length > 0) {
+                data = selRow[0]["GroupCode"];
+
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("Edit", "UserGroup", new { Area = "Maintenance" })',
+                    data: {
+                        'GroupCode': data
+                    },
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#loadingModal').modal('hide');
+                        $('#PartialSection').empty();
+                        $("#PartialSection").html(result);
+                        $("#modalTitle").html("Edit Data");
+                        $("#GroupCode").attr('readonly', 'true');
+                        $("#CreateEditForm").modal('show');
+                        $('.select2DDList').select2();
+                    },
+                    error: function (status) {
+                        $('#loadingModal').modal('hide');
+                        alert('');
+                    }
+                });
+            }
+            else {
+                alert("Please select data to be edit");
+            }
+        }
+
+        function LoadPrivileges() {
+            var myElement = document.getElementById("tableData");
+            if (!myElement) {
+                return;
+            }
+
+            var tbl_ = $('#tableData').DataTable();
+            var tblData_ = tbl_.rows('.selected').data();
+            var tblDatalength_ = tblData_.length;
+            if (tblDatalength_ <= 0) {
+                NoAccessModal("You Must Be Selected First!");
+                return;
+            }
+
+            debugger;
+            var param = tblData_[0].GroupCode;
+            var GroupName = tblData_[0].GroupName;
+            var urlParam = "";
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GenerateUrlParam", "Helper", new { Area = "Tools" })',
+                data: { "param": param },
+                dataType: "json",
+                success: function (respond) {
+
+                    urlParam = respond;
+
+                    var url = '@Url.Action("Privileges", "UserGroup", new { Area = "Maintenance" })';
+                    window.location.href = url + "?k=" + urlParam;
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.log(xhr.responseText);
+                }
+            });
+
+            }
+
+
+
+
+        function txtprojectmainchangeHandler(elem) {
+            // isi tabel
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("LoadMntGroupUser", "UserGroup", new { Area = "Maintenance" })',
+                data: JSON.stringify({ 'ProjectName': $('#txtprojectmain option:selected').text(), 'Groupcode': $('#txtgroupcode').val() }),
+                dataType: "json",
+                success: function (datajson) {
+                    GetLlistPriveleges(datajson)
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+        var tblPriv;
+
+
+
+        function btnPrivilegesBack_click() {
+             RefreshUserGroupPage();
+        }
+
+        function btnPrivilegesSave_click() {
+            var tbl_ = $('#tblprivileges').DataTable();
+            var $table = tbl_.table().node();
+            var $chkbox_all = $('tbody input[type="checkbox"]', $table);
+            var $chkbox_checked = $('tbody input[type="checkbox"]:checked', $table);
+            var chkbox_select_all = $('thead input[name="select_all"]', $table).get(0);
+            if ($chkbox_checked.length === 0) {
+                NoAccessModal("You Must Be Selected First!");
+                return
+            }
+
+            var Groupcode = {};
+            jsonObj = [];
+            var values = $('#tblprivileges input:checked').map(function () {
+                var data = tbl_.row($(this).closest('tr')).data();
+                //console.log(data.FrmName + "'s next columns name is: " + data.MenuName);
+                item = {}
+                item["hfURL"] = data.FrmName;
+                jsonObj.push(item);
+                return this.value;
+            })//.get().join(',');// <-- ini bisa juga di pakai untuk joint textnya (dengan koma sebagai pemisah)
+            Groupcode.Groupcode = $("#txtgroupcode").val();
+            Groupcode.Akses = $("#cbopermission").val();
+            if (jsonObj.length > 0) {
+                Groupcode.Data = jsonObj
+               $.ajax({
+                type: "POST",
+                url: '@Url.Action("MultiSaveToMntGroupAccess", "UserGroup", new { Area = "Maintenance" })',
+                data: JSON.stringify(Groupcode),
+                dataType: "json",
+                success: function (datajson) {
+                    //Refresh Tabel
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("LoadMntGroupUser", "UserGroup", new { Area = "Maintenance" })',
+                        data: JSON.stringify({ 'ProjectName': $('#txtgroupname').val(), 'Groupcode': $('#txtgroupcode').val() }),
+                        dataType: "json",
+                        success: function (datajson) {
+                            GetLlistPriveleges(datajson)
+                        },
+                        error: function (xhr, status, errorThrown) {
+                            console.log(xhr.responseText);
+                        }
+                    });
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.log(xhr.responseText);
+                }
+                });
+            }// End If
+
+
+        }
+
+        function updateDataTableSelectAllCtrl(table) {
+            var $table = table.table().node();
+            var $chkbox_all = $('tbody input[type="checkbox"]', $table);
+            var $chkbox_checked = $('tbody input[type="checkbox"]:checked', $table);
+            var chkbox_select_all = $('thead input[name="select_all"]', $table).get(0);
+
+
+
+        }
+
+        function Delete() {
+            var tbl_ = $('#tableData').DataTable();
+            var form = this;
+          var selRow = tbl_.rows('.selected').data();
+
+            if (selRow == null || selRow == 'undefined' || selRow.length == 0) {
+                alert("Please select the data you want to delete");
+                return false;
+            }
+
+            var dataCollection = '';
+            var data = '';
+
+            $.each(selRow, function (index, row) {
+                data += row["GroupCode"] + ',';
+                dataCollection += '[' + row["GroupCode"] + '] - ' + row["GroupName"] + "\n";
+            })
+
+            var answer = confirm("You are about to delete data:\n" + dataCollection + "\nAre you sure want to delete the data ?");
+
+
+
+            if (answer) {
+                if (dataCollection.length > 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Delete", "UserGroup", new { Area = "Maintenance" })',
+                        data: { "groupCodeList": data },
+                        dataType: 'JSON',
+                        success: function (respond) {
+                            switch (respond) {
+                                case "NoAccess":
+                                    alert("No Access");
+                                    break;
+                                case "Success":
+                                    RefreshUserGroup();
+                                    alert(respond);
+        @*window.location.href = '@Url.Action("index", "Bank", new { Area = "GeneralTable" })'*@
+                                    break;
+                                default:
+                                    RefreshUserGroup();
+                                    //RefreshUserGroupPage()
+                                    alert(respond);
+        @*window.location.href = '@Url.Action("index", "Bank", new { Area = "GeneralTable" })'*@
+                                    break;
+                            }
+
+                        },
+                        error: function (respond) {
+                            alert(respond);
+                        }
+                    })
+                }
+            }
+            else {
+                return false;
+            }
+
+        }
+
+
+    </script>
+}

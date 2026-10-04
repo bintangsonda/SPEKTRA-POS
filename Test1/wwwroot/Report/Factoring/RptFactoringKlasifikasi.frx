@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="11/12/2025 16:52:25" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4TTUmlMwNE9aXcyvMJ0araC">
+      <ProcedureDataSource Name="SelRptFactAsset_Liabilty" DataType="System.Int32" PropName="_1SelRptFactAsset_Liabilty" Enabled="true" TableName="SelRptFactAsset_Liabilty" SelectCommand="SelRptFactAsset_Liabilty">
+        <Column Name="Nama" DataType="System.String"/>
+        <Column Name="Limit" DataType="System.Decimal"/>
+        <Column Name="ExpDate" DataType="System.DateTime"/>
+        <Column Name="RateBunga" DataType="System.Double"/>
+        <Column Name="NoDaftarPenerimaan" DataType="System.String"/>
+        <Column Name="PokokPembagian" DataType="System.Decimal"/>
+        <Column Name="NilaiJaminanInvoice" DataType="System.Decimal"/>
+        <Column Name="PeriodePembagianStart" DataType="System.DateTime"/>
+        <Column Name="PeriodePembagianEnd" DataType="System.DateTime"/>
+        <Column Name="Kategori" DataType="System.Int32"/>
+        <Column Name="Klasifikasi" DataType="System.String"/>
+        <ProcedureParameter Name="@Tanggal" DataType="22" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPPeriod" DataType="System.String" AsString=""/>
+    <Total Name="sumlimit" Expression="[SelRptFactAsset_Liabilty.Limit]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="sumpokok" Expression="[SelRptFactAsset_Liabilty.PokokPembagian]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="suminvoice" Expression="[SelRptFactAsset_Liabilty.NilaiJaminanInvoice]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="grandlimit" Expression="[SelRptFactAsset_Liabilty.Limit]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="grandpokok" Expression="[SelRptFactAsset_Liabilty.PokokPembagian]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="grandinvoice" Expression="[SelRptFactAsset_Liabilty.NilaiJaminanInvoice]" Evaluator="Data1" PrintOn="DataFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="1088.64" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="319.41" Top="9.45" Width="449.82" Height="22.68" Text="Factoring Aging" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="966.41" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="956.96" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="956.96" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text66" Left="446.99" Top="32.13" Width="194.67" Height="22.68" Text="Due Date: [RPPeriod]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text67" Left="-9450" Top="-9450" Width="449.82" Height="22.68" Text="Transaction Listing By Account" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <ChildBand Name="Child2" Top="71.24" Width="1088.64" Height="15.57" Border.Lines="Top, Bottom">
+        <TextObject Name="Text76" Left="280.94" Width="117.43" Height="15.12" Text="Limit" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text77" Left="1.02" Width="280.17" Height="15.12" Text="Nama" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text78" Left="402.37" Width="66.15" Height="15.12" Text="Exp Date" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text79" Left="648.1" Width="127.83" Height="15.12" Text="Pembiayaan" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text80" Left="505.07" Width="143.03" Height="15.12" Text="SOA No." Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text81" Left="775.93" Width="129.43" Height="15.12" Text="Invoice" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text83" Left="468.52" Width="34.15" Height="15.12" Text="Rate" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text84" Left="910.96" Width="65.35" Height="15.12" Text="Periode Start" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text85" Left="976.31" Width="60.55" Height="15.12" Text="Periode End" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text86" Left="1036.86" Width="51.25" Height="15.12" Text="Month Diff" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </ChildBand>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="90.01" Width="1088.64" Height="15.12" Border.Lines="Bottom" Condition="[SelRptFactAsset_Liabilty.Klasifikasi]" SortOrder="None">
+      <TextObject Name="Text87" Left="1.02" Width="949.77" Height="15.12" Text="[SelRptFactAsset_Liabilty.Klasifikasi]" Padding="0, 0, 0, 0" Font="Arial, 9pt, style=Bold"/>
+      <DataBand Name="Data1" Top="108.33" Width="1088.64" Height="15.12" DataSource="SelRptFactAsset_Liabilty">
+        <TextObject Name="Text88" Left="1.02" Width="280.17" Height="15.12" Text="[SelRptFactAsset_Liabilty.Nama]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text89" Left="280.94" Width="117.43" Height="15.12" Text="[SelRptFactAsset_Liabilty.Limit]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text90" Left="402.37" Width="66.15" Height="15.12" Text="[SelRptFactAsset_Liabilty.ExpDate]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text91" Left="468.52" Width="34.15" Height="15.12" Text="[SelRptFactAsset_Liabilty.RateBunga]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text92" Left="505.07" Width="143.03" Height="15.12" Text="[SelRptFactAsset_Liabilty.NoDaftarPenerimaan]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text93" Left="648.1" Width="127.83" Height="15.12" Text="[SelRptFactAsset_Liabilty.PokokPembagian]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text94" Left="775.93" Width="129.43" Height="15.12" Text="[SelRptFactAsset_Liabilty.NilaiJaminanInvoice]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text95" Left="910.96" Width="65.35" Height="15.12" Text="[SelRptFactAsset_Liabilty.PeriodePembagianStart]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text96" Left="976.31" Width="60.55" Height="15.12" Text="[SelRptFactAsset_Liabilty.PeriodePembagianEnd]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+        <TextObject Name="Text97" Left="1036.86" Width="51.25" Height="15.12" Text="[SelRptFactAsset_Liabilty.Kategori]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator="." Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+        <Sort>
+          <Sort Expression="[SelRptFactAsset_Liabilty.Kategori]"/>
+        </Sort>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="126.65" Width="1088.64" Height="22.32">
+        <TextObject Name="Text98" Left="1.02" Width="280.17" Height="15.12" Text="Sub Total:" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text99" Left="280.94" Width="117.43" Height="15.12" Border.Lines="Bottom" Text="[sumlimit]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text100" Left="648.1" Width="127.83" Height="15.12" Border.Lines="Bottom" Text="[sumpokok]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text101" Left="781.53" Width="123.83" Height="15.12" Border.Lines="Bottom" Text="[suminvoice]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </GroupFooterBand>
+      <DataFooterBand Name="DataFooter1" Top="152.17" Width="1088.64" Height="15.12">
+        <TextObject Name="Text102" Left="280.94" Width="117.43" Height="15.12" Border.Lines="Bottom" Border.BottomLine.Style="Double" Text="[grandlimit]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text103" Left="648.1" Width="127.83" Height="15.12" Border.Lines="Bottom" Border.BottomLine.Style="Double" Text="[grandpokok]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text104" Left="781.53" Width="123.83" Height="15.12" Border.Lines="Bottom" Border.BottomLine.Style="Double" Text="[grandinvoice]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text105" Left="1.02" Width="280.17" Height="15.12" Text="Grand Total:" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </DataFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

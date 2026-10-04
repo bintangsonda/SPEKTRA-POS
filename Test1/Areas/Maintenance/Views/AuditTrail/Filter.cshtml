@@ -1,0 +1,131 @@
+﻿@model List<IDS.Maintenance.AuditTrail>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Filter";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/assets/css/print.css" media="print" />
+<style>
+    .card-body p {
+        font-size:11px;
+    }
+
+        .timeline.timeline-center .timeline-item.timeline-item-right .timeline-event-time, .timeline.timeline-center .timeline-item:nth-of-type(even):not(.timeline-item-left, .timeline-item-right) .timeline-event-time {
+            inset-inline-start: -12.2rem !important;
+        }
+</style>
+}
+<div class="row invoice-preview">
+    <!-- Invoice -->
+    <div class="col-xl-9 col-md-8 col-12 mb-md-0 mb-6">
+        <div class="card invoice-preview-card p-sm-12 p-6">
+            <div class="card-body invoice-preview-header rounded-4 p-6">
+                <div class="d-flex justify-content-between flex-xl-row flex-md-column flex-sm-row flex-column text-heading align-items-xl-center align-items-md-start align-items-sm-center flex-wrap gap-6">
+                    <div>
+                        <div class="d-flex svg-illustration align-items-center gap-2 mb-6">
+                            <span class="app-brand-logo demo">
+                                <span class="text-primary">
+                                    <img src="~/assets/img/Logo/FISCUS1.png" alt="Logo" style="height: 60px;">
+                                </span>
+                            </span>
+                        </div>
+                       
+                    </div>
+                  
+                </div>
+            </div>
+            <div class="card-body py-6 px-0">
+                <div class="d-flex justify-content-between flex-wrap gap-6">
+                    <div>
+                        <h6>Filters:</h6>
+                        <p class="mb-1">Date : @ViewData["From"] - @ViewData["To"]</p>
+                        <p class="mb-1">Data : @ViewData["Data"]</p>
+                        <p class="mb-1">User : @ViewData["User"]</p>
+                        <p class="mb-1">Generated at: @DateTime.Now.ToString("dd MMM yyyy hh:mm")</p>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row overflow-hidden">
+                <div class="col-12">
+                    <ul class="timeline timeline-center mt-12">
+                        @foreach(var item in Model)
+                        {
+                            <li class="timeline-item">
+                                <span class="timeline-indicator timeline-indicator-primary aos-init aos-animate" data-aos="zoom-in" data-aos-delay="200">
+                                    <i class="icon-base ri ri-chat-history-line"></i>
+                                </span>
+                                <div class="timeline-event card p-0 aos-init aos-animate" data-aos="fade-right">
+                                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                                        <h6 class="card-title mb-0">@item.TableName</h6>
+                                        <div class="meta">
+                                            @if(item.Status == "INSERT")
+                                            {
+                                                <span class="badge rounded-pill bg-label-success">Insert</span>
+                                            }
+                                            else if(item.Status == "UPDATE")
+                                            {
+                                                <span class="badge rounded-pill bg-label-primary">Update</span>
+                                            }
+                                            else if(item.Status == "DELETE")
+                                            {
+                                                <span class="badge rounded-pill bg-label-danger">Delete</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge rounded-pill bg-label-warning">@item.Status</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        @foreach(var detail in item.Details)
+                                        {
+                                            if(item.Status == "INSERT" || item.Status == "DELETE")
+                                            {
+                                                <p class="mb-2">@detail.ColumnName : @detail.NewValue</p>
+
+                                            }
+                                            else
+                                            {
+                                                <p class="mb-2">@detail.ColumnName : <del>@detail.OldValue</del> → @detail.NewValue</p>
+
+                                            }
+                                        }
+                                        
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap mt-2">
+                                            <div>
+                                                <p class="text-body-secondary mb-2">By: @item.UserId</p>
+                                                <p class="text-body-secondary mb-2">Key: @item.Key</p>
+@*                                                 <p class="text-body-secondary mb-2">Timestamp: @item.UpdatedDate.ToString("dd MMM yyyy hh:mm")</p>
+ *@
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-event-time ">@item.UpdatedDate.ToString("dd MMM yyyy hh:mm")</div>
+                                </div>
+                            </li>
+                        }
+                       
+
+                     
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-4 col-12 invoice-actions">
+        <div class="card">
+            <div class="card-body">
+               
+                @* <button class="btn btn-outline-secondary d-grid w-100 mb-4 waves-effect">Download</button> *@
+
+                <a class="btn btn-outline-secondary d-grid w-100 me-4 waves-effect" target="_blank" onclick="window.print()" href="#">
+                        Print
+                    </a>
+               
+            </div>
+        </div>
+    </div>
+</div>
+

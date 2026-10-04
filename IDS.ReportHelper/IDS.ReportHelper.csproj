@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FastReport.OpenSource" Version="2026.1.2" />
+    <PackageReference Include="FastReport.OpenSource.Web" Version="2026.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IDS.DataAccess\SPOS.DataAccess.csproj" />
+    <ProjectReference Include="..\IDS.GeneralTable\IDS.GeneralTable.csproj" />
+    <ProjectReference Include="..\IDS.Tool\IDS.Tool.csproj" />
+  </ItemGroup>
+
+</Project>

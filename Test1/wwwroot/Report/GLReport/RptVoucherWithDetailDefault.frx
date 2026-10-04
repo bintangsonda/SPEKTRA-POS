@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="10/31/2025 13:59:14" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4SvTqsn5l28k+Mj+6xZo5yI">
+      <ProcedureDataSource Name="SelVoucherDetail" DataType="System.Int32" PropName="_aSelVoucherDetail" Enabled="true" TableName="SelVoucherDetail" SelectCommand="SelVoucherDetail">
+        <Column Name="SCODE" DataType="System.String"/>
+        <Column Name="VOUCHER" DataType="System.String"/>
+        <Column Name="ENT_DATE" DataType="System.DateTime"/>
+        <Column Name="TRANS_DATE" DataType="System.DateTime"/>
+        <Column Name="PAY_TERM" DataType="System.Byte"/>
+        <Column Name="REVERSED" DataType="System.Byte"/>
+        <Column Name="Name" DataType="System.String"/>
+        <Column Name="REV_VOUCHER" DataType="System.String"/>
+        <Column Name="OPERATORID" DataType="System.String"/>
+        <Column Name="LastUpdate" DataType="System.DateTime"/>
+        <Column Name="CCY" DataType="System.String"/>
+        <Column Name="ACC" DataType="System.String"/>
+        <Column Name="CASHACC" DataType="System.String"/>
+        <Column Name="DEPT" DataType="System.String"/>
+        <Column Name="Proj" DataType="System.String"/>
+        <Column Name="DOC_NO" DataType="System.String"/>
+        <Column Name="INSTRUMENT_NO" DataType="System.String"/>
+        <Column Name="DESCRIP" DataType="System.String"/>
+        <Column Name="Debit" DataType="System.Decimal"/>
+        <Column Name="Credit" DataType="System.Decimal"/>
+        <Column Name="DESC_ACFTRANH" DataType="System.String"/>
+        <ProcedureParameter Name="@pBranchCode" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@pFromDate" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@pScode" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@pToDate" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@pVoucher" DataType="22" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperHeight="148.5" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15" OtherPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="759.78" Height="22.68" Border.Lines="Bottom">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="192.78" Width="374.22" Height="22.68" Text="Journal Transaction" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="25.88" Width="759.78" Height="52.61" StartNewPage="true" Condition="[SelVoucherDetail.SCODE]+&quot;-&quot;+[SelVoucherDetail.VOUCHER]">
+      <TextObject Name="Text49" Left="0.95" Top="5.21" Width="78.71" Height="12.45" Border.Lines="All" Text="CODE" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text50" Left="0.95" Top="17.66" Width="78.71" Height="12.45" Border.Lines="All" Text="NO. VOUCHER" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text51" Left="301.18" Top="5.21" Width="78.71" Height="12.45" Border.Lines="All" Text="ENTRY DATE" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text52" Left="79.66" Top="5.21" Width="78.71" Height="12.45" Border.Lines="All" Text="[SelVoucherDetail.SCODE]" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text53" Left="79.66" Top="17.66" Width="78.71" Height="12.45" Border.Lines="All" Text="[SelVoucherDetail.VOUCHER]" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text54" Left="379.89" Top="5.21" Width="78.71" Height="12.45" Border.Lines="All" Text="[SelVoucherDetail.ENT_DATE]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text83" Left="301.18" Top="17.66" Width="78.71" Height="12.45" Border.Lines="All" Text="TRANS DATE" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text84" Left="379.89" Top="17.66" Width="78.71" Height="12.45" Border.Lines="All" Text="[SelVoucherDetail.TRANS_DATE]" Padding="1, 1, 1, 1" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text85" Left="602.35" Top="5.21" Width="78.71" Height="12.45" Border.Lines="All" Text="OPERATOR" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text86" Left="681.06" Top="5.21" Width="78.71" Height="12.45" Border.Lines="All" Text="[SelVoucherDetail.OPERATORID]" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text87" Left="602.35" Top="17.66" Width="78.71" Height="12.45" Border.Lines="All" Text="REVERSE" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text88" Left="681.06" Top="17.66" Width="78.71" Height="12.45" Border.Lines="All" Text="[SelVoucherDetail.REVERSED]" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text89" Left="602.35" Top="30.11" Width="78.71" Height="12.45" Border.Lines="All" Text="REV VOUCHER" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <TextObject Name="Text90" Left="681.06" Top="30.11" Width="78.71" Height="12.45" Border.Lines="All" Text="[SelVoucherDetail.REV_VOUCHER]" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      <ChildBand Name="Child2" Top="81.69" Width="759.78" Height="12.45" Border.Lines="All">
+        <TextObject Name="Text63" Width="102.51" Height="12.45" Text="Acc No" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text64" Left="170.89" Width="388.28" Height="12.45" Text="Account Name" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text65" Left="559.17" Width="100.91" Height="12.45" Text="Debit" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text66" Left="660.04" Width="99.2" Height="12.45" Text="Credit" Padding="1, 1, 1, 1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text80" Left="102.26" Width="68.91" Height="12.45" Text="Cash Acc" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </ChildBand>
+      <DataBand Name="Data1" Top="97.34" Width="759.78" Height="12.45" Border.Lines="Left, Right" CanGrow="true" DataSource="SelVoucherDetail">
+        <TextObject Name="Text67" Width="102.51" Height="12.45" CanGrow="true" Text="[SelVoucherDetail.ACC]" Padding="1, 1, 1, 1" Font="Arial, 7pt"/>
+        <TextObject Name="Text68" Left="170.85" Width="388.32" Height="12.45" CanGrow="true" Text="[SelVoucherDetail.Name]" Padding="1, 1, 1, 1" Font="Arial, 7pt"/>
+        <TextObject Name="Text69" Left="559.17" Width="100.91" Height="12.45" Text="[SelVoucherDetail.Debit]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt"/>
+        <TextObject Name="Text70" Left="660.04" Width="99.2" Height="12.45" Text="[[SelVoucherDetail.Credit]*-1]" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" Font="Arial, 7pt"/>
+        <TextObject Name="Text81" Left="102.26" Width="68.91" Height="12.45" Text="[SelVoucherDetail.CASHACC]" Padding="1, 1, 1, 1" VertAlign="Center" Font="Arial, 7pt"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="112.99" Width="759.78" Height="24.7" Border.Lines="Top" CanGrow="true">
+        <TextObject Name="Text79" Top="9.45" Width="61.71" Height="12.45" CanGrow="true" Text="Keterangan:" Padding="1, 1, 1, 1" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text82" Left="61.71" Top="9.45" Width="697.71" Height="12.45" CanGrow="true" Text="[SelVoucherDetail.DESC_ACFTRANH]" Padding="1, 1, 1, 1" Font="Arial, 7pt"/>
+        <ChildBand Name="Child3" Top="140.89" Width="759.78" Height="73" PrintOnBottom="true">
+          <TextObject Name="Text71" Width="189.76" Height="12.45" Border.Lines="All" Text="Dibuat Oleh:" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text72" Left="189.76" Width="189.76" Height="12.45" Border.Lines="All" Text="Diperiksa Oleh:" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text73" Left="379.52" Width="189.76" Height="12.45" Border.Lines="All" Text="Disetujui Oleh:" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text74" Left="569.28" Width="189.76" Height="12.45" Border.Lines="All" Text="Diterima Oleh:" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text75" Top="12.45" Width="189.76" Height="59.7" Border.Lines="All" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text76" Left="189.76" Top="12.45" Width="189.76" Height="59.7" Border.Lines="All" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text77" Left="379.52" Top="12.45" Width="189.76" Height="59.7" Border.Lines="All" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TextObject Name="Text78" Left="569.28" Top="12.45" Width="189.76" Height="59.7" Border.Lines="All" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        </ChildBand>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

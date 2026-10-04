@@ -1,0 +1,404 @@
+﻿@model IEnumerable<IDS.Maintenance.AuditTrail>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Audit Trail";
+}
+@{
+    var fromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("dd MMM yyyy");
+    var toDate = DateTime.Now.ToString("dd MMM yyyy");
+}
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    @* <link rel="stylesheet" type="text/css" href="~/Content/loader.css" /> *@
+    <style>
+        .daterangepicker,
+        .flatpickr-calendar {
+            z-index: 999999 !important;
+        }
+
+        .select2-container {
+            z-index: 999999 !important;
+        }
+        .modal-body p {
+            font-size: 11px;
+        }
+
+        .h6 {
+            font-size: 12px;
+        }
+
+        table.table.dataTable > tbody > tr {
+            background-color: transparent;
+            font-size: 11px;
+        }
+
+        .datatables-users thead th {
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .datatables-users th,
+        .datatables-users td {
+            padding-top: 3px;
+            padding-bottom: 3px;
+            padding-left: 12px;
+            padding-right: 12px;
+            font-size: 12px;
+            vertical-align: middle; /* supaya teks tidak nempel atas */
+        }
+
+        div.dt-search input {
+            margin-right: 1rem !important;
+        }
+    </style>
+}
+<div id="loading" style="display:none; height:100%; width:100%">
+    <div class="loading-wave " id="loading-content">
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+    </div>
+    <div class="loading loading07">
+        <span data-text="I">I</span>
+        <span data-text="N">N</span>
+        <span data-text="T">T</span>
+        <span data-text="I">I</span>
+        <span data-text="D">D</span>
+        <span data-text="A">A</span>
+        <span data-text="T">T</span>
+        <span data-text="A">A</span>
+    </div>
+</div>
+
+
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Users List Table -->
+    <div class="card">
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Audit Trail</h5>
+            <p class="mt-1">Data from @fromDate until @toDate. Click Filter above to filter data.</p>
+        </div>
+        <div class="card-datatable">
+            <table id="tableData" class="datatables-users table table-sm">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Updated By</th>
+                        <th>Affected Data</th>
+                        <th>Operation</th>
+                        <th>Key</th>
+                        <th>Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+       
+    </div>
+</div>
+<div class="modal fade" id="CreateEditForms" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle"></h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-floating form-floating-outline mb-3">
+                            <div class="flatpickr-wrapper">
+                                <input type="text" class="form-control flatpickr-input" placeholder="YYYY-MM-DD to YYYY-MM-DD" id="date" ><div class="flatpickr-calendar rangeMode animate static arrowLeft arrowTop" tabindex="-1">
+                                    <div class="flatpickr-months"><span class="flatpickr-prev-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z"></path></svg></span><div class="flatpickr-month"><div class="flatpickr-current-month"><select class="flatpickr-monthDropdown-months" aria-label="Month" tabindex="-1"><option class="flatpickr-monthDropdown-month" value="0" tabindex="-1">January</option><option class="flatpickr-monthDropdown-month" value="1" tabindex="-1">February</option><option class="flatpickr-monthDropdown-month" value="2" tabindex="-1">March</option><option class="flatpickr-monthDropdown-month" value="3" tabindex="-1">April</option><option class="flatpickr-monthDropdown-month" value="4" tabindex="-1">May</option><option class="flatpickr-monthDropdown-month" value="5" tabindex="-1">June</option><option class="flatpickr-monthDropdown-month" value="6" tabindex="-1">July</option><option class="flatpickr-monthDropdown-month" value="7" tabindex="-1">August</option><option class="flatpickr-monthDropdown-month" value="8" tabindex="-1">September</option><option class="flatpickr-monthDropdown-month" value="9" tabindex="-1">October</option><option class="flatpickr-monthDropdown-month" value="10" tabindex="-1">November</option><option class="flatpickr-monthDropdown-month" value="11" tabindex="-1">December</option></select><div class="numInputWrapper"><input class="numInput cur-year" type="number" tabindex="-1" aria-label="Year"><span class="arrowUp"></span><span class="arrowDown"></span></div></div></div><span class="flatpickr-next-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z"></path></svg></span></div><div class="flatpickr-innerContainer">
+                                        <div class="flatpickr-rContainer">
+                                            <div class="flatpickr-weekdays">
+                                                <div class="flatpickr-weekdaycontainer">
+                                                    <span class="flatpickr-weekday">
+                                                        Sun
+                                                    </span><span class="flatpickr-weekday">Mon</span><span class="flatpickr-weekday">Tue</span><span class="flatpickr-weekday">Wed</span><span class="flatpickr-weekday">Thu</span><span class="flatpickr-weekday">Fri</span><span class="flatpickr-weekday">
+                                                        Sat
+                                                    </span>
+                                                </div>
+                                            </div><div class="flatpickr-days" tabindex="-1"><div class="dayContainer"><span class="flatpickr-day prevMonthDay" aria-label="September 28, 2025" tabindex="-1">28</span><span class="flatpickr-day prevMonthDay" aria-label="September 29, 2025" tabindex="-1">29</span><span class="flatpickr-day prevMonthDay" aria-label="September 30, 2025" tabindex="-1">30</span><span class="flatpickr-day selected startRange" aria-label="October 1, 2025" tabindex="-1">1</span><span class="flatpickr-day inRange" aria-label="October 2, 2025" tabindex="-1">2</span><span class="flatpickr-day inRange" aria-label="October 3, 2025" tabindex="-1">3</span><span class="flatpickr-day inRange" aria-label="October 4, 2025" tabindex="-1">4</span><span class="flatpickr-day inRange" aria-label="October 5, 2025" tabindex="-1">5</span><span class="flatpickr-day inRange" aria-label="October 6, 2025" tabindex="-1">6</span><span class="flatpickr-day inRange" aria-label="October 7, 2025" tabindex="-1">7</span><span class="flatpickr-day inRange" aria-label="October 8, 2025" tabindex="-1">8</span><span class="flatpickr-day inRange" aria-label="October 9, 2025" tabindex="-1">9</span><span class="flatpickr-day selected endRange" aria-label="October 10, 2025" tabindex="-1">10</span><span class="flatpickr-day" aria-label="October 11, 2025" tabindex="-1">11</span><span class="flatpickr-day" aria-label="October 12, 2025" tabindex="-1">12</span><span class="flatpickr-day" aria-label="October 13, 2025" tabindex="-1">13</span><span class="flatpickr-day" aria-label="October 14, 2025" tabindex="-1">14</span><span class="flatpickr-day" aria-label="October 15, 2025" tabindex="-1">15</span><span class="flatpickr-day" aria-label="October 16, 2025" tabindex="-1">16</span><span class="flatpickr-day" aria-label="October 17, 2025" tabindex="-1">17</span><span class="flatpickr-day" aria-label="October 18, 2025" tabindex="-1">18</span><span class="flatpickr-day" aria-label="October 19, 2025" tabindex="-1">19</span><span class="flatpickr-day" aria-label="October 20, 2025" tabindex="-1">20</span><span class="flatpickr-day today" aria-label="October 21, 2025" aria-current="date" tabindex="-1">21</span><span class="flatpickr-day" aria-label="October 22, 2025" tabindex="-1">22</span><span class="flatpickr-day" aria-label="October 23, 2025" tabindex="-1">23</span><span class="flatpickr-day" aria-label="October 24, 2025" tabindex="-1">24</span><span class="flatpickr-day" aria-label="October 25, 2025" tabindex="-1">25</span><span class="flatpickr-day" aria-label="October 26, 2025" tabindex="-1">26</span><span class="flatpickr-day" aria-label="October 27, 2025" tabindex="-1">27</span><span class="flatpickr-day" aria-label="October 28, 2025" tabindex="-1">28</span><span class="flatpickr-day" aria-label="October 29, 2025" tabindex="-1">29</span><span class="flatpickr-day" aria-label="October 30, 2025" tabindex="-1">30</span><span class="flatpickr-day" aria-label="October 31, 2025" tabindex="-1">31</span><span class="flatpickr-day nextMonthDay" aria-label="November 1, 2025" tabindex="-1">1</span><span class="flatpickr-day nextMonthDay" aria-label="November 2, 2025" tabindex="-1">2</span><span class="flatpickr-day nextMonthDay" aria-label="November 3, 2025" tabindex="-1">3</span><span class="flatpickr-day nextMonthDay" aria-label="November 4, 2025" tabindex="-1">4</span><span class="flatpickr-day nextMonthDay" aria-label="November 5, 2025" tabindex="-1">5</span><span class="flatpickr-day nextMonthDay" aria-label="November 6, 2025" tabindex="-1">6</span><span class="flatpickr-day nextMonthDay" aria-label="November 7, 2025" tabindex="-1">7</span><span class="flatpickr-day nextMonthDay" aria-label="November 8, 2025" tabindex="-1">8</span></div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <label for="flatpickr-range">Date</label>
+                        </div>
+                   
+                        <div class="form-floating form-floating-outline mb-3">
+                            @Html.DropDownList("TableName", ViewData["TableList"] as SelectList, "Select Data", new { @class = "form-select select2DDList", @required = "required", @id = "cboTableList" })
+                        </div>
+                        <div class="form-floating form-floating-outline mb-3">
+                            @Html.DropDownList("User", ViewData["UserList"] as SelectList, "Select User", new { @class = "form-select select2DDList", @required = "required", @id = "cboUserList" })
+                        </div>
+                        <div class="text-center mt-3">
+                            <button id="btnFilter" class="btn btn-sm btn-outline-primary">Filter</button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                @* <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="btnClose" data-dismiss="modal">Close</button>
+                </div> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="PartialSection">
+</div>
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+
+    <script type="text/javascript">
+        $('.select2DDList').select2({
+            dropdownParent: $('#CreateEditForms')
+        });
+
+        $(document).ready(function () {
+            flatpickr("#date", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                allowInput: true,
+                appendTo: document.body,
+                onClose: (s, d, i) => i.input.blur()
+            });
+            RefreshUserGroup();
+
+            $(".open-modal-export").click(function () {
+                 $("#modalTitle").html("Filter");
+                 $('#date').val('');
+                $("#CreateEditForms").modal('show');
+            })
+        });
+        function RefreshUserGroup() {
+             $('#tableData').DataTable({
+                "bDestroy": true,
+                "columnDefs": [
+                    {
+                        "targets": 'no-sort',
+                        "orderable": false,
+                    },
+
+                    {
+                        "width": "60px",
+                        "orderable": true,
+                        "targets": [0]
+                    },
+                    {
+                        "width": "120px",
+                        "orderable": true,
+                        "targets": [1]
+                    },
+                    {
+                        "width": "120px",
+                        "orderable": true,
+                        "targets": [2]
+                    },
+                    {
+                        "width": "110px",
+                        "orderable": true,
+                        "targets": [3]
+                    },
+                    {
+                        "width": "150px",
+                        "orderable": true,
+                        "targets": [4]
+                    },
+                    {
+                         "width": "180px",
+                         "orderable": false,
+                         "targets":[5]
+                    },
+                     {
+                         "width": "100px",
+                         "orderable": false,
+                         "targets":[6]
+                    },
+                  
+
+                ],
+                "select": {
+                    "style": 'os'
+                },
+                "language":
+                {
+                    "search": "",
+                    "searchPlaceholder": "Search...",
+                    "emptyTable": "No record found.",
+                    "processing": "<div class='overlay custom-loader-background' style='background: transparent !important;'><i class='fa fa-spinner fa-spin custom-loader-color' style='font-size:30px;color:#2196F3'></i></div>"
+                },
+                "processing": "true",
+                "order": [[1, "asc"]],
+                 layout: {
+                   topStart: {
+                    rowClass: 'row m-2 my-0 mt-0 justify-content-between',
+                    features: [
+                        {
+                            buttons: [
+                                {
+                                    className: 'btn btn-outline-secondary dropdown-toggle waves-effect open-modal-export',
+                                    text: '<span class="d-flex align-items-center gap-2"><i class="icon-base ri ri-upload-2-line icon-16px me-sm-1"></i> <span class="d-none d-sm-inline-block">Filter</span></span>',
+                                }
+                            ]
+                        }
+                    ]
+                },
+                    topEnd: {
+                        features: [
+                            {
+                                search: {
+                                    placeholder: 'Search...',
+                                    text: '_INPUT_'
+                                }
+                            },
+                           
+                        ]
+                    },
+                    bottomStart: {
+                        rowClass: 'row mx-3 justify-content-between',
+                        features: ['info']
+                    },
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    paginate: {
+                        next: '<i class="icon-base ri ri-arrow-right-s-line scaleX-n1-rtl icon-22px"></i>',
+                        previous: '<i class="icon-base ri ri-arrow-left-s-line scaleX-n1-rtl icon-22px"></i>',
+                        first: '<i class="icon-base ri ri-skip-back-mini-line scaleX-n1-rtl icon-22px"></i>',
+                        last: '<i class="icon-base ri ri-skip-forward-mini-line scaleX-n1-rtl icon-22px"></i>'
+                    }
+                },
+                "serverSide": "true",
+                "lengthMenu": [[1, 10, 20, 50, 100, 1000, -1], [1, 10, 20, 50, 100, 1000, "All"]],
+                "pageLength": 10,
+                "ajax":
+                {
+                    "url": '@Url.Action("GetData", "AuditTrail", new { Area = "Maintenance" })',
+                    "type": "POST",
+                    "dataType": "JSON",
+                        "dataSrc": function (json) {
+            console.log(json); // Check what structure you're getting
+            return json.data;
+        }
+                },
+                "columns": [
+                    { "data": "ID", "name": "ID" },
+                    { "data": "UserId", "name": "UserId" },
+                    { "data": "TableName", "name": "TableName" },
+                   {
+                        "data": "Status", "name": "Status",
+                        "render": function (data, type, row, meta) {
+                            switch (row.Status) {
+                                case "INSERT":
+                                    return "<span class=\"badge rounded-pill bg-label-success\">Create</span>";
+                                    break;
+                                case "UPDATE":
+                                    return "<span class=\"badge rounded-pill bg-label-secondary\">Update</span>";
+                                    break;
+
+                                case "DELETE":
+                                    return "<span class=\"badge rounded-pill bg-label-danger\">Delete</span>";
+                                    break;
+
+                                
+                                default:
+                                    return row.FactStatus;
+                            }
+                        }
+                    },
+                    { "data": "Key", "name": "Key" },
+                 
+                    {
+                        "data": "UpdatedDate", "name": "UpdatedDate",
+                        "render": function (data, type, row, meta) {
+                            return moment(row.UpdatedDate).format('DD/MMM/YYYY HH:mm:ss');
+                        }
+                    },
+                    {
+                        "data": "ID", "name": "ID",
+                        "render": function (data, type, row, meta) {
+                            return `<div class="d-flex align-items-center">
+
+                        <a href="javascript:ViewLog('${row.ID}');"  class="btn btn-icon btn-text-secondary rounded-pill">
+                          <i class="icon-base ri ri-eye-line icon-md"></i>
+                        </a>
+                       
+                      </div>`;
+                        }
+                    },
+
+                ]
+            });
+        }
+        $("#btnFilter").click(function() {
+            const range = $("#date").val(); // contoh: "2025-10-01 to 2025-10-22"
+            let from = "";
+            let to = "";
+
+            if (range.includes(" to ")) {
+                const parts = range.split(" to ");
+                from = parts[0].trim();
+                to = parts[1].trim();
+            }
+            let data = "";
+            let user = "";
+            user = $('#cboUserList').val();
+            data = $('#cboTableList').val();
+            // Kirim via querystring atau AJAX ke controller
+                 const url = '@Url.Action("Filter", "AuditTrail")'
+            + `?from=${from}&to=${to}&data=${data}&user=${user}`;
+                        window.open(url, "_blank");
+
+        });
+
+      
+        function ViewLog(data) {
+
+        if (data == "")
+        {
+            alert("Data did not have log!");
+            return false;
+        }
+        else
+        {
+
+            $.ajax({
+            type: "GET",
+            url: '@Url.Action("LogDetail", "AuditTrail", new { Area = "Maintenance" })',
+            data: {
+                key: data,
+            },
+            dataType: 'html',
+            success: function (result) {
+                $('#PartialSection').empty();
+                $("#PartialSection").html(result);
+                $("#modalTitle").html("Audit View");
+                $("#CreateEditForm").modal('show');
+
+            },
+            error: function (status) {
+                alert('');
+            }
+        });
+        }
+    }
+
+    </script>
+}

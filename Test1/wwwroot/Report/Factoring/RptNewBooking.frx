@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="11/15/2025 15:02:44" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4QyLEb/lJEmvE9Zk1GQrqO/">
+      <ProcedureDataSource Name="RptFTNewBooking" DataType="System.Int32" PropName="_1RptFTNewBooking" Enabled="true" TableName="RptFTNewBooking" SelectCommand="RptFTNewBooking">
+        <Column Name="ClientID" DataType="System.String"/>
+        <Column Name="LesseeName" DataType="System.String"/>
+        <Column Name="InvNo" DataType="System.String"/>
+        <Column Name="DisbAmt" DataType="System.Decimal"/>
+        <Column Name="IntRateDisb" DataType="System.Double"/>
+        <Column Name="FromDue" DataType="System.DateTime"/>
+        <Column Name="ToDue" DataType="System.DateTime"/>
+        <Column Name="Tenor" DataType="System.Int32"/>
+        <Column Name="LastInvAmt" DataType="System.Decimal"/>
+        <Column Name="isRevolving" DataType="System.String"/>
+        <Column Name="LocationName" DataType="System.String"/>
+        <Column Name="IndusName" DataType="System.String"/>
+        <ProcedureParameter Name="@BranchCode" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@From" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@To" DataType="4" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPFrom" DataType="System.String" AsString=""/>
+    <Parameter Name="RPTo" DataType="System.String" AsString=""/>
+    <Total Name="sumdisbamt" Expression="[RptFTNewBooking.DisbAmt]" Evaluator="Data1" PrintOn="DataFooter1"/>
+    <Total Name="sumlastinvamt" Expression="[RptFTNewBooking.LastInvAmt]" Evaluator="Data1" PrintOn="DataFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="1088.64" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="319.41" Top="9.45" Width="449.82" Height="22.68" Text="Factoring New Booking" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="966.41" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="956.96" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="956.96" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text66" Left="420.01" Top="32.13" Width="128.52" Height="22.68" Text="From: [RPFrom]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text67" Left="-9450" Top="-9450" Width="449.82" Height="22.68" Text="Transaction Listing By Account" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text68" Left="556.45" Top="32.13" Width="119.07" Height="22.68" Text="To: [RPTo]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <ChildBand Name="Child1" Top="71.24" Width="1088.64" Height="15.57" Border.Lines="Top, Bottom">
+        <TextObject Name="Text72" Left="-0.3" Top="0.45" Width="111.15" Height="15.12" Text="CIF" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text73" Left="581.1" Top="0.45" Width="104.1" Height="15.12" Text="Financing Amount" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text74" Left="110.85" Top="0.45" Width="337.55" Height="15.12" Text="Customer" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text77" Left="448.35" Top="0.45" Width="132.75" Height="15.12" Text="No. SOA" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text80" Left="685.2" Top="0.45" Width="48.9" Height="15.12" Text="Rate" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text82" Left="738.1" Top="0.45" Width="61.7" Height="15.12" Text="Disb. Date" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text84" Left="799.8" Top="0.45" Width="61.7" Height="15.12" Text="End Date" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text86" Left="861.5" Top="0.45" Width="37.7" Height="15.12" Text="Tenor" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text88" Left="899.2" Top="0.45" Width="104.1" Height="15.12" Text="Amount Collateral" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text90" Left="1009.3" Top="0.45" Width="78.5" Height="15.12" Text="Revolving / New" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="90.01" Width="1088.64" Height="15.12" CanGrow="true" DataSource="RptFTNewBooking">
+      <TextObject Name="Text75" Left="-0.3" Width="111.15" Height="15.12" Text="[RptFTNewBooking.ClientID]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text76" Left="110.85" Width="337.55" Height="15.12" CanGrow="true" Text="[RptFTNewBooking.LesseeName]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text78" Left="448.35" Width="132.75" Height="15.12" CanGrow="true" Text="[RptFTNewBooking.InvNo]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text79" Left="581.1" Width="104.1" Height="15.12" Text="[RptFTNewBooking.DisbAmt]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text81" Left="685.2" Width="48.9" Height="15.12" Text="[RptFTNewBooking.IntRateDisb] %" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text83" Left="738.1" Width="61.7" Height="15.12" Text="[RptFTNewBooking.FromDue]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text85" Left="799.8" Width="61.7" Height="15.12" Text="[RptFTNewBooking.ToDue]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text87" Left="861.5" Width="37.7" Height="15.12" Text="[RptFTNewBooking.Tenor]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text89" Left="899.2" Width="104.1" Height="15.12" Text="[RptFTNewBooking.LastInvAmt]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text91" Left="1009.3" Width="78.5" Height="15.12" Text="[RptFTNewBooking.isRevolving]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <DataFooterBand Name="DataFooter1" Top="108.33" Width="1088.64" Height="15.12" Border.Lines="Top">
+        <TextObject Name="Text92" Left="448.35" Width="132.75" Height="15.12" CanGrow="true" Text="TOTAL" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text93" Left="581.1" Width="104.1" Height="15.12" Text="[sumdisbamt]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text94" Left="899.2" Width="104.1" Height="15.12" Text="[sumlastinvamt]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </DataFooterBand>
+      <Sort>
+        <Sort Expression="[RptFTNewBooking.FromDue]"/>
+      </Sort>
+    </DataBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,25 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Invalid License</title>
+</head>
+<body>
+    <h1 style="text-align: center; font-family: Arial, Tahoma, sans-serif;">Forbidden - Invalid License</h1>
+    <hr />
+    @if (ViewData["Message"] != null)
+    {
+        <p style="text-align: center; font-family: Arial, Tahoma, sans-serif; font-size: 15px;">@ViewData["Message"]</p>
+    }
+    else
+    {
+        <p style="text-align: center; font-family: Arial, Tahoma, sans-serif; font-size: 15px;">You don't have permission to access on this server. Please contact PT. Intidata Anugrah Pratama at (+62-21) 5595-2979</p>
+    }
+</body>
+</html>

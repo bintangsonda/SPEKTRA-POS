@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="11/07/2025 17:06:36" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+   
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4TSsoEsH25j8NHKII/bMToU">
+      <ProcedureDataSource Name="GETConFactAPPList" DataType="System.Int32" Enabled="true" TableName="GETConFactAPPList" SelectCommand="GETConFactAPPList">
+        <Column Name="AgreementNo" DataType="System.String"/>
+        <Column Name="StartAgreeDate" DataType="System.DateTime"/>
+        <Column Name="EndAgreeDate" DataType="System.DateTime"/>
+        <Column Name="CreditLimit" DataType="System.Decimal"/>
+        <Column Name="LesseeFullName" DataType="System.String"/>
+        <Column Name="FactStatus" DataType="System.Byte"/>
+        <Column Name="CurrCode" DataType="System.String"/>
+        <Column Name="InvNo" DataType="System.String"/>
+        <Column Name="Disbamt" DataType="System.Int32"/>
+        <ProcedureParameter Name="@Period" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@Status" DataType="22" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPPeriod" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="759.78" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="192.78" Top="9.9" Width="374.22" Height="22.68" Text="Contract Factoring Not Approved List" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="637.26" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="627.81" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="627.81" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text40" Left="192.78" Top="32.58" Width="374.22" Height="17.55" Text="Period: [RPPeriod]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <ChildBand Name="Child1" Top="71.24" Width="759.78" Height="15.57" Border.Lines="Top, Bottom">
+        <TextObject Name="Text20" Top="0.45" Width="143.95" Height="15.12" Text="Agreement No." Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text43" Left="699.65" Top="0.45" Width="59.95" Height="15.12" Text="End Date" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text44" Left="143.95" Top="0.45" Width="495.95" Height="15.12" Text="Client Name" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text45" Left="639.7" Top="0.45" Width="59.95" Height="15.12" Text="Start Date" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="90.01" Width="759.78" Height="15.12" DataSource="GETConFactAPPList">
+      <TextObject Name="Text46" Width="143.95" Height="15.12" Text="[GETConFactAPPList.AgreementNo]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text47" Left="143.95" Width="495.95" Height="15.12" Text="[GETConFactAPPList.LesseeFullName]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text49" Left="639.7" Width="59.95" Height="15.12" Text="[GETConFactAPPList.StartAgreeDate]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text50" Left="699.65" Width="59.95" Height="15.12" Text="[GETConFactAPPList.EndAgreeDate]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd-MMM-yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+      <Sort>
+        <Sort Expression="[GETConFactAPPList.StartAgreeDate]"/>
+      </Sort>
+    </DataBand>
+  </ReportPage>
+</Report>

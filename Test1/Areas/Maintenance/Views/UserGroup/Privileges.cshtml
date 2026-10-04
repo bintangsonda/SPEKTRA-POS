@@ -1,0 +1,259 @@
+﻿@model IEnumerable<IDS.Maintenance.UserGroupAccessView>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "User Group List";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Content/DataTables/datatables.css" />
+    <link rel="stylesheet" href="~/Content/DataTables/DataTables-1.10.25/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="~/Content/DataTables/Select-1.3.3/css/select.bootstrap5.min.css" />
+}
+
+
+@using (Html.BeginForm(null, null, FormMethod.Get, new { @id = "formCreateEdit" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+    @Html.Hidden("FormSave", "0");
+
+    <script type="text/javascript">
+
+    </script>
+
+
+    <div class="row mb-2">
+        <section class="col-lg-6">
+            <div class='row mb-2'>
+                <div class='row pb-0 mb-1'>
+                    @Html.Label("GroupCode", "Group Code", new { @class = "col-form-label-sm col-sm-3" })
+                    <div class='col-sm'>
+                        @Html.TextBox("GroupCode", ViewData["UserGroupCode"], new { @class = "form-control form-control-sm", @readonly = "readonly", @required = "required" })
+                    </div>
+                </div>
+                <div class='row pb-0 mb-1'>
+                    @Html.Label("GroupName", "Group Name", new { @class = "col-form-label-sm col-sm-3" })
+                    <div class='col-sm'>
+                        @Html.TextBox("GroupName", "Group Name", new { @class = "form-control form-control-sm", @readonly = "readonly", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="col-lg-6">
+            <div class='row pb-0 mb-1'>
+                @Html.Label("ProjectMain", "Project Main", new { @class = "col-form-label-sm col-sm-3" })
+                <div class='col-sm'>
+                    @Html.DropDownList("ProjectName", ViewData["ProjectNameList"] as SelectList, new { @class = "form-control form-control-sm select2DDList", @onchange = "txtprojectmainchangeHandler(this)" })
+
+                </div>
+            </div>
+            <div class='row mb-2'>
+                <div class='row pb-0 col-sm-12 mb-1'>
+                    @Html.Label("Permission", "Permission", new { @class = "col-form-label-sm col-sm-3" })
+                    <div class='col-sm'>
+                        @Html.DropDownList("Permission", ViewData["AccessList"] as SelectList, new { @class = "form-control form-control-sm select2DDList" })
+                    </div>
+                </div>
+                <div class='row pb-0 col-sm-12 mb-1 d-none'>
+                    @Html.Label("SelectAll", "Select All Form", new { @class = "col-form-label-sm col-sm-3" })
+                    <div class='col-sm'>
+                        @Html.CheckBox("SelectAll", false, new { @class = "form-control-sm", @id = "chkSelectAll" })
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+
+<div class="row">
+    <section class="col-lg-12">
+        <div id="classgrid1" class="row mb-1">
+            <div class="table-responsive table-responsive-sm p-2 bg-white border">
+                <table id="tblprivileges" class="table table-bordered table-hover w-100">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.CheckBox("checkAll", false, new { @class = "", @id = "chkSelectAll", @onclick = "chkSelecteAllClick(this)" })
+                                @*<input name="select_all" value="1" id="example-select-all" type="checkbox" />*@
+                            </th>
+                            <th>Menu Url</th>
+                            <th>Form Of</th>
+                            <th>Project Name</th>
+                            <th>Privilege</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </section>
+    <section class="col-lg-12 text-right mt-1">
+        <button type="button" class="btn btn-primary btn-sm" onclick="btnPrivilegesBack_click()">Back</button>
+        <button type="button" class="btn btn-success btn-sm" onclick="btnSave_click()">Save</button>
+    </section>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/moment.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/Select-1.3.3/js/select.bootstrap5.js"></script>
+
+
+    <script type="text/javascript">
+
+
+        var tblPriv;
+
+        $(document).ready(function () {
+            $('form#formCreateEdit').removeData("validator");
+            $('form#formCreateEdit').removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse($('form#formCreateEdit'));
+
+            RefreshUserGroup();
+
+            $('#example-select-all,#ckselectallform').on('click', function () {
+                var tbl_ = $('#tblprivileges').DataTable();
+                var rows = tbl_.rows({ 'search': 'applied' }).nodes();
+                $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            });
+        });
+
+        function txtprojectmainchangeHandler() {
+            // isi tabel
+            //RefreshUserGroup()
+        }
+
+        function RefreshUserGroup() {
+            tblPriv = $('#tblprivileges').DataTable({
+                "bDestroy": true,
+                "columnDefs": [
+                    {
+                        "targets": 'no-sort',
+                        "orderable": true,
+                    },
+                    {
+                        "data": null,
+                        "width": "20px",
+                        "defaultContent": '',
+                        "orderable": false,
+                        "className": "select-checkbox",
+                        "checkboxes": {
+                            "selectRow": true
+                        },
+                        "targets": [0]
+                    },
+                    {
+                        "width": "110px",
+                        "orderable": true,
+                        "targets": [1]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": true,
+                        "targets": [3]
+                    },
+                    {
+                        "width": "120px",
+                        "orderable": true,
+                        "targets": [4]
+                    },
+                ],
+                "select": {
+                    "style": 'os'
+                },
+                "processing": "true",
+                "language":
+                {
+                    "search": "",
+                    "searchPlaceholder": "Search...",
+                    "emptyTable": "No record found.",
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+                "processing": "true",
+                "order": [[1, "asc"]],
+                "serverSide": "true",
+                "lengthMenu": [[1, 10, 20, 50, 100, 1000, -1], [1, 10, 20, 50, 100, 1000, "All"]],
+                "pageLength": 10,
+                "ajax":
+                {
+                    "url": '@Url.Action("GetPrivileges", "UserGroup", new { Area = "Maintenance" })',
+                    "type": "POST",
+                    "dataType": "JSON",
+                    "data": {
+                        "groupCode": $('#GroupCode').val(),
+                        "projectName": $('#ProjectName').val()
+                    },
+                },
+                "columns": [
+                    {
+                        "data": "UserGroupCode", "name": "UserGroupCode",
+                        render: function (data, type, row) {
+                            if (type === 'display') {
+                                return '<input type="checkbox" class="editor-active" id="' + row["menuUrl"] + '" name="chkPrivileges" value="' + data["UserGroupCode"] + '">';
+                            }
+                            return data;
+                        },
+                        className: "dt-body-center"
+                    },
+                    { "data": "MenuUrl", "name": "MenuUrl" },
+                    { "data": "MenuName", "name": "MenuName" },
+                    { "data": "ProjectName", "name": "ProjectName" },
+                    { "data": "AccessName", "name": "AccessName" }
+                ],
+            });
+        }
+
+        $('#ProjectName').change(function () {
+            RefreshUserGroup();
+        });
+
+        function chkSelecteAllClick(e) {
+            $("input[name='chkPrivileges']").prop('checked', e.checked);
+        }
+        function btnPrivilegesBack_click() {
+            window.location.href = '@Url.Action("Index", "UserGroup", new { Area = "Maintenance" })';
+        }
+        function btnSave_click() {
+            debugger;
+            if ($('table[id="tblprivileges"] tbody tr td input[name="chkPrivileges"]:checked').length > 0) {
+                var answer = confirm("Are you sure to change group pivileges ?");
+
+                if (answer) {
+                    var data = [];
+                    $.each($('table[id="tblprivileges"] tbody tr td input[name="chkPrivileges"]:checked').closest('tr'), function (k, v) {
+                        data.push({
+                            "UserGroupCode": $('input[id="GroupCode"]').val(),
+                            "UserGroupName": $('input[id="GroupName"]').val(),
+                            "MenuUrl": $(this).find('td').eq(1).html().toString(),
+                            "MenuName": $(this).find('td').eq(2).html().toString(),
+                            "MenuCode": "" ,
+                            "ProjectName": $(this).find('td').eq(3).html().toString(),
+                            "Access": $('select[id="Permission"] > option:selected').val(),
+                            "AccessName": ""
+                        })
+                    })
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("SavePrivileges", "UserGroup", new { Area = "Maintenance" })',
+                        data: { "data": data },
+                        dataType: "json",
+                        success: function (response) {
+                            alert(response.message);
+                            RefreshUserGroup();
+                        },
+                        error: function (xhr, status, errorThrown) {
+                            console.log(xhr.responseText);
+                        }
+                    });
+                }
+            }
+            else {
+                alert("Please select data");
+            }
+        }
+
+    </script>
+}

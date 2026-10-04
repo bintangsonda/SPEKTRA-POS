@@ -1,0 +1,1803 @@
+﻿@model Transaction.Employee.CashierH
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Cashier";
+}
+<style>
+
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+
+    /* LAYOUT */
+   .pos-container {
+        display: grid;
+        grid-template-columns: 3fr 1.4fr;
+        height: 90vh;
+        gap: 12px;
+    }
+
+   
+
+    /* LEFT PANEL */
+    .left-panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #fcf3dc;
+        border-radius: 10px;
+        overflow: hidden; /* 🔥 penting */
+    }
+
+
+    /* HEADER */
+    .header {
+        background: linear-gradient( 135deg, var(--bs-primary), var(--bs-primary-dark, #0a58ca) );
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 10px 10px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header small {
+        opacity: 0.85;
+        font-weight: normal;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        margin: 12px 0;
+        padding: 0 8px;
+    }
+    .header {
+        flex: 0 0 auto;
+    }
+
+    .toolbar {
+        flex: 0 0 auto;
+        margin: 12px 0;
+        padding: 0 8px;
+    }
+
+
+    /* PRODUCT GRID */
+    .product-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* default: bawah md */
+    gap: 12px;
+
+    overflow-y: auto;
+    padding: 8px;
+    align-content: start;
+    }
+
+    /* md (≥768px) → 3 kolom */
+    @@media (min-width: 768px) {
+        .product-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .action-btn .btn-text {
+            display: none; /* sembunyikan text */
+        }
+
+        .action-btn i {
+            font-size: 16px;
+        }
+    }
+
+    /* lg (≥992px) → 4 kolom */
+    @@media (min-width: 992px) {
+        .product-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+
+    /* PRODUCT CARD */
+    .product {
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,.06),
+                    0 4px 12px rgba(0,0,0,.08);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .product:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    }
+
+    .product .img {
+        position: relative;
+        height: 120px;          /* 🔥 KUNCI */
+        background: #f1f3f5;
+        overflow: hidden;
+    }
+
+    .product .img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .product .img.no-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+    }
+
+    .no-image-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #adb5bd;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .product .price {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.75);
+        color: #fff;
+        font-weight: 600;
+        text-align: center;
+        padding: 6px 0;
+        font-size: 13px;
+    }
+
+    .product .name {
+        padding: 6px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* RIGHT PANEL */
+    .right-panel {
+        background: #ffffff;
+        border-radius: 10px;
+        border:1px solid grey;
+        padding: 8px;
+        display: flex ;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* TRANSACTION HEADER */
+    .trans-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+
+
+     /* MOBILE */
+    @@media (max-width: 767.98px) {
+        .pos-container {
+            grid-template-columns: 1fr;
+        }
+         .toolbar .col-sm-8,
+        .toolbar .col-sm-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .toolbar label {
+            display: none; /* opsional biar lebih clean */
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+        .payment-btn {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+
+        }
+        }
+
+.type-option {
+    position: relative;
+    color:black;
+    width: 130px;
+    height: 50px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+/* sembunyikan radio */
+.type-option input {
+    display: none;
+}
+
+/* span isi penuh */
+.type-option span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+}
+
+/* SAAT DIPILIH */
+.type-option input:checked + span {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* hover */
+.type-option:hover {
+    border-color: #0d6efd;
+}
+
+/* ===== Qty ===== */
+.qty-wrapper {
+    display: flex;
+    align-items: center;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.qty-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: #f8f9fa;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.qty-btn:hover {
+    background-color: #e9ecef;
+}
+
+.qty-input {
+    width: 60px;
+    height: 40px;
+    text-align: center;
+    border: none;
+    outline: none;
+    font-weight: 500;
+}
+
+/* ===== Diskon ===== */
+.discount-wrapper {
+    display: flex;
+    align-items: center;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    height: 40px;
+    padding: 0 10px;
+}
+
+.discount-prefix {
+    font-weight: 500;
+    margin-right: 5px;
+}
+
+.discount-input {
+    width: 120px;
+    border: none;
+    outline: none;
+}
+
+/* hilangkan spinner number */
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button,
+.discount-input::-webkit-inner-spin-button,
+.discount-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* INI BAGIAN BILL*/
+/* HEADER & ITEM PAKAI GRID YANG SAMA */
+.bill-header,
+.bill-item {
+    display: grid;
+    grid-template-columns: 40px 1fr 100px 20px;
+    align-items: center;
+}
+
+/* HEADER */
+.bill-header {
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 6px 0;
+}
+
+/* ITEM */
+.bill-item {
+    padding: 8px 0;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.qty {
+    font-weight: 600;
+}
+
+.name {
+    color: #374151;
+    cursor: pointer;
+}
+
+/* PRICE SEJAJAR */
+.billprice {
+    text-align: right;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* DELETE BUTTON → X KECIL TANPA BACKGROUND */
+.btn-delete {
+    border: none;
+    background: none;
+    color: #ef4444;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-delete:hover {
+    color: #b91c1c;
+}
+
+/* VARIANT */
+.bill-variant {
+    font-size: 12px;
+    color: #6b7280;
+    margin-left: 40px;
+    padding: 2px 0;
+}
+
+/* SUMMARY */
+.summary {
+    margin-top: 10px;
+    border-top: 2px solid #e5e7eb;
+    padding-top: 8px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.total-row.bold {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.branch-name {
+    font-size: clamp(14px, 2vw, 22px);
+    font-weight: bold;
+}
+.TransDate-LeftPanel{
+    font-size: clamp(12px, 2vw, 18px);
+}
+/* default (md ke atas) */
+.action-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+
+</style>
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/assets/css/custom.css" />
+
+}
+@Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
+@Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
+@Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
+@Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+
+<div class="pos-container">
+    <div class="left-panel">
+        <div class="header">
+            <div class="branch-name">@Model.BranchName<br><small> user : @Model.OperatorID</small></div>
+            <div class="TransDate-LeftPanel">@Model.TransDate.ToString("dd-MMM-yyyy")</div>
+        </div>
+        <div class="toolbar row g-3 align-items-end">
+
+    <!-- CATEGORY -->
+    <div class="col-12 col-md-6">
+        <label class="form-label text-black">Category</label>
+        <div class="form-floating form-floating-outline"
+             style="background:#fff; border-radius:10px;">
+            @Html.DropDownList(
+                "CategoriesFilter",
+                ViewData["CategoriesList"] as SelectList,
+                null,
+                new {
+                    @class = "form-control form-control-sm select2",
+                    data_placeholder = "Pilih Category"
+                })
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="col-16 col-md-6">
+        <label class="form-label text-black" for="searchMenu">Search</label>
+        <input
+            type="text"
+            class="form-control form-control-sm bg-white"
+            id="searchMenu"
+            placeholder="Type Here to Search the Menu..."
+            onkeyup="searchMenu(this.value)">
+    </div>
+
+    <!-- PAYMENT (MOBILE ONLY) -->
+    <div class="col-12 d-md-none">
+        <button type="button"
+                class="btn btn-success w-100 payment-btn2"
+                data-bs-dismiss="modal"
+                onclick="ShowModalMobile()">
+            <i class="ri ri-refund-2-line me-1 fs-6"></i>
+            Process
+        </button>
+    </div>
+
+</div>
+
+
+
+
+        <div class="product-grid" id="productGrid">
+        </div>
+    </div>
+
+
+    <div class="right-panel d-none d-md-block">
+        @Html.Partial("Create")
+    </div>
+</div>
+
+<div class="modal fade" id="ModalOrder" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+                <h4 class="modal-title mb-0 fw-semibold text-white" id="defferedAmmortizeLabel">
+                    Set Order
+                </h4>
+                <button type="button"
+                        class="btn shadow-none p-0"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body bg-white">
+                <div class="row gy-2">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="ProdName fw-bold fs-5 text-black mb-2">
+                                Product :
+                            </label>             
+                            <input class="ProdCode fw-bold fs-5 text-black mb-2 d-none">
+                            <input class="ProdHarga fw-bold fs-5 text-black mb-2 d-none">
+                        </div>
+                        <div class="row gy-2 align-items-start mt-4">
+                            <div class="col-12 col-md-2">
+                                <label class="fw-bold fs-6 text-black">Type :</label>
+                            </div>
+
+                            <div class="col-12 col-md-10">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <label class="type-option">
+                                        <input type="radio" name="orderType" value="Take away">
+                                        <span>Take away</span>
+                                    </label>
+
+                                    <label class="type-option">
+                                        <input type="radio" name="orderType" value="Dine in">
+                                        <span>Dine in</span>
+                                    </label>
+
+                                    <label class="type-option">
+                                        <input type="radio" name="orderType" value="GoFood">
+                                        <span>GoFood</span>
+                                    </label>
+
+                                    <label class="type-option">
+                                        <input type="radio" name="orderType" value="GrabFood">
+                                        <span>GrabFood</span>
+                                    </label>
+
+                                    <label class="type-option">
+                                        <input type="radio" name="orderType" value="ShopeeFood">
+                                        <span>ShopeeFood</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row gy-2 align-items-center mt-4">
+                            <div class="col-12 col-md-2">
+                                <label class="fw-bold fs-6 text-black">Qty :</label>
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <div class="qty-wrapper">
+                                    <button type="button" class="qty-btn" onclick="decreaseQty()">−</button>
+                                    <input type="number" id="qtyInput" class="qty-input" value="1" min="1">
+                                    <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <label class="fw-bold fs-6 text-black">Disc :</label>
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <div class="discount-wrapper">
+                                    <span class="discount-prefix">Rp</span>
+                                    <input type="number" class="discount-input" placeholder="Discount" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row gy-2 align-items-start mt-4">
+                            <div class="col-12 col-md-2">
+                                <label class="fw-bold fs-6 text-black">Remark :</label>
+                            </div>
+
+                            <div class="col-12 col-md-10">
+                                @Html.TextArea(
+                                    "RemarkOrder",
+                                    null,
+                                    new {
+                                        @class = "form-control form-control-sm auto-resize",
+                                        placeholder = "Masukkan deskripsi...",
+                                        maxlength = "300",
+                                        rows = "1"
+                                    }
+                                )
+                            </div>
+                        </div>
+                        <div class="row gy-2 align-items-start mt-4 d-none" id="variantSection">
+                            <div class="col-12 col-md-2">
+                                <label class="fw-bold fs-6 text-black">Variant :</label>
+                            </div>
+
+                            <div class="col-12 col-md-10">
+                                <div class="d-flex flex-wrap gap-2" id="variantContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+           <div class="modal-footer py-2 px-3 border-0 bg-white">
+            <div class="d-flex gap-2 w-100 justify-content-center">
+
+                <button type="button"
+                        class="btn btn-danger btn-sm flex-fill flex-md-grow-0 px-md-4"
+                        data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1 fs-6 fs-md-5"></i>
+                    Close
+                </button>
+
+                <button type="button"
+                        class="btn btn-success btn-sm flex-fill flex-md-grow-0 px-md-4 SaveInsert"
+                        onclick="SaveOrder()"
+                        id="btnSaveOrder">
+                    <i class="ri ri-check-fill me-1 fs-6 fs-md-5"></i>
+                    Save
+                </button>
+
+            </div>
+        </div>
+
+
+        </div>
+    </div>
+</div>
+
+@* kayanya udah gadipake *@
+<div class="modal fade" id="ModalBillEdit" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+                <h4 class="modal-title mb-0 fw-semibold text-white" id="defferedAmmortizeLabel">
+                    Edit Bill
+                </h4>
+                <button type="button"
+                        class="btn shadow-none p-0"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body bg-white">
+
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Trans No</th>
+                        <th>Nilai Amt</th>
+                        <th>Seq No</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>TRX001</td>
+                        <td>1,500,000</td>
+                        <td>001</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary">Pilih</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>TRX002</td>
+                        <td>2,750,000</td>
+                        <td>002</td>
+                        <td>
+                            <button class="btn btn-sm btn-success">Pilih</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>TRX003</td>
+                        <td>980,000</td>
+                        <td>003</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning">Pilih</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+
+        <!-- Footer -->
+        <div class="modal-footer py-2 px-3 border-0 justify-content-end bg-white">
+
+            <button type="button" class="btn btn-success btn-sm SaveInsert" onclick="SaveOrder()" id="btnSaveOrder" >
+                <i class="ri ri-check-fill me-1 icon-18px"></i> Save
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                <i class="ri ri-close-line me-1 icon-18px"></i> Close
+            </button>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalViewBill" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+                <h4 class="modal-title mb-0 fw-semibold text-white" id="defferedAmmortizeLabel">
+                    List Bill
+                </h4>
+                <button type="button"
+                        class="btn shadow-none p-0"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body bg-white">
+                <div class="table-responsive">
+                     <table class="table table-sm table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>TransCode</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="TransList">
+                        <!-- data masuk di sini -->
+                    </tbody>
+                </table>
+                </div>
+               
+
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer py-2 px-3 border-0 justify-content-end bg-white">
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1 icon-18px"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalPayment" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+                <h4 class="modal-title mb-0 fw-semibold text-white" id="defferedAmmortizeLabel">
+                    Payment
+                </h4>
+                <button type="button"
+                        class="btn shadow-none p-0"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+           <div class="modal-body bg-white">
+
+                <h4 class="TotalPayment text-center mb-3">
+                    Rp. xxx
+                </h4>
+
+                <hr>
+
+                <!-- Payment Method -->
+                <div class="mb-3">
+                    <p class="fw-bold mb-2">Payment Method</p>
+
+                   <div class="col-12">
+                        
+                        <div class="d-flex flex-wrap gap-5">
+            
+                            <label class="type-option">
+                                <input type="radio" name="PayMethod" value="Cash" checked>
+                                <span>Cash</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayMethod" value="EDC">
+                                <span>EDC</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayMethod" value="EWall">
+                                <span>E-Wallet</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayMethod" value="QRIS">
+                                <span>QRIS</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayMethod" value="Trans">
+                                <span>Transfer</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayMethod" value="Other">
+                                <span>Other</span>
+                            </label>
+                        </div>
+                   </div>
+                </div>
+
+                <!-- Payment Type -->
+                <div class="mb-4">
+                    <p class="fw-bold mb-2">Payment Type</p>
+
+                   @* CASH =======================================>*@
+                   <div id="CashMethod" >
+                       <div class="d-flex flex-wrap gap-5">
+                            <label class="type-option">
+                                <input type="radio" name="PayType" value="UangPas" checked>
+                                <span>Uang Pas</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayType" value="50000">
+                                <span>Rp. 50,000</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayType" value="25000">
+                                <span>Rp. 25,000</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayType" value="100000">
+                                <span>Rp. 100,000</span>
+                            </label>
+
+                            <label class="type-option">
+                                <input type="radio" name="PayType" value="Lainnya">
+                                <span>Other</span>
+                            </label>
+                       </div>
+                   </div>                   
+                    @* END CASH ==================================>*@
+
+                    @* SELAIN CASH ===============================>*@
+                     <div id="OtherMethod" style="display:none;">
+                        <div class="form-floating form-floating-outline mb-3 mt-5">
+                            @Html.DropDownList("OtherMethoddropDown",ViewData["OtherMethod"] as SelectList,new { @class = "form-control form-control-sm select2",@id = "OtherMethodSelect" })
+                            <label class="PayMethodLabel">Type</label>
+                        </div>
+                    </div>
+
+                    @* END Selain CASH ===========================>*@
+
+                </div>
+
+                <div class="mb-4">
+                    <p class="fw-bold mb-2">Total Payment</p>
+                    <input type="text" class="mt-2 form-control GrandTotalPayment" maxlength="15" onkeyup="InputNumber(this); FormatGrandTotal(this);" readonly   />
+
+                </div>
+                <!-- Button -->
+                <div class="text-center">
+                    <button type="button" class="btn btn-success btn-sm w-50 text-center" onclick="ProcessPayment()">
+                        <i class="ri ri-refund-2-line me-1 icon-18px"></i>
+                        Process
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalMobile" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+                <h4 class="modal-title mb-0 fw-semibold text-white" id="defferedAmmortizeLabel">
+                    Bill Order
+                </h4>
+                <button type="button"
+                        class="btn shadow-none p-0"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body bg-white">
+                @Html.Partial("Create")
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/select2/select2.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/popular.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/auto-focus.js"></script>
+    <script src="~/assets/vendor/libs/cleave-zen/cleave-zen.js"></script>
+    <script src="~/assets/js/forms-selects.js"></script>
+    <script src="~/assets/vendor/libs/tagify/tagify.js"></script>
+    <script src="~/assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="~/assets/vendor/libs/bloodhound/bloodhound.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script src="~/assets/js/generalscript.js"></script>
+    <script type="text/javascript">
+        const token = $('input[name="__RequestVerificationToken"]').val();
+        const getDataUrl = '@Url.Action("GetData", "Categories", new { area = "Catalog" })';
+        var seqCounter = 1;
+        var DataMenu = [];
+        var table = null;
+        var nilaiTampung = "";
+       $('.select2').select2();
+        $(document).ready(function () {
+            renderBill();
+            getDataProduct();
+            getNewTransNo();
+        });
+
+        function getDataProduct() {
+             CloseModalMobile()
+            var dataBranch='@Model.BranchCode';
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetDataProduct", "Cashier", new { Area = "Employee" })',
+                data : {"BranchCode":dataBranch,"Categories":$("#CategoriesFilter").val(),"SearchMenu":$("#searchMenu").val()},
+                success: function (data) {
+
+                    let html = '';
+
+                    $.each(data, function (i, item) {
+
+                        let hasImage = item.Image && item.Image !== "";
+                        $(".ProdCode").val(item.ProdCode)
+                        $(".ProdHarga").val(item.Harga)
+                        
+                        html += `
+                            <div class="product" onclick="ShowModalOrder('${item.ProdCode}','${AddCommaDecimal(item.Harga)}','${item.ProdName}')" data-code="${item.ProdCode}">
+                                <div class="img ${hasImage ? '' : 'no-image'}">
+                                    ${hasImage
+                                        ? `<img src="../..${item.Image}" alt="${item.ProdName}">`
+                                        : `<div class="no-image-text">NO IMAGE</div>`
+                                    }
+                                    <div class="price">Rp ${AddCommaDecimal(item.Harga)}</div>
+                                </div>
+                                <div class="name">${item.ProdName}</div>
+                            </div>
+                        `;
+                    });
+
+                    $('#productGrid').html(html);
+                },
+                error: function () {
+                    SweetAlertError('Error', 'Failed to load Product data. Please try again.');
+                }
+            });
+        }
+
+        $("#CategoriesFilter").on('change',function(){
+            getDataProduct()
+        })
+
+        $("#searchMenu").on('change',function(){
+             getDataProduct();
+        })
+        
+        function AddCommaDecimal(numb) {
+            if (numb === null || numb === undefined || numb === "") {
+                return "-";
+            }
+
+            let num = parseFloat(numb.toString().replace(/,/g, ""));
+
+            if (isNaN(num)) return "-";
+
+            // Jika bilangan bulat → tanpa decimal
+            if (Number.isInteger(num)) {
+                return num.toLocaleString("en-US");
+            }
+
+            // Jika ada pecahan → max 2 decimal, tanpa .00
+            return num.toLocaleString("en-US", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function renderBill() {
+            let html = "";
+
+            DataMenu.forEach(item => {
+                html += `
+                    <div class="bill-item">
+                        <span class="qty">${item.qty}x</span>
+                        <span class="name ShowItemModalByName" data-seq="${item.seqNo}">
+                            ${item.name}
+                        </span>
+                        <span class="billprice">
+                            ${AddCommaDecimal(item.price)}
+                        </span>
+                        <button class="btn-delete" data-seq="${item.seqNo}">
+                            ✕
+                        </button>
+                    </div>
+                `;
+
+                if (item.variants?.length) {
+                    item.variants.forEach(v => {
+                        html += `
+                            <div class="bill-variant">
+                                └ ${v.type}: ${v.value}
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            document.querySelectorAll(".bill-list")
+                .forEach(el => el.innerHTML = html);
+        }
+
+        
+
+        function ModalBillEdit(){
+             CloseModalMobile()
+            let modal = new bootstrap.Modal(document.getElementById('ModalOrder'));
+            modal.show();
+        }
+
+        function ShowModalMobile(){
+            let modal = new bootstrap.Modal(document.getElementById('ModalMobile'));
+            modal.show();
+            renderBill()
+            
+        }
+
+        function CloseModalMobile(){
+            const modalEl = document.getElementById('ModalMobile');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+
+            if (modal) {
+                modal.hide();
+            }
+        }
+        function ShowModalOrder(dataCode, Harga, ProductName) {
+             CloseModalMobile()
+            resetOrderModal();
+            let modal = new bootstrap.Modal(document.getElementById('ModalOrder'));
+            modal.show();
+            $('#ModalOrder').removeData('edit-seq');
+
+            $(".ProdName").text(ProductName + " - Rp. " + Harga.toLocaleString());
+            $(".ProdHarga").val(Harga)
+            $(".ProdCode").val(dataCode)
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetProductDetail", "Cashier", new { Area = "Employee" })',
+                data: { productCode: dataCode }, // ⚠️ samakan dengan controller
+                success: function (data) {
+                    const section = document.getElementById('variantSection');
+                    const container = document.getElementById('variantContainer');
+
+                    // reset dulu
+                    container.innerHTML = '';
+                    section.classList.add('d-none');
+
+                    // kalau tidak ada variant
+                    if (!data || data.length === 0) {
+                        return;
+                    }
+
+                    // tampilkan section
+                    section.classList.remove('d-none');
+
+                    // loop header
+                    data.forEach(header => {
+
+                        const inputType = header.VarianType === false ? 'radio' : 'checkbox';
+                        let minMaxLabel = '';
+
+                       if (header.VarianType === true) {
+                            minMaxLabel = `
+                                <small class="text-muted">
+                                    (min ${header.Minimal}, max ${header.Maximal})
+                                </small>
+                            `;
+                        }
+
+                        let html = `
+                        <div class="w-100 variant-group"
+                                data-code="${header.VarianCode}"
+                                data-name="${header.VarianName}"
+                                data-min="${header.Minimal}"
+                                data-max="${header.Maximal}"
+                                data-mode="${header.VarianMode}"
+                                data-type="${header.VarianType}">
+     
+                            <div class="fw-bold mb-2 varianLabel">
+                                ${header.VarianName}
+                                ${minMaxLabel}
+                            </div>
+                            <div class="fw-bold mb-2 varianCode" hidden>
+                                ${header.VarianCode}
+                                
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                        `;
+
+                    // loop detail
+                    header.Variants.forEach(v => {
+                        html += `
+                            <label class="type-option">
+                                <input type="${inputType}"
+                                        name="variant_${header.VarianCode}"
+                                        value="${v.Name}"
+                                        data-price="${v.Value}">
+                                <span>
+                                    ${v.Name}
+                                    ${v.Value > 0 ? `( +Rp ${Number(v.Value).toLocaleString()} )` : ''}
+                                </span>
+                            </label>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+
+
+                        container.insertAdjacentHTML('beforeend', html);
+                    });
+                },
+                error: function () {
+                    SweetAlertError('Error', 'Failed to load Product data. Please try again.');
+                }
+            });
+        }
+
+        function resetOrderModal() {
+
+            // header / hidden
+            $('.ProdName').text('');
+            $('.ProdCode').val('');
+            $('.ProdHarga').val('');
+
+            // qty & discount
+            $('#qtyInput').val(1);
+            $('.discount-input').val(0);
+
+            // remark
+            $('#RemarkOrder').val('');
+
+            // order type
+            $('input[name="orderType"]').prop('checked', false);
+
+            // variant
+            $('#variantContainer').empty();
+            $('#variantSection').addClass('d-none');
+
+            // hapus edit mode
+            $('#ModalOrder').removeData('edit-seq');
+        }
+
+        $(document).on('change', 'input[name^="variant_"]', function () {
+
+            const $input = $(this);
+            const $group = $input.closest('.variant-group');
+
+            const min  = parseInt($group.data('min'));
+            const max  = parseInt($group.data('max'));
+            const type = parseInt($group.data('type'));
+
+            const $inputs  = $group.find('input[name^="variant_"]');
+            const checkedCount = $inputs.filter(':checked').length;
+
+            // === MAXIMAL (checkbox) ===
+            if (type === 1 && checkedCount > max) {
+                $input.prop('checked', false);
+                alert(`Maksimal pilih ${max} item`);
+                return;
+            }
+
+            // === RADIO TYPE ===
+            if (type === 0 && checkedCount > 1) {
+                $inputs.not($input).prop('checked', false);
+            }
+        });
+         
+        function increaseQty() {
+            const input = document.getElementById('qtyInput');
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQty() {
+            const input = document.getElementById('qtyInput');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        function SaveOrder() {
+            if (!validateOrder()) return;
+
+            // ===== BASIC DATA =====
+            const qty = parseInt($('#qtyInput').val()) || 1;
+            const discount = parseFloat($('.discount-input').val()) || 0;
+            const remark = $('#RemarkOrder').val() || "";
+
+            const productName = $('.ProdName').text().split("-")[0]
+                .replace('Product :', '')
+                .trim();
+
+            const productCode = $(".ProdCode").val();
+            const basePrice = RemoveAllComma($(".ProdHarga").val());
+
+            const orderType = $("input[name='orderType']:checked").val() || "";
+
+            // ===== VARIANTS =====
+            let variants = [];
+            let valid = true;
+
+            $('.variant-group').each(function () {
+                const group = $(this);
+
+                const typeName = group.data('name');       // ambil nama dari data-name
+                const variancode = group.data('code');     // ambil code dari data-code
+
+                const min = parseInt(group.data('min')) || 0;
+                const type = parseInt(group.data('type')) || 0;
+
+                const checked = group.find('input:checked');
+
+                if (type === 1 && checked.length < min) {
+                    alert(`Minimal pilih ${min} untuk ${typeName}`);
+                    valid = false;
+                    return false;
+                }
+
+                checked.each(function () {
+                    variants.push({
+                        type: typeName,
+                        code: variancode,
+                        value: $(this).val(),
+                        price: parseFloat($(this).data('price')) || 0
+                    });
+                });
+            });
+
+            if (!valid) return;
+
+            // ===== EDIT / INSERT =====
+            const editSeq = $('#ModalOrder').data('edit-seq');
+
+            if (editSeq) {
+                // === EDIT MODE ===
+                const item = DataMenu.find(x => x.seqNo === editSeq);
+                if (!item) return;
+
+                item.qty = qty;
+                item.discount = discount;
+                item.remark = remark;
+                item.orderType = orderType;
+                item.variants = variants;
+
+                // ⚠️ data inti tetap dijaga
+                item.price = basePrice;
+                item.code = productCode;
+                item.name = productName;
+
+                $('#ModalOrder').removeData('edit-seq');
+
+            } else {
+                // === INSERT MODE ===
+                DataMenu.push({
+                    seqNo: seqCounter++,
+                    code: productCode,
+                    name: productName,
+                    price: basePrice,
+                    qty: qty,
+                    discount: discount,
+                    remark: remark,
+                    orderType: orderType,
+                    variants: variants
+                });
+            }
+
+            // ===== CLOSE & REFRESH =====
+            bootstrap.Modal.getInstance(
+                document.getElementById('ModalOrder')
+            ).hide();
+
+            renderBill();
+            CalculateTotal();
+        }
+
+        function validateOrder() {
+
+            // === TYPE ===
+            const orderType = $('input[name="orderType"]:checked').val();
+            if (!orderType) {
+                alert('Type wajib diisi');
+                return false;
+            }
+
+            // === QTY ===
+            const qty = parseInt($('#qtyInput').val());
+            if (!qty || qty <= 0) {
+                alert('Qty wajib diisi dan harus lebih dari 0');
+                return false;
+            }
+
+            // === PRODUCT CODE ===
+            if ($(".ProdCode").val()==null ||$(".ProdCode").val()=="") {
+                alert('Product tidak ditemukan');
+                return false;
+            }
+
+            // === PRODUCT PRICE ===
+            if ($(".ProdHarga").val()==null ||$(".ProdHarga").val()=="") {
+                alert('Product tidak ditemukan harganya');
+                return false;
+            }
+
+            // === VARIANT VALIDATION ===
+            let isValid = true;
+            let errorMsg = '';
+
+            $('.variant-group').each(function () {
+
+                const group = $(this);
+
+                const variantName = group.data('name');
+
+                // normalize value
+                const mode = group.data('mode');      // contoh: "1" / 1 / true
+                const isRequired = mode == 1 || mode === true || mode === "true";
+
+
+                const min = parseInt(group.data('min')) || 0;
+                const max = parseInt(group.data('max')) || 0;
+
+                const checked = group.find('input:checked');
+                const checkedCount = checked.length;
+
+                // === WAJIB PILIH JIKA MODE TRUE ===
+                if (isRequired && checkedCount === 0) {
+                    errorMsg = `Varian "${variantName}" wajib dipilih`;
+                    isValid = false;
+                    return false; // break loop
+                }
+
+                // === MIN ===
+                if (isRequired && min > 0 && checkedCount < min) {
+                    errorMsg = `Varian "${variantName}" minimal pilih ${min}`;
+                    isValid = false;
+                    return false;
+                }
+
+                // === MAX ===
+                if (max > 0 && checkedCount > max) {
+                    errorMsg = `Varian "${variantName}" maksimal pilih ${max}`;
+                    isValid = false;
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                alert(errorMsg);
+                return false;
+            }
+
+
+            return true;
+        }
+
+        //ini buat pencet order list nya 
+        function CalculateTotal(){
+            let total = 0;
+
+            $.each(DataMenu, function (i, item) {
+                total += (item.qty * item.price);
+            });
+            $(".SubTotal").text(AddCommaDecimal(total));
+            $(".Total").text(AddCommaDecimal(total));
+        }
+
+        function DeleteBill(){
+            DataMenu.length = 0;   // kosongkan array
+            renderBill();          // refresh tampilan
+            CalculateTotal();         // reset total (kalau ada)
+        }
+
+        $(document).on("click", ".btn-delete", function () {
+            let seqNo = $(this).data("seq");
+
+            // hapus item dari array
+            DataMenu = DataMenu.filter(item => item.seqNo !== seqNo);
+
+            renderBill();
+            CalculateTotal();
+        });
+
+        $(document).on("click", ".ShowItemModalByName", function () {
+             CloseModalMobile()
+            let seqNo = $(this).data("seq");
+
+            // cari data di array
+            let item = DataMenu.find(x => x.seqNo === seqNo);
+            if (!item) return;
+
+            fillOrderModal(item);
+
+            // simpan seqNo yg sedang diedit
+            $("#ModalOrder").data("edit-seq", seqNo);
+
+            // buka modal
+            let modal = new bootstrap.Modal(document.getElementById("ModalOrder"));
+            modal.show();
+        });
+
+        function fillOrderModal(item) {
+            // Nama & hidden value
+            $(".ProdName").text(item.name);
+            $(".ProdCode").val(item.code);
+            $(".ProdHarga").val(item.price);
+
+            // Qty & discount
+            $("#qtyInput").val(item.qty);
+            $(".discount-input").val(item.discount || 0);
+            $("#RemarkOrder").val(item.remark || "");
+
+            // Order Type
+            $("input[name='orderType']").prop("checked", false);
+            if (item.orderType) {
+                $(`input[name='orderType'][value="${item.orderType}"]`).prop("checked", true);
+            }
+
+            // Variant: ambil dari server
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetProductDetail", "Cashier", new { Area = "Employee" })',
+                data: { productCode: item.code },
+                success: function(data) {
+                    renderVariantFromServer(data, item.variants || []);
+                },
+                error: function() {
+                    SweetAlertError("Error", "Failed to load product variant data");
+                }
+            });
+        }
+
+        function renderVariantFromServer(headers, selectedVariants) {
+            const container = $("#variantContainer");
+            if (!headers || headers.length === 0) {
+                $("#variantSection").addClass("d-none");
+                container.html("");
+                return;
+            }
+
+            $("#variantSection").removeClass("d-none");
+            let html = "";
+
+            headers.forEach(header => {
+                const inputType = header.VarianType === false ? 'radio' : 'checkbox';
+                let minMaxLabel = '';
+                if (header.VarianType === true) {
+                    minMaxLabel = `<small class="text-muted">(min ${header.Minimal}, max ${header.Maximal})</small>`;
+                }
+
+                html += `<div class="variant-group"   data-name="${header.VarianName}" data-code="${header.VarianCode}">
+                            <div class="fw-bold mb-2">${header.VarianName} ${minMaxLabel}</div>
+                            <div class="d-flex flex-wrap gap-2">`;
+
+                header.Variants.forEach(v => {
+                    const isChecked = selectedVariants.some(sv => sv.code === header.VarianCode && sv.value === v.Name) ? 'checked' : '';
+                    html += `<label class="type-option">
+                                <input type="${inputType}" name="variant_${header.VarianCode}" value="${v.Name}" data-price="${v.Value}" ${isChecked}>
+                                <span>${v.Name} ${v.Value > 0 ? `( +Rp ${Number(v.Value).toLocaleString()} )` : ''}</span>
+                            </label>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.html(html);
+        }
+
+        function SaveBillPayment(StatusUpdate){
+           
+            if (DataMenu.length === 0) {
+                alert("Order masih kosong");
+                return;
+            
+            }
+            CloseModalMobile()
+            const details = DataMenu.map(item => {
+                return {
+                    ProductCode: item.code,
+                    ProductName: item.name,
+                    SeqNo:item.seqNo,
+                    Qty: item.qty,
+                    Price: item.price,
+                    Discount: item.discount,
+                    Remark: item.remark,
+                    OrderType: item.orderType,
+                    VariantCode: item.variants.map(v => v.code).join(","),
+                    VariantName: item.variants.map(v => v.type).join(","),
+                    VariantValue: item.variants.map(v => v.value).join(","),
+                    VariantHarga: item.variants.map(v => v.price).join(",")
+                };
+            });
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("SaveBillPayment", "Cashier", new { Area = "Employee" })',
+                data : {"TransCode":$(".TransactionCode").first().text().trim(),
+                "TransTotalAmt":RemoveAllComma($(".Total").first().text().trim()),
+                "TransSubTotalAmt":RemoveAllComma($(".SubTotal").first().text().trim()),
+                "Status":StatusUpdate,
+                "TransTotalPaid":RemoveAllComma($(".GrandTotalPayment").val()),
+                "TransPayMtd":$('input[name="PayMethod"]:checked').val(),
+                "TransPayType":$("#OtherMethodSelect").val(),
+                "Details":details,
+                },
+                success: function (data) {
+                    if(data.success==1){
+                        SweetAlertSuccess("Success",data.msg)
+                    }
+                    else{
+                        SweetAlertError("Failed",data.msg)
+                    }
+                    getNewTransNo()
+                    DeleteBill()
+                     bootstrap.Modal.getInstance(
+                        document.getElementById('ModalPayment')
+                    ).hide();
+                },
+                error: function () {
+                    SweetAlertError('Error', 'Failed to Save. Please try again.');
+                }
+            });
+        }
+
+        function getNewTransNo(){
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetNewTransNo", "Cashier", new { Area = "Employee" })',
+                success: function (data) {
+                    console.log("ini jalan:"+data)
+                    $(".TransactionCode").text(data)
+                },
+                error: function () {
+                    SweetAlertError('Error', 'Failed to load new TransNo.');
+                }
+            });
+        }
+
+        function renderTransaction() {
+            let html = '';
+             $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetBillList", "Cashier", new { Area = "Employee" })',
+                dataType: 'json',
+                success: function (data) {
+                    $.each(data, function (index, item) {
+                        html += `
+                            <tr>
+                                <td>${item.TransCode}</td>
+                                <td class="text-end">
+                                    ${AddCommaDecimal(item.TransTotalAmt)}
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary btn-edit" OnClick='GetDataBillForTransaction("${item.TransCode}")'
+                                            data-code="${item.TransCode}">
+                                        Select
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    // 🔥 PINDAH KE SINI
+                    $('#TransList').html(html);
+                },
+                error: function () {
+                    SweetAlertError('Error', 'Failed to load new TransNo.');
+                }
+            });
+            
+        }
+
+        function ListBill(){//open modal list bill
+             CloseModalMobile()
+            let modal = new bootstrap.Modal(document.getElementById('ModalViewBill'));
+            modal.show();
+            renderTransaction();
+        }
+
+        function GetDataBillForTransaction(TransCode) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Edit", "Cashier", new { Area = "Employee" })',
+                data: { TransCode },
+                dataType: 'json',
+                success: function (res) {
+
+                    // RESET
+                    DataMenu = [];
+                    seqCounter = 1;
+
+                    $(".TransactionCode").text(res.TransCode);
+                    $(".SubTotal").text(AddCommaDecimal(res.TransSubTotalAmt));
+                    $(".Total").text(AddCommaDecimal(res.TransTotalAmt));
+
+                    res.Details.forEach(d => {
+
+                        // === SPLIT VARIANT ===
+                        const codes  = d.VariantCode?.split(',') || [];
+                        const names  = d.VariantName?.split(',') || [];
+                        const values = d.VariantValue?.split(',') || [];
+                        const prices = d.VariantHarga?.split(',') || [];
+                        const ordertypes = d.OrderType?.split(',') || [];
+
+                        let variants = [];
+
+                        for (let i = 0; i < codes.length; i++) {
+                            if (!codes[i]) continue;
+
+                            variants.push({
+                                code: codes[i],
+                                type: names[i] || "",
+                                value: values[i] || "",
+                                price: parseFloat(prices[i]) || 0
+                            });
+                        }
+
+                        // === PUSH KE DATAMENU ===
+                        DataMenu.push({
+                            seqNo: d.SeqNo,
+                            code: d.ProductCode,
+                            name: d.ProductName,
+                            price: d.Price,
+                            qty: d.Qty,
+                            discount: 0,
+                            remark: d.Remark || "",
+                            orderType: ordertypes,
+                            variants: variants
+                        });
+
+                        seqCounter = Math.max(seqCounter, d.SeqNo + 1);
+                    });
+
+                    renderBill();
+                    CalculateTotal();
+
+                    const modalEl = document.getElementById('ModalViewBill');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    if (window.matchMedia("(max-width: 767.98px)").matches) {
+                        const modalMobileEl = document.getElementById('ModalMobile');
+                        const modalMobile = bootstrap.Modal.getOrCreateInstance(modalMobileEl);
+                        modalMobile.show();
+                    }
+                },
+                error: function () {
+                    SweetAlertError("Error", "Failed to load transaction");
+                }
+            });
+        }
+
+        function ShowModalPayment(){//open modal list bill
+            if(parseInt(RemoveAllComma($(".Total").first().text().trim()))==0){
+                SweetAlertError('Failed','Please Fill the bill first');
+            }
+            else{
+                CloseModalMobile()
+                let modal = new bootstrap.Modal(document.getElementById('ModalPayment'));
+                modal.show();
+                $(".TotalPayment").text("Rp. "+ $(".Total").first().text().trim())
+                $(".GrandTotalPayment").val($(".Total").first().text().trim())
+                
+            }
+           
+        }
+
+        $(document).on('change', 'input[name="PayMethod"]', function () {
+            let payMethod = $(this).val();
+
+            if (payMethod === 'Cash') {
+                $('#OtherMethod').stop(true, true).slideUp();
+                $('#CashMethod').stop(true, true).slideDown();
+                $('input[name="PayType"][value="UangPas"]')
+                    .prop('checked', true)
+                    .trigger('change');
+
+            } else {
+                $('#CashMethod').stop(true, true).slideUp();
+                $('#OtherMethod').stop(true, true).slideDown();
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetPayType", "Cashier", new { Area = "Employee" })',
+                    data: {
+                        PayMethod: payMethod
+                    },
+                    success: function (data) {
+                        let $ddl = $('#OtherMethodSelect');
+                        $ddl.empty(); // kosongkan dulu
+
+                        $ddl.append('<option value="">-- Pilih Method --</option>');
+
+                        $.each(data, function (i, item) {
+                            $ddl.append(
+                                $('<option>', {
+                                    value: item.Value,
+                                    text: item.Text
+                                })
+                            );
+                        });
+                        if (data.length > 0) {
+                            $ddl.val(data[0].Value).trigger('change');
+                        }
+
+                    },
+                    error: function () {
+                        SweetAlertError('Error', 'Failed to load Product data. Please try again.');
+                    }
+                });
+
+            }
+            let total = $('.TotalPayment').text().split("Rp.")[1].trim();
+                $('.GrandTotalPayment').val(total);
+                $('.GrandTotalPayment').attr('readonly',true);
+        });
+
+        $(document).on('change', 'input[name="PayType"]', function () {
+            let payType = $(this).val();
+
+            if (payType === 'UangPas') {
+                // ambil nilai dari TotalPayment
+                let total = $('.TotalPayment').text().split("Rp.")[1].trim();
+                $('.GrandTotalPayment').val(total);
+                $('.GrandTotalPayment').attr('readonly',true);
+
+
+            } else if (!isNaN(payType)) {
+                
+                let nominal = parseInt(payType);
+                $('.GrandTotalPayment').val(AddCommaDecimal(nominal));
+                 $('.GrandTotalPayment').attr('readonly',true);
+
+            } else {
+                // Other / Lainnya
+                $('.GrandTotalPayment').removeAttr('readonly');
+            }
+        });
+
+        function ProcessPayment(){
+            if(parseInt($(".TotalPayment").text().split("Rp.")[1].trim())==0){
+                SweetAlertError("Failed","Total Amount can't be zero!")
+            }
+            else if(parseInt(RemoveAllComma($(".GrandTotalPayment").val()))==0||$(".GrandTotalPayment").val()==undefined||$(".GrandTotalPayment").val()==""){
+                SweetAlertError("Failed","Total Payment can't be zero! or Empty")
+            }
+            else if(
+            parseInt(
+                        RemoveAllComma($(".TotalPayment").text().split("Rp.")[1].trim())
+                    ) > parseInt(
+                        RemoveAllComma($(".GrandTotalPayment").val())
+                    )
+            ){
+                SweetAlertError("Failed","Total Payment can't be smaller than Total Amount!");
+            }
+            else{
+                SaveBillPayment(1)
+            }
+        }
+       
+
+
+    </script>
+}

@@ -1,0 +1,577 @@
+﻿@model Transaction.Employee.Shift
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Shift";
+}
+<style>
+
+    .row-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+    }
+
+        .row-item .label {
+            font-weight: bold;
+        }
+
+        .row-item .value {
+            text-align: right;
+        }
+
+
+</style>
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/assets/css/custom.css" />
+
+}
+@Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
+@Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
+@Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
+@Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+@Html.Hidden("GroupCode", Convert.ToString(ViewData["GroupCode"]))
+@Html.Hidden("UserID", Convert.ToString(ViewData["UserID"]))
+
+
+<div class="col d-flex align-items-center">
+    <i class="ri ri-user-3-line me-2 text-primary" style="font-size: 1.5rem;"></i>
+    <h4 class="card-title mb-0 fw-semibold text-primary">
+        @ViewBag.Title
+    </h4>
+</div>
+
+   <div class="row mt-3">
+    <div class="col-sm-5">
+        <div class="card mb-5">
+            <div class="card-header bg-gradient-primary text-white py-2 w-100 mb-5">
+                <h5 class="mb-0 text-white">Shift saat ini</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="form-floating form-floating-outline">
+                            @if(Convert.ToString(ViewData["GroupCode"])=="SuAd"){
+                                @Html.DropDownList("BranchFilter", ViewData["BranchList"] as SelectList, "All", new { @class = "form-control form-control-sm select2" })
+                            }
+                            else{
+                                @Html.DropDownList("BranchFilter", ViewData["BranchList"] as SelectList, "All", new { @class = "form-control form-control-sm select2",disabled="disabled" })
+                            }
+
+                            <label for="BranchFilter">Outlet</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-floating form-floating-outline">
+                            @if(Convert.ToString(ViewData["GroupCode"])=="SuAd"){
+                                 @Html.TextBox(
+                                    "FromDate",
+                                    DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                                    new {
+                                        id = "txtFromDate",
+                                        @class = "form-control form-control-sm",
+                                        type = "text",
+                                        placeholder = "dd/mmm/yyyy",
+                                    }
+                                )
+                            }
+                            else{
+                                 @Html.TextBox(
+                                    "FromDate",
+                                    DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                                    new {
+                                        id = "txtFromDate",
+                                        @class = "form-control form-control-sm",
+                                        type = "text",
+                                        placeholder = "dd/mmm/yyyy",
+                                        disabled ="disabled",
+                                    }
+                                )
+                            }
+                           
+                            <label for="txtFromDate">Start Shift</label>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+
+                <div class="row mt-3">
+                    <div id="shiftContainer" class="col-sm-12">
+                        <!-- Data dari JSON akan masuk ke sini -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card mb-5">
+            <div class="card-header bg-gradient-primary text-white py-2 w-100 mb-5">
+                <h5 class="mb-0 text-white">Action</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+
+                    <div class="col-12 mb-2">
+                        <button type="button" class="btn btn-success w-100" onclick="OpenShiftModal()">
+                            Open Shift
+                        </button>
+                    </div>
+
+                    <div class="col-12 mb-2">
+                        <button type="button" class="btn btn-danger w-100" onclick="CloseShiftModal()">
+                            Close Shift
+                        </button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div id="PartialSection">
+</div>
+<div class="modal fade" id="OpenShift" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm  modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+                <h4 class="modal-title mb-0 fw-semibold text-white" id="xxx">
+                    Open Shift
+                </h4>
+                <button type="button"
+                        class="btn shadow-none p-0"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                 <div class="tab-content">
+                     <div class="tab-pane fade show active" id="pane-info" role="tabpanel">
+                        <div class="row gy-2">
+                            <div class="col-12">
+                                <div class="form-group">
+
+                                    <!-- Kas Masuk -->
+                                    <div class="form-floating form-floating-outline mb-3">
+                                        @Html.TextBox(
+                                            "KasMasuk",
+                                            null,
+                                            new {
+                                                @class = "form-control",
+                                                placeholder = "Masukan Kas Awal",
+                                                maxlength = 15,
+                                                onkeyup = "InputNumber(this)"
+                                            }
+                                        )
+                                        <label>Kas Masuk</label>
+                                    </div>
+
+                                    <!-- User -->
+                                    <div class="form-floating form-floating-outline mb-3">
+                                        @Html.TextBox(
+                                            "UserInputOpen",
+                                            ViewData["UserID"],   // Value
+                                            new {
+                                                @class = "form-control",
+                                                placeholder = "AUTO",
+                                                disabled = "disabled",
+                                                maxlength = 50
+                                            }
+                                        )
+                                        <label>User</label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                     </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer py-2 px-3 border-0 justify-content-center">
+                <button type="button" class="btn btn-success btn-sm SaveInsert" onclick="InsShift()" id="btnInsert">
+                    <i class="ri ri-check-fill me-1 icon-18px"></i> Save
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1 icon-18px"></i> Close
+                </button>
+            </div>
+               
+            
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="CloseShift" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm  modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+                <h4 class="modal-title mb-0 fw-semibold text-white" id="xxx">
+                    Close Shift
+                </h4>
+                <button type="button"
+                        class="btn shadow-none p-0"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                 <div class="tab-content">
+                     <div class="tab-pane fade show active" id="pane-info" role="tabpanel">
+                        <div class="row gy-2">
+                            <div class="col-12">
+                                <div class="form-group">
+
+                                    <!-- Kas Masuk -->
+                                    <div class="form-floating form-floating-outline mb-3">
+                                        @Html.TextBox(
+                                            "KasKeluar",
+                                            null,
+                                            new {
+                                                @class = "form-control",
+                                                placeholder = "Masukan Kas Akhir",
+                                                maxlength = 15,
+                                                onkeyup = "InputNumber(this)"
+                                            }
+                                        )
+                                        <label>Kas Keluar</label>
+                                    </div>
+
+                                    <!-- User -->
+                                    <div class="form-floating form-floating-outline mb-3">
+                                        @Html.TextBox(
+                                            "UserInputClose",
+                                            ViewData["UserID"],   // Value
+                                            new {
+                                                @class = "form-control",
+                                                placeholder = "AUTO",
+                                                disabled = "disabled",
+                                                maxlength = 50
+                                            }
+                                        )
+                                        <label>User</label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                     </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer py-2 px-3 border-0 justify-content-center">
+                <button type="button" class="btn btn-success btn-sm SaveInsert" onclick="CloseShift()" id="btnInsert">
+                    <i class="ri ri-check-fill me-1 icon-18px"></i> Save
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1 icon-18px"></i> Close
+                </button>
+            </div>
+               
+            
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/select2/select2.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/popular.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/auto-focus.js"></script>
+    <script src="~/assets/vendor/libs/cleave-zen/cleave-zen.js"></script>
+    <script src="~/assets/js/forms-selects.js"></script>
+    <script src="~/assets/vendor/libs/tagify/tagify.js"></script>
+    <script src="~/assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="~/assets/vendor/libs/bloodhound/bloodhound.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script type="text/javascript">
+        const token = $('input[name="__RequestVerificationToken"]').val();
+        const getDataUrl = '@Url.Action("GetData", "Categories", new { area = "Catalog" })';
+
+        var table = null;
+        var nilaiTampung = "";
+        $('.select2').select2();
+
+        $(document).ready(function () {
+           flatpickr("#txtFromDate", {
+                dateFormat: "d/M/Y",
+                disableMobile: true,
+                static: true,
+            });
+            getdata();
+        });
+
+        function getdata(){
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("Edit", "Shift", new { Area = "Employee" })',
+                dataType: "json",
+                data: {
+                    Dates:$("#txtFromDate").val(),
+                    Outlet:$("#BranchFilter").val(),
+                },
+                success: function (respond) {
+
+                    let html = "";
+
+                    // Jika null ATAU undefined ATAU length == 0
+                    if (!respond || respond.length === 0) {
+
+                        html += `
+                            <div class="mb-3">
+
+                                <div class="row-item">
+                                    <div class="label">Nama:</div>
+                                    <div class="value">-</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Outlet:</div>
+                                    <div class="value">-</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Start Shift:</div>
+                                    <div class="value">-</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Kas Awal:</div>
+                                    <div class="value">-</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Close Shift:</div>
+                                    <div class="value">-</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Kas Akhir:</div>
+                                    <div class="value">-</div>
+                                </div>
+
+                            </div>
+                        `;
+
+                        $("#shiftContainer").html(html);
+                        return; // STOP, supaya tidak lanjut foreach
+                    }
+
+                    // ---------------------------
+                    // Jika ADA DATA, jalankan ini
+                    // ---------------------------
+
+                    respond.forEach((item, index) => {
+
+                        var kasAwal = AddCommaDecimal(item.KasAwal) || "-";
+                        var kasAkhir = AddCommaDecimal(item.KasAkhir) || "-";
+
+                        html += `
+                            <div class="mb-3">
+
+                                <div class="row-item">
+                                    <div class="label">Nama:</div>
+                                    <div class="value">${item.ShiftUser || "-"}</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Outlet:</div>
+                                    <div class="value">${item.Branch || "-"}</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Start Shift:</div>
+                                    <div class="value">${item.StartShiftString || "-"}</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Kas Awal:</div>
+                                    <div class="value">${kasAwal}</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Close Shift:</div>
+                                    <div class="value">${item.CloseShiftString || "-"}</div>
+                                </div>
+
+                                <div class="row-item">
+                                    <div class="label">Kas Akhir:</div>
+                                    <div class="value">${kasAkhir}</div>
+                                </div>
+
+                            </div>
+                        `;
+
+                        if (index < respond.length - 1) html += "<hr />";
+                    });
+
+                    $("#shiftContainer").html(html);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error load shift:", error);
+                }
+            });
+        }
+
+        function OpenShiftModal() {
+            var myModal = new bootstrap.Modal(document.getElementById('OpenShift'));
+            myModal.show();
+        }
+
+        function CloseShiftModal() {
+            var myModal = new bootstrap.Modal(document.getElementById('CloseShift'));
+            myModal.show();
+        }
+
+        function HistoryShiftModal() {
+            var myModal = new bootstrap.Modal(document.getElementById('HistoryShift'));
+            myModal.show();
+        }
+
+        function InputNumber(el) {
+            let value = el.value;
+
+            value = value
+                .replace(/[^\d.-]/g, "")
+                .replace(/^(\d*\.)(.*)\.(.*)$/, '$1$2$3')
+                .replace(/\.(\d{6})\d+/, '.$1')
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            el.value = value;
+        }
+
+        function InsShift(){
+            if($("#KasMasuk").val()==""||$("#KasMasuk").val()==null){
+                SweetAlertError('Failed!', 'All Field are required!');
+
+                return false;
+            }
+             $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ProsesShift", "Shift", new { Area = "Employee" })',
+                data: { ShiftID: null,
+                        Type:1,
+                        User:$("#UserInputOpen").val(),
+                        Outlet:$("#BranchFilter").val(),
+                        KasAwal:RemoveAllComma($("#KasMasuk").val()),
+                        KasAkhir:0,
+                        Dates:$("#txtFromDate").val(),
+                },
+                success: function (data) {
+                    SweetAlertClose(); 
+                    if (data) {
+                        if(data.success==1){
+                            var modalEl = document.getElementById('OpenShift');
+                            var myModal = bootstrap.Modal.getInstance(modalEl);
+                            myModal.hide();
+                            getdata();
+                            SweetAlertSuccess('Success', data.msg);
+
+                        }
+                        else{
+                            SweetAlertError('Failed!', data.msg);
+
+                        }
+                    } else {
+                        SweetAlertError('Not Found', 'Category data could not be found.');
+                    }
+                },
+                error: function () {
+                    SweetAlertError('Error', 'Failed to load Category data. Please try again.');
+                }
+            });
+            
+        }
+
+        function CloseShift(){
+            if($("#KasKeluar").val()==""||$("#KasKeluar").val()==null){
+                SweetAlertError('Failed', 'All Field are required!');
+
+                return false;
+            }
+             $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ProsesShift", "Shift", new { Area = "Employee" })',
+                data: { ShiftID: null,
+                        Type:2,
+                        User:$("#UserInputClose").val(),
+                        Outlet:$("#BranchFilter").val(),
+                        KasAwal:0,
+                        KasAkhir:RemoveAllComma($("#KasKeluar").val()),
+                        Dates:$("#txtFromDate").val(),
+                },
+                success: function (data) {
+                    SweetAlertClose(); 
+                    if (data) {
+                        if(data.success==1){
+                            var modalEl = document.getElementById('CloseShift');
+                            var myModal = bootstrap.Modal.getInstance(modalEl);
+                            myModal.hide();
+                            getdata();
+                            SweetAlertSuccess('Success',data.msg)
+                        }
+                        else{
+                            SweetAlertError('Failed', data.msg);
+
+                        }
+                    } else {
+                        SweetAlertError('Not Found', 'Category data could not be found.');
+                    }
+                },
+                error: function () {
+                    SweetAlertError('Error', 'Failed to load Category data. Please try again.');
+                }
+            });
+            
+        }
+        $("#BranchFilter,#txtFromDate").on("change",function(){
+            getdata();
+        })
+        function AddCommaDecimal(numb) {
+
+    if (numb === null || numb === undefined || numb === "") {
+        return "-";
+    }
+
+    let num = parseFloat(numb.toString().replace(/,/g, ""));
+
+    if (isNaN(num)) return "-";
+
+    // Jika bilangan bulat → tanpa decimal
+    if (Number.isInteger(num)) {
+        return num.toLocaleString("en-US");
+    }
+
+    // Jika ada pecahan → max 2 decimal, tanpa .00
+    return num.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
+    </script>
+}

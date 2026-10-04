@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="10/28/2025 09:06:19" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    int currentPage=1;
+    int totalPage=1;
+    
+    decimal C1CurrentAmt = 0;
+    decimal C2CurrentAmt = 0;
+    decimal C3CurrentAmt = 0;
+    decimal C4CurrentAmt = 0;
+    decimal C5CurrentAmt = 0;
+    decimal C6CurrentAmt = 0;
+    decimal C7CurrentAmt = 0;
+    decimal mCurrentAmt = 0;
+    
+    decimal C1CurrentAmtPrev = 0;
+    decimal C2CurrentAmtPrev = 0;
+    decimal C3CurrentAmtPrev = 0;
+    decimal C4CurrentAmtPrev = 0;
+    decimal C5CurrentAmtPrev = 0;
+    decimal C6CurrentAmtPrev = 0;
+    decimal C7CurrentAmtPrev = 0;
+    decimal mCurrentAmtPrev = 0;
+    
+    decimal C1CurrentAmtPrevMonth = 0;
+    decimal C2CurrentAmtPrevMonth = 0;
+    decimal C3CurrentAmtPrevMonth = 0;
+    decimal C4CurrentAmtPrevMonth = 0;
+    decimal C5CurrentAmtPrevMonth = 0;
+    decimal C6CurrentAmtPrevMonth = 0;
+    decimal C7CurrentAmtPrevMonth = 0;
+    decimal mCurrentAmtPrevMonth = 0;
+    
+    private void Data1_BeforePrint(object sender, EventArgs e) //Hitungan Income Statement
+    {
+      if(!Report.Engine.FinalPass){
+        return;
+      }
+      
+      decimal fromacc = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.fromacc&quot;));
+      
+      decimal CBegBal = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.CBegBal&quot;));
+      decimal CDebit = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.CDebit&quot;));
+      decimal CCredit = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.CCredit&quot;));
+      
+      decimal pBegbal = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.pBegbal&quot;));
+      decimal pDebit = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.pDebit&quot;));
+      decimal pCredit = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.pCredit&quot;));
+      
+      decimal multiply = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.multiply&quot;));
+      decimal divide = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.divide&quot;));
+      int dbtcrd = Convert.ToInt32(Report.GetColumnValue(&quot;GLRepIncomeStat.dbtcrd&quot;));
+      
+      decimal formula = 0;
+      decimal formulaPrev = 0;
+      decimal formulaPrevMonth = 0;
+      
+      switch ((int)fromacc)
+      {
+        case 8:
+          formula = CDebit + CCredit;
+          if (dbtcrd == 1) formula *= -1;
+          formula *= (multiply / divide);
+          mCurrentAmt = formula;
+          
+          formulaPrev = CBegBal + CDebit + CCredit;
+          if (dbtcrd == 1) formulaPrev *= -1;
+          formulaPrev *= (multiply / divide);
+          mCurrentAmtPrev = formulaPrev;
+         
+          formulaPrevMonth = pDebit + pCredit;
+          if (dbtcrd == 1) formulaPrevMonth *= -1;
+          formulaPrevMonth *= (multiply / divide);
+          mCurrentAmtPrevMonth = formulaPrevMonth;
+          
+          break;
+        case 7: mCurrentAmt = C7CurrentAmt; mCurrentAmtPrev = C7CurrentAmtPrev; mCurrentAmtPrevMonth = C7CurrentAmtPrevMonth; break;
+        case 6: mCurrentAmt = C6CurrentAmt; mCurrentAmtPrev = C6CurrentAmtPrev; mCurrentAmtPrevMonth = C6CurrentAmtPrevMonth; break;
+        case 5: mCurrentAmt = C5CurrentAmt; mCurrentAmtPrev = C5CurrentAmtPrev; mCurrentAmtPrevMonth = C5CurrentAmtPrevMonth; break;
+        case 4: mCurrentAmt = C4CurrentAmt; mCurrentAmtPrev = C4CurrentAmtPrev; mCurrentAmtPrevMonth = C4CurrentAmtPrevMonth; break;
+        case 3: mCurrentAmt = C3CurrentAmt; mCurrentAmtPrev = C3CurrentAmtPrev; mCurrentAmtPrevMonth = C3CurrentAmtPrevMonth; break;
+        case 2: mCurrentAmt = C2CurrentAmt; mCurrentAmtPrev = C2CurrentAmtPrev; mCurrentAmtPrevMonth = C2CurrentAmtPrevMonth; break;
+        case 1: mCurrentAmt = C1CurrentAmt; mCurrentAmtPrev = C1CurrentAmtPrev; mCurrentAmtPrevMonth = C1CurrentAmtPrevMonth; break;
+      }
+      
+      UpdateAmount(&quot;C1&quot;, ref C1CurrentAmt);
+      UpdateAmount(&quot;C2&quot;, ref C2CurrentAmt);
+      UpdateAmount(&quot;C3&quot;, ref C3CurrentAmt);
+      UpdateAmount(&quot;C4&quot;, ref C4CurrentAmt);
+      UpdateAmount(&quot;C5&quot;, ref C5CurrentAmt);
+      UpdateAmount(&quot;C6&quot;, ref C6CurrentAmt);
+      UpdateAmount(&quot;C7&quot;, ref C7CurrentAmt);
+      
+      UpdateAmountPrev(&quot;C1&quot;, ref C1CurrentAmtPrev);
+      UpdateAmountPrev(&quot;C2&quot;, ref C2CurrentAmtPrev);
+      UpdateAmountPrev(&quot;C3&quot;, ref C3CurrentAmtPrev);
+      UpdateAmountPrev(&quot;C4&quot;, ref C4CurrentAmtPrev);
+      UpdateAmountPrev(&quot;C5&quot;, ref C5CurrentAmtPrev);
+      UpdateAmountPrev(&quot;C6&quot;, ref C6CurrentAmtPrev);
+      UpdateAmountPrev(&quot;C7&quot;, ref C7CurrentAmtPrev);
+      
+      UpdateAmountPrevMonth(&quot;C1&quot;, ref C1CurrentAmtPrevMonth);
+      UpdateAmountPrevMonth(&quot;C2&quot;, ref C2CurrentAmtPrevMonth);
+      UpdateAmountPrevMonth(&quot;C3&quot;, ref C3CurrentAmtPrevMonth);
+      UpdateAmountPrevMonth(&quot;C4&quot;, ref C4CurrentAmtPrevMonth);
+      UpdateAmountPrevMonth(&quot;C5&quot;, ref C5CurrentAmtPrevMonth);
+      UpdateAmountPrevMonth(&quot;C6&quot;, ref C6CurrentAmtPrevMonth);
+      UpdateAmountPrevMonth(&quot;C7&quot;, ref C7CurrentAmtPrevMonth);
+    }
+    
+    private void UpdateAmount(string colName, ref decimal target)
+    {
+      var flag = Report.GetColumnValue(&quot;GLRepIncomeStat.&quot; + colName);
+      if (flag == null) return;
+
+      string val = flag.ToString();
+      if (val == &quot;+&quot;) target += mCurrentAmt;
+      else if (val == &quot;-&quot;) target -= mCurrentAmt;
+      else if (val == &quot;0&quot;) target = 0;
+    }
+    
+    private void UpdateAmountPrev(string colName, ref decimal target)
+    {
+      var flag = Report.GetColumnValue(&quot;GLRepIncomeStat.&quot; + colName);
+      if (flag == null) return;
+
+      string val = flag.ToString();
+      if (val == &quot;+&quot;) target += mCurrentAmtPrev;
+      else if (val == &quot;-&quot;) target -= mCurrentAmtPrev;
+      else if (val == &quot;0&quot;) target = 0;
+    }
+    
+    private void UpdateAmountPrevMonth(string colName, ref decimal target)
+    {
+      var flag = Report.GetColumnValue(&quot;GLRepIncomeStat.&quot; + colName);
+      if (flag == null) return;
+
+      string val = flag.ToString();
+      if (val == &quot;+&quot;) target += mCurrentAmtPrevMonth;
+      else if (val == &quot;-&quot;) target -= mCurrentAmtPrevMonth;
+      else if (val == &quot;0&quot;) target = 0;
+    }
+    
+    private void Text45_BeforePrint(object sender, EventArgs e) //Tambah border tergantung kondisi
+    {
+      
+      decimal fromacc = Convert.ToDecimal(Report.GetColumnValue(&quot;GLRepIncomeStat.fromacc&quot;));
+      string Descrip = Convert.ToString(Report.GetColumnValue(&quot;GLRepIncomeStat.Descrip&quot;));
+      string genAcc = Convert.ToString(Report.GetColumnValue(&quot;GLRepIncomeStat.genAcc&quot;));
+      
+      var txt = sender as TextObject;
+      if(fromacc==0 || Descrip==null || Descrip==&quot;&quot;){
+        txt.TextColor = System.Drawing.Color.White;
+      }else{
+        txt.TextColor = System.Drawing.Color.Black;
+      }
+      
+      if(genAcc==&quot;XX&quot;){
+        txt.Border.Lines = BorderLines.Top;
+        txt.Border.Color = System.Drawing.Color.Black;
+        txt.Border.Width = 1;
+        txt.Border.TopLine.Style = LineStyle.Solid;
+      }
+      else if(genAcc==&quot;YY&quot;){
+        txt.Border.Lines = BorderLines.Bottom;
+        txt.Border.Color = System.Drawing.Color.Black;
+        txt.Border.Width = 1;
+        txt.Border.BottomLine.Style = LineStyle.Double;
+      }
+      else{
+        txt.Border.Lines = BorderLines.None;
+        txt.Border.Width = 0;
+      }
+     
+    }
+    
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4QE6rn6q2ZAOGKWoo2fuTfh">
+      <ProcedureDataSource Name="GLRepIncomeStat" DataType="System.Int32" Enabled="true" TableName="GLRepIncomeStat" SelectCommand="GLRepIncomeStat">
+        <Column Name="genAcc" DataType="System.String"/>
+        <Column Name="Descrip" DataType="System.String"/>
+        <Column Name="fromAcc" DataType="System.Byte"/>
+        <Column Name="mn" DataType="System.String"/>
+        <Column Name="dbtcrd" DataType="System.Byte"/>
+        <Column Name="multiply" DataType="System.Byte"/>
+        <Column Name="divide" DataType="System.Byte"/>
+        <Column Name="C1" DataType="System.String"/>
+        <Column Name="C2" DataType="System.String"/>
+        <Column Name="C3" DataType="System.String"/>
+        <Column Name="C4" DataType="System.String"/>
+        <Column Name="C5" DataType="System.String"/>
+        <Column Name="C6" DataType="System.String"/>
+        <Column Name="C7" DataType="System.String"/>
+        <Column Name="printstatus" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="Line" DataType="System.Int32"/>
+        <Column Name="CBegBal" DataType="System.Decimal"/>
+        <Column Name="CDebit" DataType="System.Decimal"/>
+        <Column Name="CCredit" DataType="System.Decimal"/>
+        <Column Name="Cbudget" DataType="System.Decimal"/>
+        <Column Name="pBegbal" DataType="System.Decimal"/>
+        <Column Name="ccyA" DataType="System.String"/>
+        <Column Name="pDbtCrd" DataType="System.Byte"/>
+        <Column Name="pMultiply" DataType="System.Byte"/>
+        <Column Name="pDivide" DataType="System.Byte"/>
+        <Column Name="pDebit" DataType="System.Decimal"/>
+        <Column Name="pCredit" DataType="System.Decimal"/>
+        <Column Name="pBudget" DataType="System.Decimal"/>
+        <Column Name="acc" DataType="System.String"/>
+        <Column Name="TBudget" DataType="System.Int32"/>
+        <ProcedureParameter Name="@pBranch" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@pCode" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@Period" DataType="22" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPPeriod" DataType="System.String" AsString=""/>
+    <Parameter Name="RPLastPeriod" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="759.78" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="201.28" Top="0.45" Width="374.22" Height="22.68" Text="Statements of Comprehensive Income" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="637.26" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="627.81" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="627.81" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text40" Left="201.28" Top="23.13" Width="374.22" Height="17.55" Text="For The Period Ended On: [RPPeriod]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text41" Left="201.28" Top="40.68" Width="374.22" Height="17.55" Text="In Rupiah" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt"/>
+      <ChildBand Name="Child1" Top="70.71" Width="759.78" Height="15.57" Border.Lines="Top, Bottom">
+        <TextObject Name="Text20" Top="0.45" Width="59.15" Height="15.12" Text="Acc No" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text21" Left="59.15" Top="0.45" Width="387.69" Height="15.12" Text="Name" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text22" Left="550.95" Top="0.45" Width="104.1" Height="15.12" Text="Year To Date" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text42" Left="655.05" Top="0.45" Width="104.1" Height="15.12" Text="Up to [RPLastPeriod]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text47" Left="446.7" Top="0.45" Width="104.1" Height="15.12" Text="[RPPeriod]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="88.94" Width="759.78" Height="15.12" VisibleExpression="[GLRepIncomeStat.printstatus]" BeforePrintEvent="Data1_BeforePrint" DataSource="GLRepIncomeStat">
+      <TextObject Name="Text43" Width="59.15" Height="15.12" Text="[GLRepIncomeStat.acc]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text44" Left="59.15" Width="387.69" Height="15.12" Text="[GLRepIncomeStat.Descrip]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text45" Left="655.05" Width="104.1" Height="15.12" BeforePrintEvent="Text45_BeforePrint" Text="[mCurrentAmtPrevMonth]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text46" Left="550.95" Width="104.1" Height="15.12" BeforePrintEvent="Text45_BeforePrint" Text="[mCurrentAmtPrev]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text48" Left="446.7" Width="104.1" Height="15.12" BeforePrintEvent="Text45_BeforePrint" Text="[mCurrentAmt]" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+    </DataBand>
+  </ReportPage>
+</Report>

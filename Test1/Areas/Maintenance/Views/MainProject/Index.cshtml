@@ -1,0 +1,410 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    // ViewBag.Title = "User";
+}
+
+@section Styles{
+    <link rel="stylesheet" href="~/Content/DataTables/datatables.css" />
+    <link rel="stylesheet" href="~/Content/DataTables/DataTables-1.10.25/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="~/Content/DataTables/Select-1.3.3/css/select.bootstrap5.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/Select2/css/select2.min.css" />
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <section class="col-lg-12 connectedSortable">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="btnjf1" class="card-title">
+                            <i class="fas fa-user mr-1" style="color:#4cff00 !important;"></i>
+                            Main Project
+                        </h3>
+                        <div class="card-tools">
+
+                            <ul class="nav nav-pills ml-auto" id="sortablex">
+                                <li class="nav-item mr-1">
+                                    @{
+                                        if (Convert.ToInt32(ViewData["Page.Insert"]) == 1)
+                                        {
+                                            <a class="btn btn-sm btn-primary" href="#" data-toggle="tab" onclick="LoadCreateMainProject()">
+                                                <i class="fas fa-plus"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a href="#" class="btn btn-sm btn-primary" data-toggle="tab" onclick="NoAccess('You dont have access to create new Main Project. Please contact your administrator.')">
+                                                <i class="fas fa-plus"></i>
+                                            </a>
+                                        }
+                                    }
+                                </li>
+                                <li class="nav-item mr-1">
+                                    @{
+                                        if (Convert.ToInt32(ViewData["Page.Delete"]) == 1)
+                                        {
+                                            <a onclick="DeleteCreateMainProject()" class="btn btn-sm btn-danger" data-toggle="tab" href="#">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a onclick="NoAccess('You dont have access to delete Main Project data. Please contact your administrator.')" class="btn btn-sm btn-danger" data-toggle="tab" href="#">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        }
+                                    }
+                                </li>
+                                <li class="nav-item mr-1">
+                                    <a onclick="RefreshMaintenanMainProject()" class="btn btn-sm btn-info" href="#">
+                                        <i class="fas fa-sync"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content p-0">
+                            <div id="classgrid1" class="row mb-1">
+                                <div class="table-responsive table-responsive-sm p-2 bg-white border">
+                                    <table id="tblUserStep1" class="table table-bordered table-hover w-100">
+                                        <thead>
+                                            <tr>
+                                                <th>Project Name</th>
+                                                <th> OPERATOR ID</th>
+                                                <th> Last Update</th>
+                                                <th> Entry User</th>
+                                                <th> Entry Date</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /.card-body -->
+                </div>
+            </section>
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+
+@section Scripts{
+    <script src="~/Scripts/moment.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/Select-1.3.3/js/select.bootstrap5.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            RefreshMaintenanMainProject();
+
+    })// document Ready
+
+    function RefreshMaintenanMainProject() {
+        var data = JSON.stringify({ "optional": $('#cboBranch').val() })
+        var uri = '@Url.Action("refresh", "MainProject", new { Area = "Maintenance" })'
+        var wb_methode = 'POST';
+        var return_ = httpGet(wb_methode, uri, data);
+        GetMntMainProject(JSON.parse(return_));
+    }
+
+    function LoadCreateMainProject() {
+        CreateNewForm('', '', '');
+    }
+
+    function RefreshData() {
+        var data = JSON.stringify({ "optional": $('#cboBranch').val() })
+        var uri = '@Url.Action("refresh", "MainProject", new { Area = "Maintenance" })'
+        var wb_methode = 'POST';
+        var return_ = httpGet(wb_methode, uri, data);
+        var pieChartContent = document.getElementById('classgrid1');
+        pieChartContent.innerHTML = '&nbsp;';
+        $('#classgrid1').append("<div class='table-responsive table-responsive-sm p-2 bg-white border'>    <table id='tblUserStep1' class='table table-bordered table-hover w-100'>        <thead>        <tr>            <th>#</th>            <th>Project Name</th>            <th>Operator</th>            <th>Last Update</th>        </tr>        </thead>    </table></div>");
+        GetMntMainProject(return_);
+    }
+
+    function httpGet(getOrpost, theUrl, param) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open(getOrpost, theUrl, false); // false for synchronous request
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlHttp.send(param);
+        return xmlHttp.responseText;
+    }
+
+    function GetMntMainProject(lsData) {
+        $('#tblUserStep1').DataTable({
+            "bDestroy": true,
+            data: JSON.parse(lsData),
+            "columns": [
+                { "data": "ProjectName" },
+                { "data": "OPERATORID" },
+                { "data": "LastUpdate" },
+                { "data": "EntryUser" },
+                { "data": "EntryDate" }
+            ],
+            "select": {
+                "style": 'single'
+            }
+        });
+    }
+
+
+    function DetailAdd(obj) {
+        var currentRow = $(obj).closest("tr");
+        var ProjectName = currentRow.find("td:eq(0)").text(); // get current row 2nd TD
+        var OPERATORID = currentRow.find("td:eq(1)").text(); // get current row 3rd TD
+        var LastUpdate = currentRow.find("td:eq(2)").text(); // get current row 3rd TD
+        var EntryUser = currentRow.find("td:eq(3)").text(); // get current row 3rd TD
+        var EntryDate = currentRow.find("td:eq(4)").text(); // get current row 3rd TD
+        //var data = ProjectName + "\n" + LogUser + "\n" + LastUpdate;
+        CreateNewForm(ProjectName, LogUser, LastUpdate);
+    }
+
+    function DeleteCreateMainProject() {
+        var tbl_ = $('#tblUserStep1').DataTable();
+        var tblData_ = tbl_.rows('.selected').data();
+        var tblDatalength_ = tblData_.length;
+        if (tblDatalength_ <= 0) {
+            NoAccessModal('Please Select The Rows!');
+            return
+        }
+        var ProjectName = tblData_[0].ProjectName; // get current row 2nd TD
+        var OPERATORID = tblData_[0].OPERATORID; // get current row 2nd TD
+        var LastUpdate = tblData_[0].LastUpdate; // get current row 2nd TD
+        CreateDeleteForm(ProjectName, OPERATORID, LastUpdate);
+    }
+
+    function CreateDeleteForm(ProjectName, LogUser, LastUpdate) {
+        var b = '';
+        b += "<div class='modal fade' id='boxdelete' tabindex='-1' role='dialog' aria-labelledby='boxdelete' aria-hidden='true'>";
+        b += "   <div class='modal-dialog modal-dialog-centered' role='document'>";
+        b += "           <div class='modal-content card'>";
+        b += "              <div class='card-header'>";
+        b += "                  <div id='btnjf1' class='card-title modal-title'>";
+        b += "                      <table>";
+        b += "                          <tr>";
+        b += "                             <td><img src='@Url.Content("~/Content/AdminLTE/img/logo.png")' alt='AdminLTE Logo' class='brand-image img-circle elevation-3' style='width: 23%;height: 23%;'></td>";
+        b += "                             <td>";
+        b += "                                 <div id='txtcaption' style='font-weight: bold;'>Confirm to Delete</div>";
+        b += "                             </td>";
+        b += "                         </tr>";
+        b += "                     </table>";
+        b += "                 </div>";
+        b += "                <div class='card-tools'>";
+        b += "                     <ul class='nav nav-pills ml-auto'>";
+        b += "                         <li class='nav-item'>";
+        b += "                             <a class='nav-link' href='#' data-toggle='tab' data-dismiss='modal' id='btnEdExitdelete'>";
+        b += "                                <i class='fas fa-times' aria-hidden='true' style='color:#aa0101 !important;'></i>";
+        b += "                            </a>";
+        b += "                         </li>";
+        b += "                     </ul>";
+        b += "                </div>";
+        b += "            </div>";
+        b += "           <div class='card-body modal-body'>";
+        b += "                <!-- Mulai-->";
+        b += "                <div class='row mb-2'>";
+        b += "                    <div class='row pb-0 col-sm-12 mb-1'>";
+        b += "                        <label for='txtprojectname' class='col-sm-4 col-form-label col-form-label-sm'>Project Name</label>";
+        b += "                        <div class='col-sm-8'>";
+        b += "                            <input type='text' class='form-control form-control-sm' id='txtprojectname' required readonly value='" + ProjectName + "'>";
+        b += "                        </div>";
+        b += "                    </div>";
+        b += "";
+        b += "                    <div class='row pb-0 col-sm-12 mb-1'>";
+        b += "                        <label for='txtoperator' class='col-sm-4 col-form-label col-form-label-sm'>Operator ID</label>";
+        b += "                        <div class='col-sm-8'>";
+        b += "                            <input type='text' class='form-control form-control-sm' id='txtoperator' required readonly value='" + LogUser + "'>";
+        b += "                        </div>";
+        b += "                    </div>";
+        b += "";
+        b += "                    <div class='row pb-0 col-sm-12 mb-1'>";
+        b += "                        <label for='txtlastupdate' class='col-sm-4 col-form-label col-form-label-sm'>Last Update</label>";
+        b += "                        <div class='col-sm-8'>";
+        b += "                            <input type='text' class='form-control form-control-sm' id='txtlastupdate' required readonly value='" + LastUpdate + "'>";
+        b += "                        </div>";
+        b += "                    </div>";
+        b += "";
+
+        b += "                   <!-- selesai -->";
+        b += "               </div>";
+        b += "               <div class='modal-footer'>";
+        b += "                   <button id='btnexitdelete' type='button' class='btn btn-danger btn-sm' data-dismiss='modal'>Close</button>";
+        b += "                   <button id='btndelete' type='button' class='btn btn-primary btn-sm'>Delete</button>";
+        b += "              </div>";
+        b += "         </div>";
+        b += "   </div>";
+        b += "</div>";
+
+        var myElement = document.getElementById("publicAlert");
+        if (!myElement) {
+            let div = document.createElement('div');
+            div.id = 'publicAlert';
+            document.body.appendChild(div);
+        }
+        $('#publicAlert').empty();
+        $("#publicAlert").html(b);
+        $("#boxdelete").modal('show');
+
+        document.getElementById("btnexitdelete").addEventListener("click", function () {
+            $("#boxdelete").modal('hide');
+        });
+
+        document.getElementById("btnEdExitdelete").addEventListener("click", function () {
+            $("#boxdelete").modal('hide');
+        });
+
+        document.getElementById("btndelete").addEventListener("click", function () {
+            $.ajax({
+                url: '@Url.Action("InsMaintenanceProject", "MainProject", new { Area = "Maintenance" })',
+                type: 'POST',
+                data: JSON.stringify({ 'projectname': $('#txtprojectname').val(), 'loguser': $('#txtoperator').val(),'type':'2' }),
+                dataType: 'json',
+                success: function (data) {
+                    var data = JSON.stringify({ "optional": $('#cboBranch').val() })
+                    var uri = '@Url.Action("refresh", "MainProject", new { Area = "Maintenance" })'
+                    var wb_methode = 'POST';
+                    var return_ = httpGet(wb_methode, uri, data);
+                    var pieChartContent = document.getElementById('classgrid1');
+                    pieChartContent.innerHTML = '&nbsp;';
+                    $('#classgrid1').append(" <div class='table-responsive table-responsive-sm p-2 bg-white border'>        <table id='tblUserStep1' class='table table-bordered table-hover w-100'>            <thead>            <tr>                <th>Project Name</th>                <th> OPERATOR ID</th>                <th> Last Update</th>                <th> Entry User</th>                <th> Entry Date</th>            </tr>            </thead>        </table>    </div>");
+                    GetMntMainProject(JSON.parse(return_));
+                    $("#boxdelete").modal('hide');
+                },
+                error: function (request, error) {
+                    $("#boxdelete").modal('hide');
+                    console.log("Request: " + request);
+                }
+            });
+        });
+
+    }//CreateDeleteForm
+
+    function CreateNewForm(ProjectName, LogUser, LastUpdate) {
+        var b = '';
+        b += "<div class='modal fade' id='boxinsert' tabindex='-1' role='dialog' aria-labelledby='boxinsert' aria-hidden='true'>";
+        b += "   <div class='modal-dialog modal-dialog-centered' role='document'>";
+        b += "           <div class='modal-content card'>";
+        b += "              <div class='card-header'>";
+        b += "                  <div id='btnjf1' class='card-title modal-title'>";
+        b += "                      <table>";
+        b += "                          <tr>";
+        b += "                             <td><img src='@Url.Content("~/Content/AdminLTE/img/logo.png")' alt='AdminLTE Logo' class='brand-image img-circle elevation-3' style='width: 23%;height: 23%;'></td>";
+        b += "                             <td>";
+        b += "                                 <div id='txtcaption' style='font-weight: bold;'>New Project Name</div>";
+        b += "                             </td>";
+        b += "                         </tr>";
+        b += "                     </table>";
+        b += "                 </div>";
+        b += "                <div class='card-tools'>";
+        b += "                     <ul class='nav nav-pills ml-auto'>";
+        b += "                         <li class='nav-item'>";
+        b += "                             <a class='nav-link' href='#' data-toggle='tab' data-dismiss='modal' id='btnEdExit'>";
+        b += "                                <i class='fas fa-times' aria-hidden='true' style='color:#aa0101 !important;'></i>";
+        b += "                            </a>";
+        b += "                         </li>";
+        b += "                     </ul>";
+        b += "                </div>";
+        b += "            </div>";
+        b += "           <div class='card-body modal-body'>";
+        b += "                <!-- Mulai-->";
+        b += "                <div class='row mb-2'>";
+        b += "                    <div class='row pb-0 col-sm-12 mb-1'>";
+        b += "                        <label for='txtprojectname' class='col-sm-4 col-form-label col-form-label-sm'>Project Name</label>";
+        b += "                        <div class='col-sm-8'>";
+        b += "                            <input type='text' class='form-control form-control-sm' id='txtprojectname' required>";
+        b += "                        </div>";
+        b += "                    </div>";
+        b += "";
+        //b += "                    <div class='row pb-0 col-sm-12 mb-1'>";
+        //b += "                        <label for='txtoperator' class='col-sm-4 col-form-label col-form-label-sm'>Operator</label>";
+        //b += "                        <div class='col-sm-8'>";
+        //b += "                            <input type='text' class='form-control form-control-sm' id='txtoperator' required>";
+        //b += "                        </div>";
+        //b += "                    </div>";
+        //b += "";
+        //b += "                    <div class='row pb-0 col-sm-12 mb-1'>";
+        //b += "                        <label for='txtlastupdate' class='col-sm-4 col-form-label col-form-label-sm'>Last Update</label>";
+        //b += "                        <div class='col-sm-8'>";
+        //b += "                            <input type='text' class='form-control form-control-sm' id='txtlastupdate' required readonly>";
+        //b += "                        </div>";
+        //b += "                    </div>";
+        b += "";
+
+        b += "                   <!-- selesai -->";
+        b += "               </div>";
+        b += "               <div class='modal-footer'>";
+        b += "                   <button id='btnexit' type='button' class='btn btn-danger btn-sm' data-dismiss='modal'>Close</button>";
+        b += "                   <button id='btnsave' type='button' class='btn btn-primary btn-sm'>Save</button>";
+        b += "              </div>";
+        b += "         </div>";
+        b += "   </div>";
+        b += "</div>";
+
+        var myElement = document.getElementById("publicAlert");
+        if (!myElement) {
+            let div = document.createElement('div');
+            div.id = 'publicAlert';
+            document.body.appendChild(div);
+        }
+        $('#publicAlert').html("");
+        $("#publicAlert").html(b);
+        $("#boxinsert").modal('show');
+
+        var d = new Date();
+        var strDate = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+        $("#txtlastupdate").val(strDate);
+
+        document.getElementById("btnexit").addEventListener("click", function () {
+            $("#boxinsert").modal('hide');
+        });
+
+        document.getElementById("btnEdExit").addEventListener("click", function () {
+            $("#boxinsert").modal('hide');
+        });
+
+        document.getElementById("btnsave").addEventListener("click", function () {
+            BtnLoading($('#btnsave'));
+            $.ajax({
+                url: '@Url.Action("InsMaintenanceProject", "MainProject", new { Area = "Maintenance" })',
+                type: 'POST',
+                data: JSON.stringify({ 'projectname': $('#txtprojectname').val(), 'loguser': $('#txtoperator').val(),'type':'0' }),
+                dataType: 'json',
+                success: function (data) {
+                    var data = JSON.stringify({ "optional": $('#cboBranch').val() })
+                    var uri = '@Url.Action("refresh", "MainProject", new { Area = "Maintenance" })'
+                    var wb_methode = 'POST';
+                    var return_ = httpGet(wb_methode, uri, data);
+                    var pieChartContent = document.getElementById('classgrid1');
+                    pieChartContent.innerHTML = '&nbsp;';
+                    $('#classgrid1').append(" <div class='table-responsive table-responsive-sm p-2 bg-white border'>        <table id='tblUserStep1' class='table table-bordered table-hover w-100'>            <thead>            <tr>                <th>Project Name</th>                <th> OPERATOR ID</th>                <th> Last Update</th>                <th> Entry User</th>                <th> Entry Date</th>            </tr>            </thead>        </table>    </div>");
+                    GetMntMainProject(JSON.parse(return_));
+                    $("#boxinsert").modal('hide');
+                    BtnReset($('#btnsave'));
+                },
+                error: function (request, error) {
+                    $("#boxinsert").modal('hide');
+                    console.log("Request: " + request);
+                    BtnReset($('#btnsave'));
+                }
+            });
+        });
+
+        function BtnLoading(elem) {
+            $(elem).attr("data-original-text", $(elem).html());
+            $(elem).prop("disabled", true);
+            $(elem).html('<i class="spinner-border spinner-border-sm"></i>');
+            // $(elem).html('<i class="spinner-border spinner-border-sm"></i> Loading...');
+        }
+
+        function BtnReset(elem) {
+            $(elem).prop("disabled", false);
+            $(elem).html($(elem).attr("data-original-text"));
+        }
+
+
+    }
+    </script>
+}
+
+

@@ -1,0 +1,103 @@
+﻿@model IEnumerable<IDS.Maintenance.History>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<link rel="stylesheet" href="~/Content/Report.css" type="text/css" />
+<div class="col-md-12">
+    <div class="card card-body printableArea">
+        @*<h3><b>REPORT</b></h3>*@
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="text-center">
+
+                    <address>
+                        <p class="left">@ViewBag.Name<br>@ViewBag.Address1<br>@ViewBag.Address2<br>@ViewBag.Address3</p>
+                        <p class="right">Print Date : @ViewBag.Date <br>Print Time : @ViewBag.Clock</p>
+                        <h3> &nbsp;<b class="text-danger">HISTORY</b></h3><div class="clearfix"></div>
+                    </address>
+
+                    <div class="text-left">
+                        <button id="print" class="btn btn-default btn-outline" type="button"> <span><i class="fa fa-print"></i> Print</span> </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="table-responsive" style="clear: both;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Computer Name</th>
+                                <th>IP Address</th>
+                                <th>User Name</th>
+                                <th>Status</th>
+                                <th>Table</th>
+                                <th>Key Field 1</th>
+                                <th>Key Field 2</th>
+                                <th>Key Field 3</th>
+                                <th>Key Field 4</th>
+                                <th>Key Field 5</th>
+                                <th>Key Field 6</th>
+                                <th>Date Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Model)
+                             {
+                                <tr>
+                                    <td class="text-left">@a.Id</td>
+                                    <td class="text-left">@a.ComputerName</td>
+                                    <td class="text-center">@a.IpAddress </td>
+                                    <td class="text-center">@a.UserName </td>
+                                    <td class="text-center">@a.Status</td>
+                                    <td class="text-center">@a.TableName</td>
+                                    <td class="text-center">@a.KeyField1</td>
+                                    <td class="text-center">@a.KeyField2</td>
+                                    <td class="text-center">@a.KeyField3</td>
+                                    <td class="text-center">@a.KeyField4</td>
+                                    <td class="text-center">@a.KeyField5</td>
+                                    <td class="text-center">@a.KeyField6</td>
+                                    <td class="text-center">@a.DateUpdated</td>
+
+                                </tr>
+                             }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    div.printableArea {
+        position: relative;
+        width: 100%;
+        top: 3em;
+        left: 0px;
+        right: 0px;
+    }
+</style>
+
+@section Scripts {
+    <script type="text/javascript" src="~/Scripts/jquery.PrintArea.js"></script>
+    <script>
+        $(document).ready(function () {
+            var vm = {};
+            $("#print").click(function () {
+                var mode = 'iframe'; //popup
+                var close = mode == "popup";
+                var options = {
+                    mode: mode,
+                    popClose: close
+                };
+                $("div.printableArea").printArea(options);
+            });
+        });
+    </script>
+}

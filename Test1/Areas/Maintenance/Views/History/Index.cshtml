@@ -1,0 +1,454 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "History";
+}
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/Content/DataTables/datatables.css" />
+    <link rel="stylesheet" href="~/Content/DataTables/DataTables-1.10.25/css/dataTables.bootstrap5.min.css" />
+    @*<link rel="stylesheet" href="~/Content/DataTables/Select-1.3.3/css/select.bootstrap5.min.css" />*@
+    <link rel="stylesheet" href="~/Content/flatpickr/flatpickr.min.css" />
+    <link rel="stylesheet" href="~/Content/flatpickr/plugins/monthSelect/style.css" />
+    <link href="~/Content/Select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+}
+
+<div class="col-sm-6 col-md-6 col-6">
+    <h4>@ViewBag.Title</h4>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Filter</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+
+
+            <div class="col-sm-5 mb-0">
+                <div class="form-group row mb-0">
+                    @Html.Label("Period", "Period", new { @class = "control-label col-sm-3 col-form-label" })
+                    <div class="col-xs-12 col-sm-8">
+                        @Html.TextBox("PeriodIndex", "", htmlAttributes: new { @class = "form-control form-control-sm bg-white col-sm-6", @id = "PeriodIndex" })
+                    </div>
+                </div>
+                <div class="form-group row mb-0">
+                    @Html.Label("", "", new { @class = "control-label col-sm-3 col-form-label" })
+                    <div class="col-sm-9 mb-2">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+
+            <div class="col-sm-5 mb-0">
+                <div class="form-group row mb-0">
+                    @Html.Label("Status", "Status", new { @class = "control-label col-sm-3 col-form-label" })
+                    <div class="col-xs-12 col-sm-8">
+                        @Html.DropDownList("Status", (SelectList)ViewData["Status"], new { @id = "cboStatus", @class = "form-control col-sm-6 select2DDList" })
+                    </div>
+                </div>
+                <div class="form-group row mb-0">
+                    @Html.Label("", "", new { @class = "control-label col-sm-3 col-form-label" })
+                    <div class="col-sm-9 mb-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Selesai -->
+    </div>
+</div>
+<div class="row mb-1 justify-content-between col-sm-12">
+    <div class="col-sm-12 col-md-12 col-12 text-right">
+        <div class="text-right">
+
+            <p>
+
+                <a class="btn btn-sm btn-default" onclick="LoadHistory()" title="View History">
+                    <i class="fas fa-eye"></i>
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive table-responsive-sm p-2 bg-white border">
+    <table id="tableData" class="table table-bordered table-hover w-100">
+        <thead>
+            <tr>
+                <th class="align-middle">Id</th>
+                <th class="align-middle">Computer Name</th>
+                <th class="align-middle">Ip Address</th>
+                <th class="align-middle">User Name</th>
+                <th class="align-middle">Status</th>
+                <th class="align-middle">Table</th>
+                <th class="align-middle">Key Field1</th>
+                <th class="align-middle">Key Field2</th>
+                <th class="align-middle">Key Field3</th>
+                <th class="align-middle">Key Field4</th>
+                <th class="align-middle">Key Field5</th>
+                <th class="align-middle">Key Field6</th>
+                <th class="align-middle">Date Updated</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<div id="PartialSectionSecond">
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/Scripts/moment.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" src="~/Content/flatpickr/flatpickr.min.js"></script>
+    <script type="text/javascript" src="~/Content/flatpickr/id.min.js"></script>
+    <script type="text/javascript" src="~/Content/flatpickr/plugins/monthSelect/Index.js"></script>
+    <script type="text/javascript" src="~/Content/Select2/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/GeneralDataTable.js"></script>
+
+    <script type="text/javascript">
+        var table = null;
+        var PeriodValue = $("#PeriodIndex").val();
+        var status = $("#cboStatus").val();
+        flatpickr('#PeriodIndex', {
+            shorthand: true,
+            disableMobile: "true",
+            dateFormat: "M-Y",
+            defaultDate: ["today"],
+            disableMobile: "true",
+            plugins: [new monthSelectPlugin({
+                shorthand: true, //defaults to false
+                dateFormat: "M Y", //defaults to "F Y"
+            })],
+        });
+
+        $(document).ready(function () {
+
+            //Edited By Renaldi 13 March 2025
+            //LoadData(PeriodValue, status);
+            LoadData();
+            //End Edited
+
+            $(".select2DDList").select2();
+            //LoadData();
+        });
+
+        function LoadData() {
+            //Edited By Renaldi 13 March 2025
+            //table = LoadDT(httpGet('POST', '@Url.Action("GetData", "History", new { Area = "Maintenance" })', JSON.stringify({ "period": PeriodValue, 'status': status })));
+
+            table = $('#tableData').DataTable
+            ({
+                destroy: true,
+                "columnDefs": [
+                    {
+                        "targets": 'no-sort',
+                        "orderable": false,
+                    },
+                    {
+                        "width": "50px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [0]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [1]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [2]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [3]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [4]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [5]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [6]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [7]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [8]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [9]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [10]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [11]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [12]
+                    }
+                ],
+                "select": {
+                    "style": 'os'
+                },
+                "language":
+                {
+                    "search": "",
+                    "searchPlaceholder": "Search...",
+                    "emptyTable": "No record found.",
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+                "scrollX": "true",
+                "scrollCollapse": "true",
+                "processing": "true",
+                "order": [[0, "desc"]],
+                "serverSide": "true",
+                "lengthMenu": [[1, 10, 20, 50, 100, 1000, -1], [1, 10, 20, 50, 100, 1000, "All"]],
+                "pageLength": 10,
+                "ajax":
+                {
+                    "url": '@Url.Action("GetData", "History", new { Area = "Maintenance" })',
+                    "type": "POST",
+                    "dataType": "JSON",
+                    "data": function (d) {
+                        d.period = PeriodValue,
+                        d.status = status
+                    }
+                },
+                "columns": [
+                    { "data": "Id", "name": "Id" },
+                    { "data": "ComputerName", "name": "ComputerName" },
+                    { "data": "IpAddress", "name": "IpAddress" },
+                    { "data": "UserName", "name": "UserName" },
+                    { "data": "Status", "name": "Status" },
+                    { "data": "TableName", "name": "TableName" },
+                    { "data": "KeyField1", "name": "KeyField1" },
+                    { "data": "KeyField2", "name": "KeyField2" },
+                    { "data": "KeyField3", "name": "KeyField3" },
+                    { "data": "KeyField4", "name": "KeyField4" },
+                    { "data": "KeyField5", "name": "KeyField5" },
+                    { "data": "KeyField6", "name": "KeyField6" },
+
+                    {
+                        "data": "DateUpdated", "name": "DateUpdated",
+                        "render": function (data, type, row, meta) {
+                            return moment(row.DateUpdated).format('DD/MMM/YYYY HH:mm:ss');
+                        }
+                    }
+                ]
+            });
+            //End Edited
+        }
+
+        function LoadDT(dataJS) {
+            return $('#tableData').DataTable({
+                "bDestroy": true,
+                data: JSON.parse(dataJS),
+                "columns": [
+                    { "data": "Id", "name": "Id" },
+                    { "data": "ComputerName", "name": "ComputerName" },
+                    { "data": "IpAddress", "name": "IpAddress" },
+                    { "data": "UserName", "name": "UserName" },
+                    { "data": "Status", "name": "Status" },
+                    { "data": "TableName", "name": "TableName" },
+                    { "data": "KeyField1", "name": "KeyField1" },
+                    { "data": "KeyField2", "name": "KeyField2" },
+                    { "data": "KeyField3", "name": "KeyField3" },
+                    { "data": "KeyField4", "name": "KeyField4" },
+                    { "data": "KeyField5", "name": "KeyField5" },
+                    { "data": "KeyField6", "name": "KeyField6" },
+
+                    {
+                        "data": "DateUpdated", "name": "DateUpdated",
+                        "render": function (data, type, row, meta) {
+                            return moment(row.DateUpdated).format('DD/MMM/YYYY HH:mm:ss');
+                        }
+                    }
+                ],
+                "order": [[0, "desc"]],
+                "lengthMenu": [[1, 10, 25, 50, -1], [1, 10, 25, 50, "All"]],
+                "pageLength": 10,
+                "columnDefs": [
+                    {
+                        "targets": 'no-sort',
+                        "orderable": false,
+                    },
+                    {
+                        "width": "50px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [0]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [1]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [2]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [3]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [4]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [5]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [6]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [7]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [8]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [9]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [10]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [11]
+                    },
+                    {
+                        "width": "100px",
+                        "orderable": false,
+                        "className": "text-right",
+                        "targets": [12]
+                    }
+
+
+                ],
+                "select": {
+                    "style": 'os'
+                },
+            });
+        }
+         function LoadHistory() {
+            var form = this;
+            var selRow = table.rows('.selected').data();
+             var id = selRow[0].Id;
+
+
+                    $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("ViewUpdate", "History", new { Area = "Maintenance" })',
+                    data: {
+                        'id': id
+                    },
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#PartialSectionSecond').empty();
+                        $("#PartialSectionSecond").html(result);
+                        $("#modalTitle").html("History View");
+                        $("#CreateEditForm").modal('show');
+
+                    },
+                        error: function (status) {
+                            alert('');
+                        }
+                });
+        }
+
+        $('#cboStatus').change(function () {
+            status = $(this).val();
+
+            //Edited By Renaldi 13 March 2025
+            //LoadData(PeriodValue, status);
+            LoadData();
+            //End Edited
+        });
+
+        $('#PeriodIndex').change(function () {
+            PeriodValue = $(this).val();
+
+            //Edited By Renaldi 13 March 2025
+            //LoadData(PeriodValue, status);
+            LoadData();
+            //End Edited
+        });
+
+        //function Refresh() {
+        //    LoadData($("#PeriodIndex").val(), $("#cboBranchIndex").val());
+        //}
+
+    </script>
+}

@@ -1,0 +1,342 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Department";
+}
+
+@section Styles {
+    <link rel="stylesheet" type="text/css" href="~/Content/CustomDatatable.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/Datatablenew.css" />
+
+    <link rel="stylesheet" type="text/css" href="~/Content/loader.css" />
+
+    <script id="actionTemplate" type="text/x-template">
+        <div class="text-center">
+            <button class="e-btn e-flat e-primary e-small EditData" title="Edit">
+                <span class="e-icons e-edit"></span>
+            </button>
+            <button class="e-btn e-flat e-danger e-small DeleteData" title="Delete">
+                <span class="e-icons e-delete"></span>
+            </button>
+        </div>
+    </script>
+}
+
+<div id="modalCreateDepartment" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCreateTitle">Create Department</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row" style="font-size:12px">
+                    <div class="col-lg-11">
+                        <div class="form-group">
+                            <div class="row  mx-1 my-1">
+                                <div class="col-4 mb-2">
+                                    <label class="form-check-label">Department Code</label>
+                                </div>
+                                <div class="col-8 mb-2">
+                                    <ejs-textbox id="modalDepartmentCode" maxlength="5" cssClass="e-small"></ejs-textbox>
+                                </div>
+                                <div class="col-4 mb-2">
+                                    <label class="form-check-label">Department Name</label>
+                                </div>
+                                <div class="col-8 mb-2">
+                                    <ejs-textbox id="modalDepartmentName" maxlength="50" cssClass="e-small"></ejs-textbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="RunCreateDepartment()" id="btnCreateDepartment">Confirm</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<body>
+    <div id="loading" style="display:none; height:100%; width:100%">
+        <div class="loading-wave " id="loading-content">
+            <div class="loading-bar"></div>
+            <div class="loading-bar"></div>
+            <div class="loading-bar"></div>
+            <div class="loading-bar"></div>
+        </div>
+        <div class="loading loading07">
+            <span data-text="I">I</span>
+            <span data-text="N">N</span>
+            <span data-text="T">T</span>
+            <span data-text="I">I</span>
+            <span data-text="D">D</span>
+            <span data-text="A">A</span>
+            <span data-text="T">T</span>
+            <span data-text="A">A</span>
+        </div>
+    </div>
+
+    @Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
+    @Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
+    @Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
+    @Html.Hidden("FormAction", 0)
+    @Html.AntiForgeryToken()
+
+    <div>
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h2>@ViewBag.Title</h2>
+                    </div>
+                    <div class="col-sm-8">
+                        <button type="button" class="btn btn-success add-new" onclick="CreateDepartment()"><i class="fa fa-plus-circle"></i> Add New</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-filter">
+                <div class="row">
+                </div>
+            </div>
+
+            <div id="Grid">
+            </div>
+
+        </div>
+    </div>
+
+
+</body>
+
+<div id="PartialSection">
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/moment.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            getData();
+        });
+
+        function getData() {
+            const gridEl = document.getElementById('Grid');
+            if (gridEl && gridEl.ej2_instances && gridEl.ej2_instances.length > 0) {
+                gridEl.ej2_instances[0].destroy();
+            }
+            gridEl.innerHTML = '';
+
+            var grid = new ej.grids.Grid({
+                dataSource: new ej.data.DataManager({
+                    url: '@Url.Action("GetData", "Department", new { Area = "Maintenance" })',
+                    adaptor: new ej.data.UrlAdaptor(),
+                    crossDomain: true
+                }),
+                allowPaging: true,
+                pageSettings: { pageSize: 10 },
+                allowSorting: true,
+                allowFiltering: true,
+                filterSettings: {
+                    type: 'FilterBar',
+                    operator: 'contains',
+                    mode: 'Immediate'
+                },
+                allowSearching: true,
+                toolbar: ['Search'],
+                allowSelection: true,
+                selectionSettings: {
+                    type: 'Single',
+                    mode: 'Row',
+                    checkboxOnly: false,
+                    enableToggle: false
+                },
+                columns: [
+                    {
+                        field: 'DepartmentCode',
+                        headerText: 'Action',
+                        width: 70,
+                        template: '#actionTemplate',
+                        textAlign: 'Center'
+                        , allowFiltering: false
+                        , allowSorting: false,
+                    },
+                    { field: 'DepartmentCode', headerText: 'Dept. Code', width: 80, filter: { operator: 'contains' } },
+                    { field: 'DepartmentName', headerText: 'Dept. Name', width: 120, filter: { operator: 'contains' } },
+                    { field: 'LastUpdate', headerText: 'Last Update', width: 120, type: 'date', format: 'dd/MMM/yyyy', filter: { operator: 'contains' } },
+                    { field: 'OperatorID', headerText: 'Operator ID', width: 100, filter: { operator: 'contains' } }
+                ]
+            });
+
+            grid.appendTo('#Grid');
+        }
+
+        function CreateDepartment() {
+            $('#FormAction').val(1);
+            $('#modalDepartmentCode').val('');
+            $('#modalDepartmentName').val('');
+            $('#modalDepartmentCode')[0].ej2_instances[0].readonly = false;
+            $('#modalDepartmentCode')[0].ej2_instances[0].dataBind();
+            $('#modalCreateTitle').text('Create Department');
+            $("#modalCreateDepartment").modal('show');
+        }
+
+        function RunCreateDepartment() {
+            if ($('#modalDepartmentCode').val() == '') {
+                alert('Department Code cannot be empty')
+                return
+            }
+
+            if ($('#modalDepartmentName').val() == '') {
+                alert('Department Name cannot be empty')
+                return
+            }
+
+            var Jawaban = confirm("Are you sure want to continue ?");
+            if (!Jawaban) {
+                return false;
+            }
+
+            var a = document.getElementById('loading');
+            a.style.display = "block";
+            $.ajax({
+                type: "POST",
+                dataType: 'JSON',
+                url: '@Url.Action("Create", "Department", new { Area = "Maintenance" })',
+                data: {
+                    "FormAction": $('#FormAction').val(),
+                    "obj": {
+                        "DepartmentCode": $('#modalDepartmentCode').val(),
+                        "DepartmentName": $('#modalDepartmentName').val(),
+                    }
+                },
+                success: function (result) {
+                    a.style.display = "none";
+                    alert(result.msg);
+
+                    if (result.success == true) {
+                        $("#modalCreateDepartment").modal('hide');
+                    }
+                    getData();
+                },
+                error: function (status, xhr, msg) {
+                    a.style.display = "none";
+                    alert(msg);
+                }
+            });
+        }
+
+        $(document).on("click", ".EditData", function () {
+            if ($('#PageEdit').val() == 1) {
+                var grid = ej.base.getComponent(document.getElementById("Grid"), "grid");
+                var selRow = grid.getSelectedRecords();
+
+                if (selRow == null || selRow == 'undefined' || selRow.length == 0) {
+                    alert("Please select the data you want to edit");
+                    return false;
+                }
+
+                if (selRow.length > 0) {
+                    var ID = selRow[0]["DepartmentCode"];
+                    EditDepartment(ID);
+                    //console.log(ID);
+                }
+
+            }
+            else {
+                alert("You Don't Have Access")
+            }
+        });
+
+        $(document).on("click", ".DeleteData", function () {
+            if ($('#PageDelete').val() == 1) {
+                var grid = ej.base.getComponent(document.getElementById("Grid"), "grid");
+                var selRow = grid.getSelectedRecords();
+
+                if (selRow == null || selRow == 'undefined' || selRow.length == 0) {
+                    alert("Please select the data you want to edit");
+                    return false;
+                }
+
+                if (selRow.length > 0) {
+                    var departmentCode = selRow[0]["DepartmentCode"];
+                    var departmentName = selRow[0]["DepartmentName"];
+                    DeleteDepartment(departmentCode, departmentName);
+                    //console.log(ID);
+                }
+
+            }
+            else {
+                alert("You Don't Have Access")
+            }
+        });
+
+
+        function EditDepartment(ID) {
+            $('#FormAction').val(2);
+            $('#modalDepartmentCode').val('');
+            $('#modalDepartmentName').val('');
+            $('#modalDepartmentCode')[0].ej2_instances[0].readonly = true;
+            $('#modalDepartmentCode')[0].ej2_instances[0].dataBind();
+            $('#modalCreateTitle').text('Edit Department');
+
+            var a = document.getElementById('loading');
+            a.style.display = "block";
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetDataForEdit", "Department", new { Area = "Maintenance" })',
+                data: {
+                    "DepartmentCode": ID,
+                },
+                success: function (respond) {
+                    a.style.display = "none";
+                    //console.log(respond.obj);
+
+                    $('#modalDepartmentCode').val(respond.obj.DepartmentCode);
+                    $('#modalDepartmentName').val(respond.obj.DepartmentName);
+                    $("#modalCreateDepartment").modal('show');
+                },
+                error: function (b, c) {
+                    a.style.display = "none";
+                    alert('Something is wrong, please contact your administrator')
+                }
+            });
+        }
+
+        function DeleteDepartment(departmentCode, departmentName) {
+            var Jawaban = confirm("Are you sure want to continue ?");
+            if (!Jawaban) {
+                return false;
+            }
+
+            var a = document.getElementById('loading');
+            a.style.display = "block";
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Delete", "Department", new { Area = "Maintenance" })',
+                data: {
+                    "obj": {
+                        "DepartmentCode": departmentCode,
+                        "DepartmentName": departmentName,
+                    }
+                },
+                success: function (respond) {
+                    a.style.display = "none";
+                    //console.log(respond.obj);
+
+                    getData();
+                    alert(respond.msg);
+                },
+                error: function (b, c) {
+                    a.style.display = "none";
+                    alert('Something is wrong, please contact your administrator')
+                }
+            });
+        }
+
+    </script>
+}

@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/20/2025 10:43:38" ReportInfo.Modified="11/06/2025 16:19:17" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionString="rijcmlq+rW0RkboK+/8CKGGYUID3ctBV8q9SvKYxl3iiE7vBnh7Tgou0+4WFf3NfmPSvHVFESecFIToWHIHd7DGOB2EEKr2pIAhxxK1mH1ayW/eExhO3THq1TfMWpnyk4D/ItYtBTEiiTTYZ158CPfD7oYkzA/hR1pmPMl5ji3OJyM3W4SCtS0Let4b+XRWWvQYmnf1">
+      <ProcedureDataSource Name="RepSelLessee" DataType="System.Int32" PropName="_1RepSelLessee" Enabled="true" TableName="RepSelLessee" SelectCommand="RepSelLessee">
+        <Column Name="LesseeNo" DataType="System.String"/>
+        <Column Name="BranchCode" DataType="System.String"/>
+        <Column Name="LesseeName" DataType="System.String"/>
+        <Column Name="LesseeFullName" DataType="System.String"/>
+        <Column Name="LesseeType" DataType="System.Byte"/>
+        <Column Name="TypeCode" DataType="System.String"/>
+        <Column Name="StatusCode" DataType="System.String"/>
+        <Column Name="GrpNo" DataType="System.String"/>
+        <Column Name="IndusCode" DataType="System.String"/>
+        <Column Name="BidangUsahaTempatBekerja" DataType="System.String"/>
+        <Column Name="LegalAddr1" DataType="System.String"/>
+        <Column Name="LegalAddr2" DataType="System.String"/>
+        <Column Name="LegalAddr3" DataType="System.String"/>
+        <Column Name="LegalRT" DataType="System.String"/>
+        <Column Name="LegalRW" DataType="System.String"/>
+        <Column Name="LegalKelurahanCode" DataType="System.String"/>
+        <Column Name="LegalKecamatanCode" DataType="System.String"/>
+        <Column Name="LegalCityCode" DataType="System.String"/>
+        <Column Name="LegalProvince" DataType="System.String"/>
+        <Column Name="LegalCountry" DataType="System.String"/>
+        <Column Name="PostalCode" DataType="System.String"/>
+        <Column Name="LegalPhone1" DataType="System.String"/>
+        <Column Name="LegalPhone2" DataType="System.String"/>
+        <Column Name="DomicileAddress" DataType="System.String"/>
+        <Column Name="DomicileRT" DataType="System.String"/>
+        <Column Name="DomicileRW" DataType="System.String"/>
+        <Column Name="DomicileKelurahan" DataType="System.String"/>
+        <Column Name="DomicileKecamatan" DataType="System.String"/>
+        <Column Name="DomicileCity" DataType="System.String"/>
+        <Column Name="DomicileProvince" DataType="System.String"/>
+        <Column Name="DomicileCountry" DataType="System.String"/>
+        <Column Name="DomilicePostalCode" DataType="System.String"/>
+        <Column Name="BillAddress" DataType="System.String"/>
+        <Column Name="BillRT" DataType="System.String"/>
+        <Column Name="BillRW" DataType="System.String"/>
+        <Column Name="BillKelurahan" DataType="System.String"/>
+        <Column Name="BillKecamatan" DataType="System.String"/>
+        <Column Name="BillCity" DataType="System.String"/>
+        <Column Name="BillProvince" DataType="System.String"/>
+        <Column Name="BillCountry" DataType="System.String"/>
+        <Column Name="BillPostalCode" DataType="System.String"/>
+        <Column Name="Email" DataType="System.String"/>
+        <Column Name="ContactAddr1" DataType="System.String"/>
+        <Column Name="ContactAddr2" DataType="System.String"/>
+        <Column Name="ContactAddr3" DataType="System.String"/>
+        <Column Name="ContactCityCode" DataType="System.String"/>
+        <Column Name="ContactPhone1" DataType="System.String"/>
+        <Column Name="ContactPhone2" DataType="System.String"/>
+        <Column Name="ContactPhone3" DataType="System.String"/>
+        <Column Name="ContactPhone4" DataType="System.String"/>
+        <Column Name="ContactPhone5" DataType="System.String"/>
+        <Column Name="ContactFax" DataType="System.String"/>
+        <Column Name="ContactTelex" DataType="System.String"/>
+        <Column Name="ContactPerson1" DataType="System.String"/>
+        <Column Name="ContactPerson2" DataType="System.String"/>
+        <Column Name="Position" DataType="System.String"/>
+        <Column Name="OwnerName" DataType="System.String"/>
+        <Column Name="Commis1" DataType="System.String"/>
+        <Column Name="Commis2" DataType="System.String"/>
+        <Column Name="Executive1" DataType="System.String"/>
+        <Column Name="Executive2" DataType="System.String"/>
+        <Column Name="BusinessLine" DataType="System.String"/>
+        <Column Name="Banker1" DataType="System.String"/>
+        <Column Name="Banker2" DataType="System.String"/>
+        <Column Name="EstDate" DataType="System.DateTime"/>
+        <Column Name="Subsidiary1" DataType="System.String"/>
+        <Column Name="Subsidiary2" DataType="System.String"/>
+        <Column Name="IntroducedBy" DataType="System.String"/>
+        <Column Name="CurrCode" DataType="System.String"/>
+        <Column Name="CreditLmt" DataType="System.Decimal"/>
+        <Column Name="UsedCreditLmt" DataType="System.Decimal"/>
+        <Column Name="CrdtLmtExpDate" DataType="System.DateTime"/>
+        <Column Name="KindOfComp" DataType="System.String"/>
+        <Column Name="NPWP" DataType="System.String"/>
+        <Column Name="SIUP" DataType="System.String"/>
+        <Column Name="SIUPExpiredDate" DataType="System.DateTime"/>
+        <Column Name="FirstDeedNo" DataType="System.String"/>
+        <Column Name="FirstDeedDate" DataType="System.DateTime"/>
+        <Column Name="LastDeedNo" DataType="System.String"/>
+        <Column Name="LastDeedDate" DataType="System.DateTime"/>
+        <Column Name="FirstTDRTDP" DataType="System.String"/>
+        <Column Name="FirstTDRTDPExpiredDate" DataType="System.DateTime"/>
+        <Column Name="TDRTDP" DataType="System.String"/>
+        <Column Name="TDRTDPExpiredDate" DataType="System.DateTime"/>
+        <Column Name="Remark" DataType="System.String"/>
+        <Column Name="LogUserId" DataType="System.String"/>
+        <Column Name="LogDate" DataType="System.String"/>
+        <Column Name="LogTime" DataType="System.String"/>
+        <Column Name="OutPrincipal" DataType="System.Decimal"/>
+        <Column Name="OutIncome" DataType="System.Decimal"/>
+        <Column Name="OutLR" DataType="System.Decimal"/>
+        <Column Name="IDType" DataType="System.Byte"/>
+        <Column Name="IDNo" DataType="System.String"/>
+        <Column Name="IDNoExpiredDate" DataType="System.DateTime"/>
+        <Column Name="Age" DataType="System.Int16"/>
+        <Column Name="AccessCode" DataType="System.String"/>
+        <Column Name="NextRvwDate" DataType="System.DateTime"/>
+        <Column Name="MSLeaseAgr" DataType="System.String"/>
+        <Column Name="MSLeaseAgrDate" DataType="System.DateTime"/>
+        <Column Name="CreditRiskGrade" DataType="System.String"/>
+        <Column Name="OutPrincipal_Int" DataType="System.Decimal"/>
+        <Column Name="OutIncome_Int" DataType="System.Decimal"/>
+        <Column Name="OutLR_Int" DataType="System.Decimal"/>
+        <Column Name="SignBy" DataType="System.String"/>
+        <Column Name="Title" DataType="System.String"/>
+        <Column Name="Relationship" DataType="System.Byte"/>
+        <Column Name="AreaCode" DataType="System.String"/>
+        <Column Name="CreatedBy" DataType="System.String"/>
+        <Column Name="CreatedDate" DataType="System.DateTime"/>
+        <Column Name="ModifiedBy" DataType="System.String"/>
+        <Column Name="ModifiedDate" DataType="System.DateTime"/>
+        <Column Name="DOB" DataType="System.DateTime"/>
+        <Column Name="MotherName" DataType="System.String"/>
+        <Column Name="ResidencePermit" DataType="System.String"/>
+        <Column Name="ResidencePermitExpiredDate" DataType="System.DateTime"/>
+        <Column Name="CompanyAD" DataType="System.String"/>
+        <Column Name="Sertification" DataType="System.String"/>
+        <Column Name="NumOfEmployee" DataType="System.String"/>
+        <Column Name="Website" DataType="System.String"/>
+        <Column Name="Affiliation" DataType="System.String"/>
+        <Column Name="LesseeCategory" DataType="System.String"/>
+        <Column Name="LesseeCategoryDetail" DataType="System.String"/>
+        <Column Name="PlaceOfBirth" DataType="System.String"/>
+        <Column Name="Education" DataType="System.String"/>
+        <Column Name="Gender" DataType="System.Byte"/>
+        <Column Name="WorkPlace" DataType="System.String"/>
+        <Column Name="WorkPlaceAddress" DataType="System.String"/>
+        <Column Name="WorkPlaceProvince" DataType="System.String"/>
+        <Column Name="WorkPlaceCity" DataType="System.String"/>
+        <Column Name="WorkPlacePostalCode" DataType="System.String"/>
+        <Column Name="LamaUsaha" DataType="System.Int32"/>
+        <Column Name="JobTitle" DataType="System.String"/>
+        <Column Name="JobFunction" DataType="System.String"/>
+        <Column Name="GrossIncomePerYear" DataType="System.Decimal"/>
+        <Column Name="GrossLivingCostPerYear" DataType="System.Decimal"/>
+        <Column Name="IncomeSource" DataType="System.Byte"/>
+        <Column Name="JumlahTanggungan" DataType="System.Byte"/>
+        <Column Name="RelationshipWithReporter" DataType="System.String"/>
+        <Column Name="MaritalStatus" DataType="System.Byte"/>
+        <Column Name="SpouseName" DataType="System.String"/>
+        <Column Name="SpouseDOB" DataType="System.DateTime"/>
+        <Column Name="SpouseIDNo" DataType="System.String"/>
+        <Column Name="SpouseIDExpiredDate" DataType="System.DateTime"/>
+        <Column Name="PisahHarta" DataType="System.String"/>
+        <Column Name="MelanggarBMPK" DataType="System.String"/>
+        <Column Name="MelampauiBMPK" DataType="System.String"/>
+        <Column Name="HP1" DataType="System.String"/>
+        <Column Name="HP2" DataType="System.String"/>
+        <Column Name="RatingAgency" DataType="System.String"/>
+        <Column Name="RatingDate" DataType="System.DateTime"/>
+        <Column Name="GoPublic" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PlaceOfEstablish" DataType="System.String"/>
+        <Column Name="BusinessEntityType" DataType="System.String"/>
+        <Column Name="BusinessGroup" DataType="System.String"/>
+        <Column Name="Nationality" DataType="System.Byte"/>
+        <Column Name="CIFNo" DataType="System.String"/>
+        <Column Name="LesseeRisk" DataType="System.String"/>
+        <Column Name="RiskDesc" DataType="System.String"/>
+        <Column Name="FamilyName" DataType="System.String"/>
+        <Column Name="FamilyGender" DataType="System.Byte"/>
+        <Column Name="FamilyPhone" DataType="System.String"/>
+        <Column Name="FamilyHP" DataType="System.String"/>
+        <Column Name="FamilyAddress" DataType="System.String"/>
+        <Column Name="ResidenceStatus" DataType="System.Byte"/>
+        <Column Name="ResidenceSinceYear" DataType="System.Int32"/>
+        <Column Name="ResidenceSinceMonth" DataType="System.Int32"/>
+        <Column Name="PEPNo" DataType="System.String"/>
+        <Column Name="IsLessee" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IsGuarantor" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IsBeneficiaryOwner" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="LesseeBONo" DataType="System.String"/>
+        <Column Name="LesseeBOBranchCode" DataType="System.String"/>
+        <Column Name="IsOfficer" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="KategoriUsahaBerkelanjutan" DataType="System.String"/>
+        <Column Name="Religion" DataType="System.String"/>
+        <Column Name="FTOutPrincipal" DataType="System.Decimal"/>
+        <Column Name="FTOutInterest" DataType="System.Decimal"/>
+        <Column Name="FTOutLR" DataType="System.Decimal"/>
+        <Column Name="GroupNoSilaras" DataType="System.String"/>
+        <Column Name="RelationshipWithReporterSilaras" DataType="System.String"/>
+        <Column Name="KindOfCompSLIK" DataType="System.String"/>
+        <Column Name="PeriodNo" DataType="System.String"/>
+        <Column Name="KodeBadanUsaha" DataType="System.String"/>
+        <Column Name="UrlDoc" DataType="System.String"/>
+        <Column Name="BranchName" DataType="System.String"/>
+        <Column Name="IndusName" DataType="System.String"/>
+        <Column Name="ProvinceName" DataType="System.String"/>
+        <ProcedureParameter Name="@BranchCode" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@From" DataType="4" Direction="Input"/>
+        <ProcedureParameter Name="@ID" DataType="22" Direction="Input"/>
+        <ProcedureParameter Name="@Init" DataType="20" Direction="Input"/>
+        <ProcedureParameter Name="@To" DataType="4" Direction="Input"/>
+      </ProcedureDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="NAME" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD1" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD2" DataType="System.String" AsString=""/>
+    <Parameter Name="ADD3" DataType="System.String" AsString=""/>
+    <Parameter Name="CHKPAGE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKDATE" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="CHKTIME" DataType="System.Boolean" AsString=""/>
+    <Parameter Name="BAHASA" DataType="System.String" AsString=""/>
+    <Parameter Name="COUNTRY" DataType="System.String" AsString=""/>
+    <Parameter Name="BASECCY" DataType="System.String" AsString=""/>
+    <Parameter Name="RPFrom" DataType="System.String" AsString=""/>
+    <Parameter Name="RPTo" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="4.5" TopMargin="5" RightMargin="4.5" Watermark.Font="Arial, 60pt" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="1088.64" Height="68.04">
+      <TextObject Name="Text26" Width="189" Height="15.12" Text="[NAME]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text27" Top="15.12" Width="189" Height="15.12" Text="[ADD1]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text28" Top="30.24" Width="189" Height="15.12" Text="[ADD2]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text29" Top="45.36" Width="189" Height="15.12" Text="[ADD3]" Padding="0, 0, 0, 0" Font="Arial, 8pt"/>
+      <TextObject Name="Text30" Left="319.41" Top="9.45" Width="449.82" Height="22.68" Text="Daftar Debitur" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text31" Left="966.41" Width="120.96" Height="15.12" VisibleExpression="[CHKPAGE]" Text="[PageNofM]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt"/>
+      <TextObject Name="Text32" Left="956.96" Top="28.79" Width="130.41" Height="15.12" VisibleExpression="[CHKDATE]" Text="Print Date: [DateTime.Now.ToString(&quot;dd/MMM/yyyy&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text33" Left="956.96" Top="43.91" Width="130.41" Height="15.12" VisibleExpression="[CHKTIME]" Text="Print Time: [DateTime.Now.ToString(&quot;HH:mm:ss&quot;)]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Text66" Left="420.01" Top="32.13" Width="128.52" Height="22.68" Text="From: [RPFrom]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text67" Left="-9450" Top="-9450" Width="449.82" Height="22.68" Text="Transaction Listing By Account" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 13pt, style=Bold"/>
+      <TextObject Name="Text68" Left="556.45" Top="32.13" Width="119.07" Height="22.68" Text="To: [RPTo]" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <ChildBand Name="Child1" Top="71.24" Width="1088.64" Height="15.57" Border.Lines="Top, Bottom">
+        <TextObject Name="Text20" Top="0.45" Width="84.75" Height="15.12" Text="Kode Nasabah" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text21" Left="454.4" Top="0.45" Width="294.9" Height="15.12" Text="Alamat" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text69" Left="974.95" Top="0.45" Width="112.75" Height="15.12" Text="NPWP" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text70" Left="862.5" Top="0.45" Width="112.75" Height="15.12" Text="Lessee No" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text71" Left="749.65" Top="0.45" Width="112.75" Height="15.12" Text="No. KTP" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text72" Left="84.75" Top="0.45" Width="148.75" Height="15.12" Text="Customer Name" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text73" Left="233.4" Top="0.45" Width="145.55" Height="15.12" Text="Tempat Lahir" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        <TextObject Name="Text74" Left="379" Top="0.45" Width="75.15" Height="15.12" Text="Tanggal Lahir" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+      </ChildBand>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="90.01" Width="1088.64" Height="15.12" CanGrow="true" DataSource="RepSelLessee">
+      <TextObject Name="Text75" Width="84.75" Height="15.12" Text="[IIf([RepSelLessee.LesseeType]==0,1,2)]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text76" Left="84.75" Width="148.75" Height="15.12" CanGrow="true" Text="[RepSelLessee.LesseeFullName]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text77" Left="233.4" Width="145.55" Height="15.12" CanGrow="true" Text="[RepSelLessee.PlaceOfBirth]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text78" Left="379" Width="75.15" Height="15.12" Text="[RepSelLessee.DOB]" Padding="0, 0, 0, 0" Format="Custom" Format.Format="dd/MMM/yyyy" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text79" Left="454.4" Width="294.9" Height="15.12" CanGrow="true" Text="[RepSelLessee.LegalAddr1]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text80" Left="749.65" Width="112.75" Height="15.12" Text="[RepSelLessee.IDNo]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text81" Left="862.5" Width="112.75" Height="15.12" Text="[RepSelLessee.LesseeNo]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text82" Left="974.95" Width="112.75" Height="15.12" Text="[RepSelLessee.NPWP]" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt"/>
+    </DataBand>
+  </ReportPage>
+</Report>

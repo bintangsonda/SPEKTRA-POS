@@ -1,0 +1,39 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# Visual Studio cache
+*.userprefs
+
+# Logs
+*.log
+
+# NuGet
+packages/
+
+# Publish output
+publish/
+
+# Test results
+TestResults/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Rider / JetBrains
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Configuration / secrets
+appsettings.json
+appsettings.*.json
+!appsettings.example.json

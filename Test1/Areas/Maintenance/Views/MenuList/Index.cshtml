@@ -1,0 +1,338 @@
+﻿@model IEnumerable<IDS.Maintenance.UserMenu>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Menu List";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Content/DataTables/datatables.css" />
+    <link rel="stylesheet" href="~/Content/DataTables/DataTables-1.10.25/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="~/Content/DataTables/Select-1.3.3/css/select.bootstrap5.min.css" />
+    <link href="~/Content/Select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+    @*<link rel="stylesheet" href="~/Content/DataTables/DataTables-1.10.25/css/jquery.dataTables.css">*@
+}
+
+@{
+    Html.RenderPartial("_ProgressPage");
+}
+
+<div class="row">
+    <div class="col-sm-6 col-md-6 col-6">
+        <h4>@ViewBag.Title</h4>
+    </div>
+    <div class="col-sm-6 col-md-6 col-6">
+        <div class="text-right">
+            <p>
+                @{
+                    if (Convert.ToInt32(ViewData["Page.Insert"]) == 1)
+                    {
+                        <a href="#" class="btn btn-sm btn-primary" title="Input Menu" onclick="LoadCreateNewForm()">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="#" class="btn btn-sm btn-primary" title="Input Menu" onclick="NoAccess()">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    }
+
+                    if (Convert.ToInt32(ViewData["Page.Edit"]) == 1)
+                    {
+                        <a class="btn btn-sm btn-info" title="Edit Menu" onclick="LoadEditForm()">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-sm btn-info" title="Edit Menu" onclick="NoAccess()" disabled="disabled">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    }
+
+                    if (Convert.ToInt32(ViewData["Page.Delete"]) == 1)
+                    {
+                        <a onclick="Delete()" class="btn btn-sm btn-danger" title="Delete Menu" href="#">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a onclick="Delete()" class="btn btn-sm btn-danger" title="Delete Menu" href="#">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    }
+                }
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="table-responsive table-responsive-sm p-2 bg-white border">
+    <table id="tableData" class="table table-bordered table-hover w-100">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Number</th>
+                <th>Code</th>
+                <th>Project</th>
+                <th>Level</th>
+                <th>Name</th>
+                <th>Url</th>
+                <th>Tooltip</th>
+                <th>Controller</th>
+                <th>Area</th>
+                <th>Operator ID</th>
+                <th>Last Update</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<div id="PartialSection">
+
+</div>
+
+@section Scripts {
+    <script src="~/Scripts/moment.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/Select-1.3.3/js/select.bootstrap5.js"></script>
+    <script type="text/javascript" src="~/Content/Select2/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/GeneralDataTable.js"></script>
+
+    <script type="text/javascript">
+        var table = null;
+
+        $(document).ready(function () {
+            LoadData();
+        });
+
+        function LoadData() {
+            //modalProcess();
+            //$('#loadingModal').modal('show');
+            table = LoadDT(httpGet('POST', '@Url.Action("GetData", "MenuList", new { Area = "Maintenance" })'));
+            //$('#loadingModal').modal('hide');
+        }
+
+        function LoadDT(dataJS) {
+            return $('#tableData').DataTable({
+                "bDestroy": true,
+                data: JSON.parse(dataJS),
+                "columns": [
+                    { "data": null },
+                    { "data": "MenuNumber", "name": "MenuNumber" },
+                    { "data": "MenuCode", "name": "MenuCode" },
+                    { "data": "MenuProject", "name": "MenuProject" },
+                    { "data": "MenuLevel", "name": "MenuLevel" },
+                    { "data": "MenuName", "name": "MenuName" },
+                    { "data": "MenuURL", "name": "MenuURL" },
+                    { "data": "MenuToolTip", "name": "CityMenuToolTip" },
+                    { "data": "Controller", "name": "Controller" },
+                    { "data": "Area", "name": "Area" },
+                    { "data": "OperatorID", "name": "OperatorID" },
+                    {
+                        "data": "LastUpdate", "name": "LastUpdate",
+                        "render": function (data, type, row, meta) {
+                            return moment(row.LastUpdate).format('DD/MMM/YYYY HH:mm:ss');
+                        }
+                    }
+                ],
+                "order": [[1, "asc"]],
+                "lengthMenu": [[1, 10, 25, 50, -1], [1, 10, 25, 50, "All"]],
+                "pageLength": 10,
+                "columnDefs": [
+                {
+                    "targets": 'no-sort',
+                    "orderable": false,
+                },
+                {
+                    "data": null,
+                    "width": "20px",
+                    "defaultContent": '',
+                    "orderable": false,
+                    "className": "select-checkbox",
+                    "checkboxes": {
+                        "selectRow": true
+                    },
+                    "targets": [0]
+                },
+                {
+                    "width": "20px",
+                    "orderable": true,
+                    "targets": [1]
+                },
+                {
+                    //"width": "250px",
+                    "orderable": true,
+                    "targets": [2]
+                },
+                {
+                    "width": "40px",
+                    "orderable": true,
+                    "targets": [3]
+                },
+                {
+                    "width": "60px",
+                    "orderable": true,
+                    "targets": [4]
+                },
+                {
+                    "width": "100px",
+                    "orderable": true,
+                    "targets": [5]
+                },
+                {
+                    "width": "100px",
+                    "orderable": true,
+                    "targets": [6]
+                },
+                {
+                    "width": "100px",
+                    "orderable": true,
+                    "targets": [7]
+                },
+                {
+                    "width": "100px",
+                    "orderable": true,
+                    "targets": [8]
+                },
+                {
+                    "width": "80px",
+                    "orderable": true,
+                    "targets": [9]
+                    },
+                    {
+                        "width": "80px",
+                        "orderable": true,
+                        "targets": [10]
+                    },
+                {
+                    "width": "100px",
+                    "orderable": true,
+                    "targets": [11]
+                }
+                ],
+                "select": {
+                    "style": 'os'
+                },
+            });
+        }
+
+
+        function LoadCreateNewForm() {
+            modalProcess();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("Create", "MenuList", new { Area = "Maintenance" })',
+                contentType: 'application/html; charset=utf-8',
+                dataType: 'html',
+                success: function (result) {
+                    $('#loadingModal').modal('hide');
+                    $('#PartialSection').empty();
+                    $("#PartialSection").html(result);
+                    //$("form#formCreateEdit")[0].reset();
+                    $("#modalTitle").html("Create Data");
+                    $("#CreateEditForm").modal('show');
+                },
+                error: function (status) {
+                    $('#loadingModal').modal('hide');
+                    alert('');
+                }
+            });
+        }
+
+        function LoadEditForm() {
+            var form = this;
+            var selRow = table.rows('.selected').data();
+            var data = null;
+
+            if (selRow.length > 0) {
+                data = selRow[0]["MenuCode"];
+                modalProcess();
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("Edit", "MenuList", new { Area = "Maintenance" })',
+                    data: {
+                        'MenuCode': data
+                    },
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#loadingModal').modal('hide');
+                        $('#PartialSection').empty();
+                        $("#PartialSection").html(result);
+                        $("#modalTitle").html("Edit Data");
+
+
+                        $("#CreateEditForm").modal('show');
+                    },
+                    error: function (status) {
+                        $('#loadingModal').modal('hide');
+                        alert('');
+                    }
+                });
+            }
+            else {
+                alert("Please select data to be edit");
+            }
+        }
+
+        function Delete() {
+            var form = this;
+            var selRow = table.rows('.selected').data();
+
+            if (selRow == null || selRow == 'undefined' || selRow.length == 0) {
+                alert("Please select the data you want to delete");
+                return false;
+            }
+
+            var dataCollection = '';
+            var data = '';
+
+            $.each(selRow, function (index, row) {
+                data += row["MenuCode"] + ',';
+                dataCollection += '[' + row["MenuCode"] + '] - ' + row["MenuName"] + "\n";
+            })
+
+            var answer = confirm("You are about to delete data:\n" + dataCollection + "\nAre you sure want to delete the data ?");
+
+            if (answer) {
+                if (dataCollection.length > 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Delete", "MenuList", new { Area = "Maintenance" })',
+                        data: { "menuCodeList": data },
+                        dataType: 'JSON',
+                        success: function (respond) {
+                            switch (respond) {
+                                case "NoAccess":
+                                    alert("No Access");
+                                    break;
+                                case "Success":
+                                    LoadData();
+                                    alert(respond);
+                                    @*window.location.href = '@Url.Action("index", "Bank", new { Area = "GeneralTable" })'*@
+                                    break;
+                                default:
+                                    LoadData();
+                                    alert(respond);
+                                    @*window.location.href = '@Url.Action("index", "Bank", new { Area = "GeneralTable" })'*@
+                                    break;
+                            }
+
+                        },
+                        error: function (respond) {
+                            alert(respond);
+                        }
+                    })
+                }
+            }
+            else {
+                return false;
+            }
+
+        }
+    </script>
+}

@@ -1,0 +1,10 @@
+﻿/* Make Select2 text smaller (like Bootstrap's .form-control-sm) */
+.select2-container--default .select2-selection--single {
+    font-size: 0.8rem; /* same as .form-control-sm */
+    min-height: calc(1.5em + .5rem + 2px);
+}
+
+/* Also adjust dropdown text */
+.select2-results__option {
+    font-size: 0.8rem;
+}
