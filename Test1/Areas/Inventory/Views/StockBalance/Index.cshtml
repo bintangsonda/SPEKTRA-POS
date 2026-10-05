@@ -1,0 +1,313 @@
+﻿@model SPOS.Inventory.Stock.StockBalance 
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Stock Balance";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/assets/css/custom.css" />
+
+}
+@Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
+@Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
+@Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
+@Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+
+<!--Table Data-->
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+            <i class="ri ri-restaurant-2-line me-2 text-primary" style="font-size: 1.5rem;"></i>
+            <h4 class="card-title mb-0 fw-semibold text-primary">
+                @ViewBag.Title
+            </h4>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header border-bottom">
+            <div class="row g-2 align-items-end">
+
+                <!-- Date From -->
+                <div class="col-sm-2">
+                    <div class="form-floating form-floating-outline">
+                        <input type="date"
+                               id="DateFrom"
+                               name="DateFrom"
+                               class="form-control form-control-sm" />
+                        <label for="DateFrom">Date From</label>
+                    </div>
+                </div>
+
+                <!-- Date To -->
+                <div class="col-sm-2">
+                    <div class="form-floating form-floating-outline">
+                        <input type="date"
+                               id="DateTo"
+                               name="DateTo"
+                               class="form-control form-control-sm" />
+                        <label for="DateTo">Date To</label>
+                    </div>
+                </div>
+
+                <!-- Gudang -->
+                <div class="col-sm-2">
+                    <div class="form-floating form-floating-outline">
+                        @Html.DropDownList(
+                            "Gudang",
+                            ViewData["SelectListWh"] as SelectList,
+                            new { @class = "form-control form-control-sm select2" }
+                        )
+                        <label for="Gudang">Gudang</label>
+                    </div>
+                </div>
+
+                <!-- Cabang -->
+                <div class="col-sm-2">
+                    <div class="form-floating form-floating-outline">
+                        @Html.DropDownList(
+                            "Cabang",
+                            ViewData["SelectListBranchCode"] as SelectList,
+                            "All",
+                            new { @class = "form-control form-control-sm select2" }
+                        )
+                        <label for="Cabang">Cabang</label>
+                    </div>
+                </div>
+
+                <!-- Produk -->
+                <div class="col-sm-2">
+                    <div class="form-floating form-floating-outline">
+                        @Html.DropDownList(
+                            "Produk",
+                            ViewData["SelectListProdCode"] as SelectList,
+                            "All",
+                            new { @class = "form-control form-control-sm select2" }
+                        )
+                        <label for="Produk">Produk</label>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="col-sm-1 d-flex justify-content-start align-items-center">
+                    <button type="button"
+                            class="btn btn-primary d-flex align-items-center px-3 py-2"
+                            onclick="getData()">
+                        <i class="ri ri-search-line icon-18px"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div class="card-datatable">
+            <table id="tableData" class="datatables-custom table table-responsive table-sm w-100">
+                <thead>
+                    <tr>
+                        <th>Dates</th>
+                        <th>Product Code</th>
+                        <th>Product Name</th>
+                        <th>Branch</th>
+                        <th>Gudang</th>
+                        <th>Begin Balance</th>
+                        <th>Qty In</th>
+                        <th>Qty Out</th>
+                        <th>Qty Adj</th>
+                        <th>End Balance</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<!--Table Data-->
+
+
+<!-- Loading Page -->
+<div id="loading" style="display:none; height:100%; width:100%">
+    <div class="loading-wave" id="loading-content">
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+    </div>
+    <div class="loading loading07">
+        <span data-text="S">S</span>
+        <span data-text="P">P</span>
+        <span data-text="E">E</span>
+        <span data-text="K">K</span>
+        <span data-text="T">T</span>
+        <span data-text="R">R</span>
+        <span data-text="A">A</span>
+    </div>
+</div>
+<!-- Loading Page -->
+
+<div id="PartialSection">
+</div>
+
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/select2/select2.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/popular.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/auto-focus.js"></script>
+    <script src="~/assets/vendor/libs/cleave-zen/cleave-zen.js"></script>
+    <script src="~/assets/js/forms-selects.js"></script>
+    <script src="~/assets/vendor/libs/tagify/tagify.js"></script>
+    <script src="~/assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="~/assets/vendor/libs/bloodhound/bloodhound.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script type="text/javascript">
+        const token = $('input[name="__RequestVerificationToken"]').val();
+        const getDataUrl = '@Url.Action("GetData", "StockBalance", new { area = "Inventory" })';
+
+        var table = null;
+        var nilaiTampung = "";
+        $('.select2').select2();
+
+        $(document).ready(function () {
+            var today = new Date().toISOString().split('T')[0];
+            $('#DateFrom').val(today);
+            $('#DateTo').val(today);
+            table=getData();
+            if ($('#PageInsert').val() == 0) {
+                $('.AddNew').prop('disabled', true);
+            }
+        });
+
+        function getData() {
+            return $('#tableData').DataTable({
+                bDestroy: true,
+                processing: true,
+                serverSide: true,
+                "bAutoWidth": true,
+                scrollX: true,
+                ajax: {
+                    url: getDataUrl,
+                    type: 'POST',
+                    dataType: "JSON",
+                    data:{
+                        DateFromSelected: $('#DateFrom').val(),
+                        DateToSelected: $('#DateTo').val(),
+                        werehouse: $('#Gudang').val(),
+                        prodCode: $('#Produk').val(),
+                        Branch: $('#Cabang').val(),
+                    },
+                },
+                columns: [
+                    { "data": "Date", "name": "Date" },
+                    { "data": "prod.ProdCode", "name": "prod.ProdCode" },
+                    { "data": "prod.ProdName", "name": "prod.ProdName"},
+                    { "data": "Branch", "name": "Branch" },
+                    { "data": "wh.Name", "name": "wh.Name" },
+                    { "data": "BeginBalance", "name": "BeginBalance" },
+                    { "data": "QtyIn", "name": "QtyIn" },
+                    { "data": "QtyOut", "name": "QtyOut" },
+                    { "data": "QtyAdj", "name": "QtyAdj" },
+                    { "data": "EndBalance", "name": "EndBalance" },
+                ],
+                columnDefs: [  
+                    {
+                        "targets": [0]
+                    },
+                    {
+                        "targets": [1]
+                    },
+                    {
+                        "targets": [2]
+                    },
+                    {
+                        "targets": [3]
+                    },
+                    {
+                        "targets": [4]
+                    },
+                    {
+                        "targets": [5]
+                    },
+                    {
+                        "targets": [6]
+                    },
+                    {
+                        "targets": [7]
+                    },
+                    {
+                        "targets": [8]
+                    },
+                    {
+                        "targets": [9]
+                    },
+
+                ],
+                select: {
+                    style: 'os',
+                },
+                order: [[2, 'desc']],
+                layout: {
+                    topStart: {
+                        rowClass: 'row m-2 my-0 mt-0 justify-content-between',
+                        features: [
+                            {
+                                pageLength: {
+                                    menu: [[1, 10, 25, 50, 100, 1000, -1], [1, 10, 25, 50, 100, 1000, "All"]],
+                                    text: 'Show _MENU_ entries'
+                                }
+                            },
+                        ]
+                    },
+                    topEnd: {
+                        features: [
+                            {
+                                buttons: [
+                                    {
+                                        text: `
+                                            <i class="icon-base ri ri-add-line icon-sm me-0 d-inline-block"></i>
+                                            <span class="d-none d-sm-inline-block">Add</span>
+                                        `,
+                                        className: 'btn add-new me-2 d-flex align-items-center',  // 🔥 warna + jarak kanan + center
+                                        action: function (e, dt, node, config) {
+                                            $("#CategoriesCode").prop("disabled",false)
+                                            $("#defferedAmmortizeLabel").text("Add Categories")
+                                            ClearModal();
+                                            let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
+                                            modal.show();
+                                             $("#FormAction").val(1)
+                                        }
+                                    }
+                                ]
+                            },
+
+                       
+                            {
+                                search: {
+                                    placeholder: 'Search User',
+                                    text: '_INPUT_'
+                                }
+                            },
+
+                        ]
+                    },
+                    bottomStart: {
+                        rowClass: 'row mx-3 justify-content-between',
+                        features: ['info']
+                    },
+                    bottomEnd: 'paging'
+                },
+                language: {
+                    paginate: {
+                        next: '<i class="icon-base ri ri-arrow-right-s-line scaleX-n1-rtl icon-22px"></i>',
+                        previous: '<i class="icon-base ri ri-arrow-left-s-line scaleX-n1-rtl icon-22px"></i>',
+                        first: '<i class="icon-base ri ri-skip-back-mini-line scaleX-n1-rtl icon-22px"></i>',
+                        last: '<i class="icon-base ri ri-skip-forward-mini-line scaleX-n1-rtl icon-22px"></i>'
+                    }
+                },
+            });
+        }
+    </script>
+}

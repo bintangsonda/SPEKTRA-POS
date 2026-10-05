@@ -34,8 +34,7 @@ namespace SPOS.Inventory.Stock
             using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
             {
                 db.CommandText = "select * from Inwarehouse";
-                db.AddParameter("@Init", System.Data.SqlDbType.TinyInt, 3);
-                db.CommandType = System.Data.CommandType.StoredProcedure;
+                db.CommandType = System.Data.CommandType.Text;
                 db.Open();
 
                 db.ExecuteReader();
