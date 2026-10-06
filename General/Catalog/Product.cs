@@ -360,7 +360,7 @@ namespace General.Catalog
                             SelectListItem product = new SelectListItem();
                             //Modif by Jeremi 15 Oktober 2025
                             product.Value = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
-                            product.Text = product.Value + " - " + IDS.Tool.GeneralHelper.NullToString(dr["Description"]).Replace(@"""", "&#8221;").Replace("@", "&#64;").TrimEnd();
+                            product.Text = product.Value + " - " + IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]).Replace(@"""", "&#8221;").Replace("@", "&#64;").TrimEnd();
                             //End Jeremi
 
                             list.Add(product);

@@ -2,6 +2,7 @@
 using IDS.Tool;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.SqlServer.Management.XEvent;
 using Newtonsoft.Json;
 using System.Reflection;
 
@@ -197,7 +198,6 @@ namespace IDS.Web.UI.Controllers
             }
         }
 
-        //By Renaldi For Login
         [HttpPost]
         public ActionResult UpdateLoginMemoryCache()
         {
@@ -214,6 +214,11 @@ namespace IDS.Web.UI.Controllers
 
             return new EmptyResult(); // No response body
         }
-        //End 
+
+        public ActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Login");
+        }
     }
 }

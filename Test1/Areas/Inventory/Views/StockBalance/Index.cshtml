@@ -16,7 +16,27 @@
 @Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
 @Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
 @Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+<style>
+    #tableData {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
 
+    #tableData th,
+    #tableData td {
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    #tableData th:first-child,
+    #tableData td:first-child {
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    #tableData thead th {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+</style>
 <!--Table Data-->
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -79,7 +99,7 @@
                 </div>
 
                 <!-- Produk -->
-                <div class="col-sm-2">
+                <div class="col-sm-3">
                     <div class="form-floating form-floating-outline">
                         @Html.DropDownList(
                             "Produk",
@@ -263,27 +283,6 @@
                     },
                     topEnd: {
                         features: [
-                            {
-                                buttons: [
-                                    {
-                                        text: `
-                                            <i class="icon-base ri ri-add-line icon-sm me-0 d-inline-block"></i>
-                                            <span class="d-none d-sm-inline-block">Add</span>
-                                        `,
-                                        className: 'btn add-new me-2 d-flex align-items-center',  // 🔥 warna + jarak kanan + center
-                                        action: function (e, dt, node, config) {
-                                            $("#CategoriesCode").prop("disabled",false)
-                                            $("#defferedAmmortizeLabel").text("Add Categories")
-                                            ClearModal();
-                                            let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
-                                            modal.show();
-                                             $("#FormAction").val(1)
-                                        }
-                                    }
-                                ]
-                            },
-
-                       
                             {
                                 search: {
                                     placeholder: 'Search User',

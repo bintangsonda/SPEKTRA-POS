@@ -120,10 +120,7 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
                 return RedirectToAction("error403", "error", new { area = "" });
             }
 
-            ViewData["Page.Insert"] = AccessLevel.CreateAccess;
-            ViewData["Page.Edit"] = AccessLevel.EditAccess;
-            ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
-            ViewData["MessageFromExcel"] = "";
+
 
             ModelState.Clear();
             if (ModelState.IsValid)
@@ -143,15 +140,25 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
                     //CEK IF EXISTS MAKA AKAN UPDATE, KALAU BELUM MAKA CREATE
                     int type =Transaction.Employee.CashierH.CekExistTransCode(dataTransaksi.TransCode);
                     int result = dataTransaksi.InsUpDel(type);
-
+                    int resultStockBalance = 0;
                     if (result > 0)
                     {
+                        
                         if (dataTransaksi.Status == 0)
                         {
                             return Json(new { msg = "Save Bill Successfully", success = 1, sno = dataTransaksi.TransCode });
                         }
                         else
                         {
+                            //update stock
+                            for (int i = 0; i < dataTransaksi.Details.Count; i++)
+                            {
+                                resultStockBalance = SPOS.Inventory.Stock.StockBalance.AddQtyOut(dataTransaksi.Details[i].ProductCode, dataTransaksi.Details[i].Qty, dataTransaksi.BranchCode);
+                                if (resultStockBalance < 1)
+                                {
+                                    return Json(new { msg = "Process Bill Successfully,But Update Stock Failed!", success = 1, sno = dataTransaksi.TransCode });
+                                }
+                            }
                             return Json(new { msg = "Process Bill Successfully", success = 1, sno = dataTransaksi.TransCode });
                         }
                     }

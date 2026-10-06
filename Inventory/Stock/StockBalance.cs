@@ -1,12 +1,14 @@
-﻿using System;
+﻿using IDS.DataAccess;
+using IDS.Tool;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IDS.DataAccess;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
-using IDS.Tool;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SPOS.Inventory.Stock
 {
@@ -70,11 +72,11 @@ namespace SPOS.Inventory.Stock
                             stockBalance.Branch = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
                             stockBalance.wh = new Warehouse();
                             stockBalance.wh.Name = IDS.Tool.GeneralHelper.NullToString(dr["WHCode"]);
-                            stockBalance.BeginBalance = IDS.Tool.GeneralHelper.NullToString(dr["BeginBalance"]);
-                            stockBalance.QtyIn = IDS.Tool.GeneralHelper.NullToString(dr["QtyIn"]);
-                            stockBalance.QtyOut = IDS.Tool.GeneralHelper.NullToString(dr["QtyOut"]);
-                            stockBalance.QtyAdj = IDS.Tool.GeneralHelper.NullToString(dr["QtyAdj"]);
-                            stockBalance.EndBalance = IDS.Tool.GeneralHelper.NullToString(dr["EndBalance"]);
+                            stockBalance.BeginBalance = IDS.Tool.GeneralHelper.NullToDecimal(dr["BeginBalance"],0).ToString();
+                            stockBalance.QtyIn = IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyIn"], 0).ToString();
+                            stockBalance.QtyOut = IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyOut"], 0).ToString();
+                            stockBalance.QtyAdj = IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyAdj"], 0).ToString();
+                            stockBalance.EndBalance = IDS.Tool.GeneralHelper.NullToDecimal(dr["EndBalance"], 0).ToString();
                             DateTime DateStock = IDS.Tool.GeneralHelper.NullToDateTime(dr["Date"],DateTime.Now);
                             stockBalance.Date = DateStock.ToString("dd/MMM/yyyy");
                             list.Add(stockBalance);
@@ -91,62 +93,25 @@ namespace SPOS.Inventory.Stock
             return list;
         }
 
-        public static List<SelectListItem> GetWareHouseForDataSource()
+        public static int AddQtyOut(string ProdCode,decimal Qty,string BranchCode)
         {
-            List<SelectListItem> list = new List<SelectListItem>();
-            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer(true))
+            int hasil = 0;
+            using (SqlServer db = new IDS.DataAccess.SqlServer(true))
             {
-                db.CommandText = "Select distinct WHCode, WHName,isDefault from INWarehouse order by WHCode desc";
-                db.CommandType = System.Data.CommandType.Text;
+                db.CommandText = "AddQtyStock";
+                db.CommandType = System.Data.CommandType.StoredProcedure;
+                db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, ProdCode);
+                db.AddParameter("@Qty", System.Data.SqlDbType.Decimal, Qty);
+                db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, BranchCode);
+                db.AddParameter("@Type", System.Data.SqlDbType.Int, 1);//qty out jadi 1
                 db.Open();
-                db.ExecuteReader();
-                using (SqlDataReader dr = db.DbDataReader as SqlDataReader)
-                {
-                    if (dr.HasRows)
-                    {
-                        list.Add(new SelectListItem() { Text = "ALL", Value = "ALL" });
-                        while (dr.Read())
-                        {
-                            SelectListItem coa = new SelectListItem();
-                            coa.Value = IDS.Tool.GeneralHelper.NullToString(dr["WHCode"]);
-                            coa.Text = IDS.Tool.GeneralHelper.NullToString(dr["WHCode"]) + " - " + IDS.Tool.GeneralHelper.NullToString(dr["WHName"]);
-                            list.Add(coa);
-                        }
-                    }
-                }
-                db.Close();
-            }
-            return list;
-        }
-       
-        public static List<SelectListItem> GetProductCodeForDataSource()
-        {
-            List<SelectListItem> list = new List<SelectListItem>();
-            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer(true))
-            {
-                db.CommandText = "Select distinct ProdCode,prodname from Product order by ProdCode asc";
-                db.CommandType = System.Data.CommandType.Text;
-                db.Open();
-                db.ExecuteReader();
-                using (SqlDataReader dr = db.DbDataReader as SqlDataReader)
-                {
-                    if (dr.HasRows)
-                    {
-                        list.Add(new SelectListItem() { Text = "ALL", Value = "ALL" });
-                        while (dr.Read())
-                        {
-                            SelectListItem coa = new SelectListItem();
-                            coa.Value = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
-                            coa.Text = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]) + " - " + IDS.Tool.GeneralHelper.NullToString(dr["prodname"]);
-                            list.Add(coa);
-                        }
-                    }
-                }
+                db.BeginTransaction();
+                hasil=db.ExecuteNonQuery();
+                db.CommitTransaction();
                 db.Close();
             }
 
-            return list;
+            return hasil;
         }
-
     }
 }
