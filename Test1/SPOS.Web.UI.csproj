@@ -10,6 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Catalog\Data\**" />
+    <Compile Remove="Areas\Catalog\Models\**" />
+    <Content Remove="Areas\Catalog\Data\**" />
+    <Content Remove="Areas\Catalog\Models\**" />
+    <EmbeddedResource Remove="Areas\Catalog\Data\**" />
+    <EmbeddedResource Remove="Areas\Catalog\Models\**" />
+    <None Remove="Areas\Catalog\Data\**" />
+    <None Remove="Areas\Catalog\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\assets\img\customizer\content-compact.svg" />
     <None Include="wwwroot\assets\img\customizer\content-wide.svg" />
     <None Include="wwwroot\assets\img\customizer\direction-ltr.svg" />
@@ -842,8 +853,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Catalog\Data\" />
-    <Folder Include="Areas\Catalog\Models\" />
     <Folder Include="wwwroot\Export\Report\" />
   </ItemGroup>
 
