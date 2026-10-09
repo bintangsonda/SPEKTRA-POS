@@ -54,22 +54,34 @@
                 <!-- Date From -->
                 <div class="col-sm-2">
                     <div class="form-floating form-floating-outline">
-                        <input type="date"
-                               id="DateFrom"
-                               name="DateFrom"
-                               class="form-control form-control-sm" />
-                        <label for="DateFrom">Date From</label>
+                      @Html.TextBox(
+                                    "FromDate",
+                                    DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                                    new {
+                                        id = "DateFrom",
+                                        @class = "form-control form-control-sm",
+                                        type = "text",
+                                        placeholder = "dd/mmm/yyyy",
+                                    }
+                                )
+                                <label for="txtFromDate">Date From</label>
                     </div>
                 </div>
 
                 <!-- Date To -->
                 <div class="col-sm-2">
                     <div class="form-floating form-floating-outline">
-                        <input type="date"
-                               id="DateTo"
-                               name="DateTo"
-                               class="form-control form-control-sm" />
-                        <label for="DateTo">Date To</label>
+                        @Html.TextBox(
+                                    "ToDate",
+                                    DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                                    new {
+                                        id = "DateTo",
+                                        @class = "form-control form-control-sm",
+                                        type = "text",
+                                        placeholder = "dd/mmm/yyyy",
+                                    }
+                                )
+                                <label for="txtToDate">Date To</label>
                     </div>
                 </div>
 
@@ -192,9 +204,12 @@
         $('.select2').select2();
 
         $(document).ready(function () {
-            var today = new Date().toISOString().split('T')[0];
-            $('#DateFrom').val(today);
-            $('#DateTo').val(today);
+            flatpickr("#DateFrom,#DateTo", {
+                dateFormat: "d/M/Y",
+                disableMobile: true,
+                static: true,
+            });
+            
             table=getData();
             if ($('#PageInsert').val() == 0) {
                 $('.AddNew').prop('disabled', true);

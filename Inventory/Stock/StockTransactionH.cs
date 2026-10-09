@@ -16,7 +16,7 @@ namespace SPOS.Inventory.Stock
         public string BranchCode { get; set; }
         public string WarehouseCode { get; set; }  
         public int Process { get; set; }
-        public DateTime ProcessDate { get;set; }
+        public DateTime? ProcessDate { get;set; }
         public string voucher { get; set; }
         public string Remark { get; set; } 
         public List<StockTransactionD> StockTransactionDetails { get; set; }

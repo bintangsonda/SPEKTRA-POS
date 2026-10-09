@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="~/assets/css/custom.css" />
 
 }
+
 @Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
 @Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
 @Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
@@ -33,32 +34,42 @@
 
                 <!-- Date From -->
                 <div class="col-sm-2">
-                    <div class="form-floating form-floating-outline">
-                        <input type="date"
-                               id="DateFrom"
-                               name="DateFrom"
-                               class="form-control form-control-sm" 
-                                value="@DateTime.Now.ToString("yyyy-MM-01")" />
-
-                        <label for="DateFrom">Date From</label>
-                    </div>
+                     <div class="form-floating form-floating-outline">
+                    @Html.TextBox(
+                        "FromDate",
+                        new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
+                                .ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                            new {
+                                id = "DateFrom",
+                                @class = "form-control form-control-sm",
+                                type = "text",
+                                placeholder = "dd/mmm/yyyy"
+                        }
+                    )
+                    <label for="DateFrom">From</label>
+                </div>
                 </div>
 
                 <!-- Date To -->
                 <div class="col-sm-2">
                     <div class="form-floating form-floating-outline">
-                        <input type="date"
-                               id="DateTo"
-                               name="DateTo"
-                               class="form-control form-control-sm" 
-                            value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        @Html.TextBox(
+                        "ToDate",
+                        DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                        new {
+                            id = "DateTo",
+                            @class = "form-control form-control-sm",
+                            type = "text",
+                            placeholder = "dd/mmm/yyyy"
+                        }
+                    )
+                    <label for="DateTo">To</label>
 
-                        <label for="DateTo">Date To</label>
                     </div>
                 </div>
 
                 <!-- Cabang -->
-                <div class="col-sm-2">
+                <div class="col-sm-4">
                     <div class="form-floating form-floating-outline">
                         @Html.DropDownList(
                             "Cabang",
@@ -68,6 +79,15 @@
                         )
                         <label for="Cabang">Cabang</label>
                     </div>
+                </div>
+
+                <!-- Search -->
+                <div class="col-sm-1 d-flex justify-content-start align-items-center">
+                    <button type="button"
+                            class="btn btn-primary d-flex align-items-center px-3 py-2"
+                            onclick="getData()">
+                        <i class="ri ri-search-line icon-18px"></i>
+                    </button>
                 </div>
                 </div>
                 </div>
@@ -92,54 +112,11 @@
 </div>
 <!--Table Data-->
 
-<!--modal input-->
-<div class="modal fade" id="ModalInsert" role="dialog" aria-labelledby="defferedAmmortizeLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <!-- Header -->
-            <div class="modal-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
-                <h4 class="modal-title mb-0 fw-semibold text-white" id="defferedAmmortizeLabel">
-                    Add Categories
-                </h4>
-                <button type="button"
-                        class="btn shadow-none p-0"
-                        data-bs-dismiss="modal"
-                        aria-label="Close">
-                    <i class="icon-base ri ri-close-large-line icon-md text-white"></i>
-                </button>
-            </div>
 
-            <!-- Body -->
-            <div class="modal-body">
-                <div class="row gy-2">
-                    <div class="col-12">
-                        <div class="form-group">
-                            <div class="form-floating form-floating-outline mb-3">
-                                @Html.TextBoxFor(model => model.TransNo, new { @class = "form-control", placeholder = "AUTO", @maxlength = 5 })
-                                <label>Category Code</label>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Footer -->
-            <div class="modal-footer py-2 px-3 border-0 justify-content-end">
-                <button type="button" class="btn btn-secondary btn-sm" id="btnAddNew">
-                    <i class="ri ri-reset-left-fill me-1 icon-18px"></i> Add New
-                </button>
-                <button type="button" class="btn btn-success btn-sm SaveInsert" id="btnSave_Deffered" >
-                    <i class="ri ri-check-fill me-1 icon-18px"></i> Save
-                </button>
-                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
-                    <i class="ri ri-close-line me-1 icon-18px"></i> Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--modal input-->
+
+
+
 
 <!-- Loading Page -->
 <div id="loading" style="display:none; height:100%; width:100%">
@@ -188,7 +165,17 @@
         $('.select2').select2();
 
         $(document).ready(function () {
-         
+            flatpickr("#DateFrom,#DateTo", {
+                   dateFormat: "d/M/Y",
+                    disableMobile: true,
+                    static: true,
+            });
+            flatpickr("#TransDate", {
+                   dateFormat: "d/M/Y",
+                    disableMobile: true,
+                    static: true,
+            });
+
             table=getData();
             if ($('#PageInsert').val() == 0) {
                 $('.AddNew').prop('disabled', true);
@@ -315,12 +302,8 @@
                                         `,
                                         className: 'btn add-new me-2 d-flex align-items-center',  // 🔥 warna + jarak kanan + center
                                         action: function (e, dt, node, config) {
-                                            $("#CategoriesCode").prop("disabled",false)
-                                            $("#defferedAmmortizeLabel").text("Add Categories")
-                                            ClearModal();
-                                            let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
-                                            modal.show();
-                                             $("#FormAction").val(1)
+                                                      window.location.href = '@Url.Action("Create", "StockTransaction", new { area = "Inventory" })';
+
                                         }
                                     }
                                 ]
@@ -361,7 +344,7 @@
             const code = $(this).data('code');
              $.ajax({
                 type: 'GET',
-                url: '@Url.Action("Edit", "Categories", new { Area = "Catalog" })',
+                url: '@Url.Action("Edit", "StockTransaction", new { Area = "Inventory" })',
                 data: { CategoryCode: code },
                 success: function (data) {
                     SweetAlertClose(); 
@@ -369,7 +352,7 @@
                         $("#CategoriesName").val(data.CategoriesName)
                         $("#CategoriesCode").prop("disabled",true)
                         $("#CategoriesCode").val(code)
-                        $("#defferedAmmortizeLabel").text("Edit Categories")
+                        $("#defferedAmmortizeLabel").text("Edit Stock Transaction")
                         let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
                         modal.show();
                         $("#FormAction").val(2)
@@ -389,13 +372,13 @@
                 const code = $(this).data('code');
                 SweetAlertConfirm(
                     'Delete Confirmation',
-                    'Are you sure you want to delete this data, Categories Code:' + code,
+                    'Are you sure you want to delete this data, Trans No:' + code,
                     function () {
                         var a = document.getElementById('loading');
                         a.style.display = "block";
                         $.ajax({
                             type: "POST",
-                            url: '@Url.Action("Delete", "Categories", new { Area = "Catalog" })',
+                            url: '@Url.Action("Delete", "Stock Transaction", new { Area = "Inventory" })',
                             data: {
                                 "DataModal":{
                                     "CategoriesCode":code,
@@ -429,7 +412,7 @@
 
         $("#btnAddNew").on('click',function(){
             ClearModal();
-            $("#defferedAmmortizeLabel").text("Add Categories")
+            $("#defferedAmmortizeLabel").text("Add Stock Transaction")
             $("#CategoriesCode").prop("disabled",false)
             $("#FormAction").val(1)
         })
@@ -445,13 +428,13 @@
                 }
                 SweetAlertConfirm(
                     'Confirmation',
-                    'Are you sure you want to Save this data, Category Code:' + code,
+                    'Are you sure you want to Save this data, Transaction No:' + code,
                     function () {
                         var a = document.getElementById('loading');
                         a.style.display = "block";
                         $.ajax({
                             type: "POST",
-                            url: '@Url.Action("Create", "Categories", new { Area = "Catalog" })',
+                            url: '@Url.Action("Create", "StockTransaction", new { Area = "Inventory" })',
                             data: {
                                 "dataModal": {
                                     CategoriesCode: code,
@@ -467,7 +450,7 @@
                                     SweetAlertSuccess('Success!', respond.msg);
                                     $("#FormAction").val('2');
                                     $("#CategoriesCode").prop("disabled",true)
-                                    $("#defferedAmmortizeLabel").text("Edit Categories")
+                                    $("#defferedAmmortizeLabel").text("Edit Stock Transaction")
                                 }
                                 else if(respond.success==0){
                                     SweetAlertError('Failed!', respond.msg);
@@ -477,7 +460,7 @@
                                     SweetAlertSuccess('Success!', respond.msg);
                                      $("#FormAction").val('2');
                                     $("#CategoriesCode").prop("disabled",true)
-                                    $("#defferedAmmortizeLabel").text("Edit Categories")
+                                    $("#defferedAmmortizeLabel").text("Edit Stock Transaction")
                                 }
                             },
                             error: function (respond, xhr, msg) {

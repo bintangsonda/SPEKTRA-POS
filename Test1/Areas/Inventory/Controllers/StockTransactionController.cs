@@ -141,6 +141,32 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             return View();
         }
 
-        
+
+        public ActionResult Create()
+        {
+            if (sUser == null)
+                return RedirectToAction("index", "Main", new { area = "" });
+
+            IDS.Web.UI.Models.GroupAccessLevel AccessLevel = IDS.Web.UI.Models.GroupAccessLevel.GetFormGroupAccess(Convert.ToString(sUserGroup), this.ControllerContext.RouteData.Values["controller"].ToString());
+
+            if (AccessLevel.CreateAccess == -1 || AccessLevel.EditAccess == -1 || AccessLevel.DeleteAccess == -1)
+            {
+                return RedirectToAction("Index", "Main", new { Area = "" });
+            }
+            ViewData["Page.Insert"] = AccessLevel.CreateAccess;
+            ViewData["Page.Edit"] = AccessLevel.EditAccess;
+            ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
+            ViewData["FormAction"] = 1;
+            ViewData["SelectListWh"] = new SelectList(SPOS.Inventory.Stock.Warehouse.GetWareHouseForDataSource(), "Value", "Text");
+            ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text", "All");
+            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text", "All");
+            ViewBag.UserMenu = MainMenu;
+
+
+
+            return View("Create");
+        }
+
+
     }
 }
