@@ -410,5 +410,71 @@ namespace General.Catalog
             return list;
         }
 
+        public static List<SelectListItem> GetBranchCodeSpecific()
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+
+            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
+            {
+                db.CommandText = "select * from tblBranch";
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (SqlDataReader dr = db.DbDataReader as SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            SelectListItem product = new SelectListItem();
+                            product.Value = IDS.Tool.GeneralHelper.NullToString(dr["BranchCode"]);
+                            product.Text = product.Value + " - " + IDS.Tool.GeneralHelper.NullToString(dr["BranchName"]);
+                            list.Add(product);
+                        }
+                    }
+                }
+
+                db.Close();
+            }
+
+            return list;
+        }
+
+        public static List<SelectListItem> GetProductList(string Branch)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+
+            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
+            {
+                db.CommandText = "select ProdCode,ProdName from Product where status=1 and branch=@Branch";
+                db.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            SelectListItem spacc = new SelectListItem();
+                            spacc.Value = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            spacc.Text = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]);
+
+                            list.Add(spacc);
+                        }
+                    }
+                }
+
+                db.Close();
+            }
+
+            return list;
+        }
+
     }
 }

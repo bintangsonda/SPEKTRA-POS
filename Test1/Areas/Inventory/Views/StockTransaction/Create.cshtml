@@ -43,7 +43,7 @@
                             @class = "form-control",
                                                 placeholder = "AUTO",
                                                 maxlength = 10,
-                                                @readonly = "readonly"
+                                                 @disabled = "disabled"
                                                 })
                         <label>Trans No</label>
                     </div>
@@ -58,12 +58,12 @@
                                                 {
                                                 new SelectListItem
                                                 {
-                                                Value = "stkin",
+                                                Value = "STKIN",
                                                 Text = "Stock In"
                                                 },
                                                 new SelectListItem
                                                 {
-                                                Value = "stkad",
+                                                Value = "STKAD",
                                                 Text = "Stock Adjust"
                                                 }
                                                 },
@@ -100,6 +100,17 @@
                     </div>
                 </div>
 
+                  <div class="col-12 col-md-6 col-lg-3">
+                   <div class="form-floating form-floating-outline">
+                        @Html.DropDownList(
+                            "Cabang",
+                            ViewData["SelectListBranchCode"] as SelectList,
+                            "All",
+                            new { @class = "form-control form-control-sm select2" }
+                        )
+                        <label for="Cabang">Cabang</label>
+                    </div>
+                </div>
                 <!-- Process -->
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="form-floating form-floating-outline">
@@ -113,7 +124,7 @@
                             {
                                 @class = "form-control",
                                 placeholder = "Process",
-                                @readonly = "readonly"
+                                @disabled = "disabled"
                             }
                             )
                         <label>Status</label>
@@ -139,7 +150,7 @@
                         {
                             @class = "form-control",
                             placeholder = "Process Date",
-                            @readonly = "readonly"
+                            @disabled = "disabled"
                         }
                         )
                         <label for="ProcessDate">Process Date</label>
@@ -147,7 +158,7 @@
                 </div>
 
                 <!-- Remark -->
-                <div class="col-12 col-md-6 col-lg-9">
+                <div class="col-12 col-md-6 col-lg-6">
                     <div class="form-floating form-floating-outline">
                         @Html.TextBoxFor(model => model.Remark, new
                                                 {
@@ -162,69 +173,75 @@
 
             <hr class="my-4" />
 
-            <!-- Detail Transaction -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Transaction Details</h5>
 
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    onclick="addDetailRow()">
-                                <i class="ti ti-plus me-1"></i> Add Data
-                            </button>
-                        </div>
+<!-- Detail Transaction -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Transaction Details</h5>
 
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover"
-                                       id="detailTable">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 80px;">Seq</th>
-                                            <th style="min-width: 180px;">ProdCode</th>
-                                            <th style="width: 150px;">Qty</th>
-                                            <th>Remark</th>
-                                            <th style="width: 100px;" class="text-center">
-                                                Action
-                                            </th>
-                                        </tr>
-                                    </thead>
+                <button type="button"
+                        class="btn btn-primary"
+                        onclick="addDetailRow()">
+                    <i class="ti ti-plus me-1"></i> Add Data
+                </button>
+            </div>
 
-                                    <tbody id="detailTableBody">
-                                        <!-- Rows generated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover"
+                           id="detailTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 80px;">Seq</th>
+                                <th style="min-width: 180px;">ProdCode</th>
+                                <th style="width: 150px;">Qty</th>
+                                <th style="min-width: 200px;">Remark</th>
+                                <th style="width: 160px;" class="text-center">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
 
-                            <div id="emptyDetailMessage"
-                                 class="text-center text-muted py-3">
-                                No detail data. Click Add Data to add a row.
-                            </div>
-                        </div>
-                    </div>
+                        <tbody id="detailTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="emptyDetailMessage"
+                     class="text-center text-muted py-3">
+                    No detail data. Click Add Data to add a row.
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
             <hr class="my-4" />
             <!-- Footer -->
             <div class="d-flex flex-wrap justify-content-end gap-2">
 
-                <button type="button"
-                        class="btn btn-secondary"
-                        id="btnAddNew">
+                <a href="@Url.Action("Create", "StockTransaction", new { area = "Inventory" })"
+                   class="btn btn-secondary"
+                   onclick="return confirm('Are you sure you want to create a new transaction? Unsaved changes will be lost.');">
                     <i class="ri ri-reset-left-fill me-1"></i>
                     Add New
-                </button>
+                </a>
+
+
 
                 <button type="button"
                         class="btn btn-success SaveInsert"
-                        id="btnSave_Deffered">
+                        id="btnSaveTransaction">
                     <i class="ri ri-check-fill me-1"></i>
                     Save
                 </button>
 
-                <a href="@Url.Action("Index", "TransactionList", new { area = "Employee" })"
+                <a href="@Url.Action("Index", "StockTransaction", new { area = "Inventory" })"
                    class="btn btn-danger">
                     <i class="ri ri-arrow-left-line me-1"></i>
                     Back
@@ -253,8 +270,6 @@
     <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
     <script type="text/javascript">
         const token = $('input[name="__RequestVerificationToken"]').val();
-        const getDataUrl = '@Url.Action("GetData", "TransactionList", new { area = "Employee" })';
-
         var table = null;
         var nilaiTampung = "";
         $('.select2').select2();
@@ -265,12 +280,376 @@
                 disableMobile: true,
                 static: true,
             });
+           
+              
         });
 
+        var detailSeq = 0;
+        var productList = [];
+
+        // Ambil opsi produk
+        function getProductOptions(selectedValue = '') {
+            var options = '<option value="">-- Select Product --</option>';
+
+            productList.forEach(function (item) {
+                options += `<option value="${escapeHtml(item.Value)}"
+                    ${String(item.Value) === String(selectedValue) ? 'selected' : ''}>
+                    ${escapeHtml(item.Text)}
+                </option>`;
+            });
+
+            return options;
+        }
+
+        // Escape HTML
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, function (char) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[char];
+            });
+        }
+
+        // Load product list dari controller
+        function loadProductList(callback) {
+            $.ajax({
+                url: '@Url.Action("GetProductList", "StockTransaction", new { area = "Inventory" })',
+                type: 'GET',
+                data: {
+                    Branch: $('#Cabang').val()
+                },
+                success: function (data) {
+                    productList = data || [];
+
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Failed to load product list:', xhr.responseText);
+                    alert('Failed to load product list.');
+                }
+            });
+        }
+
+        // Tambah row baru
+        function addDetailRow() {
+            loadProductList(function () {
+
+                if (productList.length === 0) {
+                    alert('Product list is empty.');
+                    return;
+                }
+
+                detailSeq++;
+
+                var row = `
+                    <tr data-mode="edit">
+                        <td class="seq-number">${detailSeq}</td>
+
+                        <td>
+                            <select class="form-select form-select-sm prod-code">
+                                ${getProductOptions()}
+                            </select>
+                            <span class="view-prod d-none"></span>
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   class="form-control form-control-sm qty-input"
+                                   value="0"
+                                   min="0"
+                                   step="any" />
+                            <span class="view-qty d-none"></span>
+                        </td>
+
+                        <td>
+                            <input type="text"
+                                   class="form-control form-control-sm remark-input"
+                                   maxlength="500" />
+                            <span class="view-remark d-none"></span>
+                        </td>
+
+                        <td class="text-center">
+                            <button type="button"
+                                    class="btn btn-sm btn-success btn-save"
+                                    title="Save">
+                                <i class="ri ri-save-line"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-warning btn-edit d-none"
+                                    title="Edit">
+                                <i class="ri ri-edit-line"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-danger btn-delete"
+                                    title="Delete">
+                                <i class="ri ri-delete-bin-line"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+
+                // Tambahkan row ke tabel
+                $('#detailTableBody').append(row);
+
+                var newRow = $('#detailTableBody tr:last');
+                var productDropdown = newRow.find('.prod-code');
+
+                // Aktifkan Select2
+                productDropdown.select2({
+                    width: '100%',
+                    minimumResultsForSearch: 0
+                });
+
+                updateDetailTable();
+            });
+        }
+
+        // Save row
+        $(document).on('click', '.btn-save', function () {
+            var row = $(this).closest('tr');
+
+            var prodCode = row.find('.prod-code').val();
+            var qtyValue = row.find('.qty-input').val();
+            var qty = Number(qtyValue);
+            var remark = row.find('.remark-input').val();
+
+            // Validasi produk
+            if (!prodCode) {
+                alert('Please select a product.');
+                return;
+            }
+
+            // Validasi quantity
+            if (qtyValue === '' || !Number.isFinite(qty) || qty < 0) {
+                alert('Please enter a valid quantity.');
+                return;
+            }
+
+            // Cari produk yang dipilih berdasarkan value dropdown
+            var product = productList.find(function (item) {
+                return String(item.Value) === String(prodCode);
+            });
+
+            // Tampilkan kode dan nama produk
+            var productText = product
+                ? product.Text
+                : prodCode;
+
+            row.find('.view-prod').text(productText);
+            row.find('.view-qty').text(qtyValue);
+            row.find('.view-remark').text(remark);
+
+            // Nonaktifkan dan sembunyikan dropdown
+            row.find('.prod-code')
+                .prop('disabled', true)
+                .addClass('d-none');
+
+            // Select2 membuat elemen tampilan tersendiri
+            row.find('.select2-container').addClass('d-none');
+
+            // Nonaktifkan dan sembunyikan input lainnya
+            row.find('.qty-input, .remark-input')
+                .prop('disabled', true)
+                .addClass('d-none');
+
+            // Tampilkan teks view
+            row.find('.view-prod, .view-qty, .view-remark')
+                .removeClass('d-none');
+
+            // Ubah tombol
+            row.find('.btn-save').addClass('d-none');
+            row.find('.btn-edit').removeClass('d-none');
+
+            // Tandai sebagai view mode
+            row.attr('data-mode', 'view');
+
+            updateDetailTable();
+        });
+
+        // Edit row
+        $(document).on('click', '.btn-edit', function () {
+            var row = $(this).closest('tr');
+
+            // Aktifkan kembali dropdown
+            row.find('.prod-code')
+                .prop('disabled', false)
+                .removeClass('d-none');
+
+            // Tampilkan kembali Select2
+            row.find('.select2-container').removeClass('d-none');
+
+            // Aktifkan input lainnya
+            row.find('.qty-input, .remark-input')
+                .prop('disabled', false)
+                .removeClass('d-none');
+
+            // Sembunyikan teks view
+            row.find('.view-prod, .view-qty, .view-remark')
+                .addClass('d-none');
+
+            // Ubah tombol
+            row.find('.btn-edit').addClass('d-none');
+            row.find('.btn-save').removeClass('d-none');
+
+            // Tandai sebagai edit mode
+            row.attr('data-mode', 'edit');
+        });
+
+        // Delete row
+        $(document).on('click', '.btn-delete', function () {
+            if (!confirm('Delete this detail row?')) {
+                return;
+            }
+
+            var row = $(this).closest('tr');
+
+            // Hapus instance Select2 sebelum menghapus row
+            row.find('.prod-code').each(function () {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+            });
+
+            row.remove();
+
+            updateDetailTable();
+        });
+
+        // Update sequence dan pesan kosong
+        function updateDetailTable() {
+            $('#detailTableBody tr').each(function (index) {
+                $(this).find('.seq-number').text(index + 1);
+            });
+
+            detailSeq = $('#detailTableBody tr').length;
+
+            var isEmpty = detailSeq === 0;
+
+            $('#emptyDetailMessage').toggle(isEmpty);
+            $('#detailTable').toggle(!isEmpty);
+        }
 
 
+        function getTransactionData() {
+            var details = [];
+            var isValid = true;
 
+            $('#detailTableBody tr').each(function (index) {
+                var row = $(this);
 
+                var prodCode = row.find('.prod-code').val();
+                var qtyValue = row.find('.qty-input').val();
+                var qty = Number(qtyValue);
+                var remark = row.find('.remark-input').val();
+
+                if (!prodCode) {
+                    alert('Please select a product on row ' + (index + 1));
+                    isValid = false;
+                    return false;
+                }
+
+                if (qtyValue === '' || !Number.isFinite(qty) || qty < 0) {
+                    alert('Invalid quantity on row ' + (index + 1));
+                    isValid = false;
+                    return false;
+                }
+
+                details.push({
+                    SeqNo: index + 1,
+                    ProdCode: prodCode,
+                    Qty: qty,
+                    Remark: remark
+                });
+            });
+
+            if (!isValid) {
+                return null;
+            }
+
+            return {
+                // Header transaksi — sesuaikan ID input dengan form kamu
+                TransNo: $('#TransNo').val(),
+                TransCode: $('#TransCode').val(),
+                TransDate: $('#TransDate').val(),
+                BranchCode: $('#Cabang').val(),
+                WarehouseCode: $('#WarehouseCode').val(),
+                Process: Number($('#Process').val() || 0),
+                voucher: $('#voucher').val(),
+                Remark: $('#Remark').val(),
+
+                // List detail transaksi
+                StockTransactionDetails: details
+            };
+        }
+
+        
+    
+$('#btnSaveTransaction').on('click', function () {
+    var data = getTransactionData();
+
+    if (data === null) {
+        return;
+    }
+
+    if (data.StockTransactionDetails.length === 0) {
+        alert('Please add at least one detail row.');
+        return;
+    }
+
+    SweetAlertConfirm(
+        'Confirmation',
+        'Are you sure you want to Save this data?',
+        function () {
+            var formData = {};
+            formData['FormAction'] = $("#FormAction").val();
+
+            // Header transaksi
+            formData['TransNo'] = data.TransNo;
+            formData['TransCode'] = data.TransCode;
+            formData['TransDate'] = data.TransDate;
+            formData['BranchCode'] = data.BranchCode;
+            formData['WarehouseCode'] = data.WarehouseCode;
+            formData['Process'] = data.Process;
+            formData['ProcessDate'] = data.ProcessDate;
+            formData['voucher'] = data.voucher;
+            formData['Remark'] = data.Remark;
+
+            // Detail transaksi
+            data.StockTransactionDetails.forEach(function (item, index) {
+                formData[`StockTransactionDetails[${index}].SeqNo`] = item.SeqNo;
+                formData[`StockTransactionDetails[${index}].ProdCode`] = item.ProdCode;
+                formData[`StockTransactionDetails[${index}].Qty`] = item.Qty;
+                formData[`StockTransactionDetails[${index}].Remark`] = item.Remark;
+            });
+
+            $.ajax({
+                url: '@Url.Action("SaveTransaction", "StockTransaction", new { area = "Inventory" })',
+                type: 'POST',
+                data: formData,
+
+                success: function (response) {
+                    if (response.success) {
+                        alert('Transaction saved successfully.');
+                    } else {
+                        alert(response.message || 'Failed to save transaction.');
+                    }
+                },
+
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert('An error occurred while saving the transaction.');
+                }
+            });
+        }
+    );
+});
 
     </script>
 }

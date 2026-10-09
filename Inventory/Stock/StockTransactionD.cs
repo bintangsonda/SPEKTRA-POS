@@ -8,11 +8,11 @@ namespace SPOS.Inventory.Stock
 {
     public class StockTransactionD
     {
-        string TransNo { get; set; }    
-        int SeqNo { get; set; }
-        string ProdCode { get; set; }
-        decimal Qty { get; set; }
-        string Remark { get; set; }
+        public string TransNo { get; set; }
+        public int SeqNo { get; set; }
+        public string ProdCode { get; set; }
+        public decimal Qty { get; set; }
+        public string Remark { get; set; }
 
 
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using General.Catalog;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SPOS.Inventory.Stock;
 using System.Linq.Dynamic.Core;
@@ -8,7 +9,7 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
 {
     [Area("Inventory")]
     public class StockTransactionController : IDS.Web.UI.Controllers.MenuController
-    {        
+    {
         private readonly IHttpContextAccessor _contextAccessor;
         private string sUser;
         private string sUserGroup;
@@ -159,7 +160,7 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             ViewData["FormAction"] = 1;
             ViewData["SelectListWh"] = new SelectList(SPOS.Inventory.Stock.Warehouse.GetWareHouseForDataSource(), "Value", "Text");
             ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text", "All");
-            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text", "All");
+            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCodeSpecific(), "Value", "Text", sBranchCode);
             ViewBag.UserMenu = MainMenu;
 
 
@@ -167,6 +168,59 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             return View("Create");
         }
 
+        [HttpGet]
+        public JsonResult GetProductList(string Branch)
+        {
+            var products = Product.GetProductList(Branch);
 
+            return Json(products);
+        }
+
+        public ActionResult SaveTransaction(int? FormAction, SPOS.Inventory.Stock.StockTransactionH dataTransaksi)
+        {
+            if (sUser == null)
+                return RedirectToAction("index", "Main", new { area = "" });
+
+            IDS.Web.UI.Models.GroupAccessLevel AccessLevel = IDS.Web.UI.Models.GroupAccessLevel.GetFormGroupAccess(Convert.ToString(sUserGroup), this.ControllerContext.RouteData.Values["controller"].ToString());
+
+            if (AccessLevel.ReadAccess == -1 || AccessLevel.CreateAccess == 0)
+            {
+                return RedirectToAction("error403", "error", new { area = "" });
+            }
+
+            string currentUser = sUser as string;
+
+            if (string.IsNullOrWhiteSpace(currentUser))
+            {
+                return Json("SessionTimeOut");
+            }
+            try
+            {
+
+                dataTransaksi.OperatorID = currentUser;
+                int result = dataTransaksi.InsUpDel((int)FormAction);
+
+                if (result > 0)
+                {
+                    if ((int)FormAction == 1)
+                    {
+                        if (string.IsNullOrWhiteSpace(dataTransaksi.TransNo))
+                            return Json(new { msg = "Failed, data is empty!", success = 0 });
+                        else
+                            return Json(new { msg = "New Variant has been save. Variant with Code: " + dataTransaksi.TransNo, success = 1, sno = dataTransaksi.TransNo });
+                    }
+                    else
+                    {
+                        return Json(new { msg = "Edit Variant has been save.", success = 1 });
+                    }
+                }
+                else
+                    throw new Exception("Error");
+            }
+            catch (Exception ex)
+            {
+                return Json(new { msg = ex.Message, success = 0 });
+            }
+        }
     }
 }
