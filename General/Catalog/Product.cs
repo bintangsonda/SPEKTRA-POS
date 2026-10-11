@@ -25,7 +25,8 @@ namespace General.Catalog
         public string OperatorID { get; set; }
         public DateTime LastUpdate { get; set; }
         public List<VariantHeader> VarianProduct { get; set; }
-
+        public string UOM { get; set; }
+        public string ItemType { get; set; }
 
         public Product()
         {
@@ -128,6 +129,8 @@ namespace General.Catalog
                     // PARAMETER LIST
                     cmd.AddParameter("@ProdCode", SqlDbType.VarChar, ProdCode);
                     cmd.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                    cmd.AddParameter("@UOM", SqlDbType.VarChar, UOM);
+                    cmd.AddParameter("@ItemType", SqlDbType.VarChar, ItemType);
                     cmd.AddParameter("@CategoriesCode", SqlDbType.VarChar, CategoriesCode);
                     cmd.AddParameter("@ProdName", SqlDbType.VarChar, ProdName);
                     cmd.AddParameter("@Description", SqlDbType.VarChar, Description);
@@ -282,6 +285,8 @@ namespace General.Catalog
                             Products.Branch = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
                             Products.CategoriesCode = IDS.Tool.GeneralHelper.NullToString(dr["CategoriesCode"]);
                             Products.ProdName = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]);
+                            Products.UOM = IDS.Tool.GeneralHelper.NullToString(dr["UOM"]);
+                            Products.ItemType = IDS.Tool.GeneralHelper.NullToString(dr["ItemType"]);
                             Products.Description = IDS.Tool.GeneralHelper.NullToString(dr["Description"]);
                             Products.Status = IDS.Tool.GeneralHelper.NullToBool(dr["Status"], false);
                             Products.Harga = IDS.Tool.GeneralHelper.NullToDecimal(dr["Harga"], 0);

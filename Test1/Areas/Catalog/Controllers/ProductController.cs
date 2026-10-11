@@ -46,6 +46,8 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             ViewData["FormAction"] = 1;
             ViewData["BranchList"] = new SelectList(IDS.GeneralTable.Branch.GetBranchForDatasource(), "Value", "Text", sBranchCode.ToString());
             ViewData["CategoriesList"] = new SelectList(General.Catalog.Categories.GetCboCategories (), "Value", "Text", sBranchCode.ToString());
+            ViewData["ItemTypeList"] = new SelectList(IDS.GeneralTable.ItemType.GetCboItemType(), "Value", "Text");
+            ViewData["UOMList"] = new SelectList(IDS.GeneralTable.UOM.GetCboUOM(), "Value", "Text");
 
 
             ViewBag.UserMenu = MainMenu;

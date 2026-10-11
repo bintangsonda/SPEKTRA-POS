@@ -139,8 +139,12 @@
                                         <label>Product Name</label>
                                     </div>
                                     <div class="form-floating form-floating-outline mb-3">
-                                        @Html.DropDownListFor(model => model.Branch,ViewData["BranchList"] as SelectList, new { @class = "form-control form-control-sm select2" })
-                                        <label>Outlet</label>
+                                        @Html.DropDownListFor(model => model.UOM, ViewData["UOMList"] as SelectList, new { @class = "form-control form-control-sm select2" })
+                                        <label>Satuan</label>
+                                    </div>
+                                    <div class="form-floating form-floating-outline mb-3">
+                                        @Html.DropDownListFor(model => model.ItemType,ViewData["ItemTypeList"] as SelectList, new { @class = "form-control form-control-sm select2" })
+                                        <label>Item Type</label>
                                     </div>
                                     <div class="form-floating form-floating-outline mb-3">
                                         @Html.DropDownListFor(model => model.CategoriesCode, ViewData["CategoriesList"] as SelectList, new { @class = "form-control form-control-sm select2" })
@@ -889,11 +893,13 @@
                 const category = $("#CategoriesCode").val();
                 const status = $("#cboStatus").prop('checked');
                 const description = $("#Description").val();
+                const uom = $("#UOM").val();
+                const itemtype = $("#ItemType").val();
                 const harga = RemoveAllComma($("#Harga").val());
 
 
                 if(code==null||name==null||outlet==null||category==null||description==null||harga==null
-                ||code==""||name==""||outlet==""||category==""||description==""||harga==""){
+                ||code==""||name==""||outlet==""||category==""||description==""||harga==""||itemtype=""||UOM=""){
                     SweetAlertError('Failed!', "All Field is Mandatory!");
                     return false;
                 }
@@ -914,7 +920,9 @@
                         formData.append("ProdName", name);
                         formData.append("Description", description);
                         formData.append("Status", status);
-                        formData.append("Harga", harga);
+                        formData.append("Harga", harga);    
+                        formData.append("UOM", uom);
+                        formData.append("ItemType", itemtype);
                         formData.append("VarianProduct", JSON.stringify(VarianProduct)),                     
                         formData.append("FormAction", $("#FormAction").val());
                         $.ajax({
