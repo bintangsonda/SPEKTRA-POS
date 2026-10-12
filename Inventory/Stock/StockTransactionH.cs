@@ -14,7 +14,7 @@ namespace SPOS.Inventory.Stock
     {
         public string TransNo { get; set; }
         public string TransCode { get; set; }
-        public DateTime TransDate { get; set; }
+        public DateTime? TransDate { get; set; }
         public string BranchCode { get; set; }
         public string WarehouseCode { get; set; }  
         public int? Process { get; set; }
@@ -102,12 +102,21 @@ namespace SPOS.Inventory.Stock
                     cmd.AddParameter("@OperatorID", System.Data.SqlDbType.VarChar, OperatorID);
 
                     cmd.BeginTransaction();
-                    object obj = cmd.ExecuteScalar();
-
-                    if (obj != null && obj != DBNull.Value)
+                    if (ExecCode == 3)
                     {
-                        TransNo = obj.ToString();
+                        result = cmd.ExecuteNonQuery();
                     }
+                    else
+                    {
+                        object obj = cmd.ExecuteScalar();
+                        if (obj != null && obj != DBNull.Value)
+                        {
+                            TransNo = obj.ToString();
+                        }
+                    }
+                   
+
+                   
                     if (StockTransactionDetails != null && StockTransactionDetails.Count > 0)
                     {
                         cmd.CommandText = "InsUpDelStockTransD";
@@ -129,7 +138,7 @@ namespace SPOS.Inventory.Stock
                             cmd.CommandType = System.Data.CommandType.StoredProcedure;
                             cmd.ClearParameter();
                             cmd.AddParameter("@Type", System.Data.SqlDbType.Int, 1);
-                            cmd.AddParameter("@SeqNo", System.Data.SqlDbType.Int, 0);
+                            cmd.AddParameter("@SeqNo", System.Data.SqlDbType.Int, count);
                             cmd.AddParameter("@TransNo", System.Data.SqlDbType.VarChar, TransNo);
                             cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, data.ProdCode);
                             cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, data.Qty);
@@ -167,6 +176,50 @@ namespace SPOS.Inventory.Stock
             }
 
             return result;
+        }
+
+
+        public static StockTransactionH GetStockTransactionHD(string TransNo)
+        {
+            StockTransactionH Data1 = null;
+            using (SqlServer db = new SqlServer())
+            {
+                db.CommandText = "select StockTransH.*,StockTransD.ProdCode,StockTransD.SeqNo,StockTransD.Qty,StockTransD.Remark from StockTransH inner join stocktransD on StockTransD.TransNo=StockTransH.Transno where StockTransH.Transno=@TransNo";
+                db.AddParameter("@TransNo", System.Data.SqlDbType.VarChar, TransNo);
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+                using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                {
+                    Data1 = new StockTransactionH();
+                    Data1.StockTransactionDetails = new List<StockTransactionD>();
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            StockTransactionD details = new StockTransactionD();
+                            Data1.TransNo = IDS.Tool.GeneralHelper.NullToString(dr["TransNo"]);
+                            Data1.TransCode = IDS.Tool.GeneralHelper.NullToString(dr["TransCode"]);
+                            Data1.TransDate = IDS.Tool.GeneralHelper.NullToDateTime(dr["TransDate"], DateTime.Now);
+                            Data1.BranchCode = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
+                            Data1.WarehouseCode = IDS.Tool.GeneralHelper.NullToString(dr["WHCode"]);
+                            Data1.Process = IDS.Tool.GeneralHelper.NullToInt(dr["Process"], 0);
+                            Data1.ProcessDate = IDS.Tool.GeneralHelper.NullToDateTime(dr["ProcessDate"], DateTime.Now);
+                            Data1.Remark = IDS.Tool.GeneralHelper.NullToString(dr["Remark"]);
+                            details.SeqNo = IDS.Tool.GeneralHelper.NullToInt(dr["SeqNo"],0);
+                            details.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            details.Qty = IDS.Tool.GeneralHelper.NullToDecimal(dr["Qty"], 0);
+                            details.Remark = IDS.Tool.GeneralHelper.NullToString(dr["Remark"]);
+                            Data1.StockTransactionDetails.Add(details);
+                        }
+                    }
+                    if (!dr.IsClosed)
+                        dr.Close();
+                }
+                db.Close();
+            }
+            return Data1;
         }
 
     }

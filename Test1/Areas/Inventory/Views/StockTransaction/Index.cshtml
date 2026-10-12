@@ -210,7 +210,24 @@
                             }
                     },
                     { "data": "BranchCode", "name": "BranchCode" },
-                    { "data": "Process", "name": "Process"},
+                    {
+                        data: "Process",
+                        name: "Process",
+                        render: function (data, type, row) {
+                            if (type !== "display") return data;
+
+                            switch (parseInt(data)) {
+                                case 0:
+                                    return '<span class="badge bg-success">Open</span>';
+                                case 1:
+                                    return '<span class="badge bg-primary">Process</span>';
+                                case 2:
+                                    return '<span class="badge bg-danger">Cancel</span>';
+                                default:
+                                    return '<span class="badge bg-secondary">Unknown</span>';
+                            }
+                        }
+                    },
                     {
                         "data": "ProcessDate", "name": "ProcessDate",
                         "render": function (data, type, row, meta) {
@@ -342,28 +359,10 @@
 
         $('.datatables-custom').on('click', '.edit-record', function () {
             const code = $(this).data('code');
-             $.ajax({
-                type: 'GET',
-                url: '@Url.Action("Edit", "StockTransaction", new { Area = "Inventory" })',
-                data: { CategoryCode: code },
-                success: function (data) {
-                    SweetAlertClose(); 
-                    if (data) {
-                        $("#CategoriesName").val(data.CategoriesName)
-                        $("#CategoriesCode").prop("disabled",true)
-                        $("#CategoriesCode").val(code)
-                        $("#defferedAmmortizeLabel").text("Edit Stock Transaction")
-                        let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
-                        modal.show();
-                        $("#FormAction").val(2)
-                    } else {
-                        SweetAlertError('Not Found', 'Category data could not be found.');
-                    }
-                },
-                error: function () {
-                    SweetAlertError('Error', 'Failed to load Category data. Please try again.');
-                }
-            });
+            window.location.href =
+                '@Url.Action("Edit", "StockTransaction", new { Area = "Inventory" })'
+                + '?TransNo=' + encodeURIComponent(code);
+
             
         });
 
@@ -378,16 +377,16 @@
                         a.style.display = "block";
                         $.ajax({
                             type: "POST",
-                            url: '@Url.Action("Delete", "Stock Transaction", new { Area = "Inventory" })',
+                            url: '@Url.Action("SaveTransaction", "StockTransaction", new { Area = "Inventory" })',
                             data: {
-                                "DataModal":{
-                                    "CategoriesCode":code,
-                                }
+                                "dataTransaksi": {
+                                    "TransNo":code,
+                                },
+                                "FormAction":3,
                             },
                             dataType: 'JSON',
                             success: function (respond) {
                                 a.style.display = "none";
-                                console.log(respond.success)
                                 if(respond.success==1){
                                     table=getData();
                                     SweetAlertSuccess('Success!', respond.msg);

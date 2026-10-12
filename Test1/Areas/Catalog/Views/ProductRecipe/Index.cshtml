@@ -520,7 +520,7 @@
 
             $("#tableVarianList tbody").append(`
                 <tr>
-                    <td class="text-center align-middle">${hargaIndex}</td>
+                            <td class="text-center align-middle">${rowCount + 1}</td>
 
                     <td class="text-center align-middle">
                         <select class="form-select form-select-sm text-center select2">
@@ -592,7 +592,7 @@
 
                                 $("#tableVarianList tbody").append(`
                                     <tr>
-                                        <td class="text-center align-middle">${item.seqNo ?? index + 1}</td>
+                                        <td class="text-center align-middle">${index + 1}</td>
 
                                         <td class="text-center align-middle">
                                             <select class="form-select form-select-sm text-center select2">
@@ -641,14 +641,7 @@
 
                                 // Pilih product sesuai data detail
                                 dropdown.val(item.ProdCode).trigger("change");
-                                        console.log("Jumlah opsi Product:", $("#ProdCode option").length);
-                                    console.log("Product utama:", $("#ProdCode").val());
-                                    console.log("Detail edit:", data.RecipeDetail);
-                                            console.log(
-            $("#ProdCode option").map(function () {
-                return $(this).val();
-            }).get()
-        );
+                                    
                             });
 
                         

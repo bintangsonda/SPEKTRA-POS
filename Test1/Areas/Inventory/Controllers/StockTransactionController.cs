@@ -207,11 +207,15 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
                         if (string.IsNullOrWhiteSpace(dataTransaksi.TransNo))
                             return Json(new { msg = "Failed, data is empty!", success = 0 });
                         else
-                            return Json(new { msg = "New Variant has been save. Variant with Code: " + dataTransaksi.TransNo, success = 1, sno = dataTransaksi.TransNo });
+                            return Json(new { msg = "New Stock Transaction has been save. Variant with Code: " + dataTransaksi.TransNo, success = 1, sno = dataTransaksi.TransNo });
+                    }
+                    else if ((int)FormAction == 2)
+                    {
+                        return Json(new { msg = "Edit Stock Transaction has been save.", success = 1 });
                     }
                     else
                     {
-                        return Json(new { msg = "Edit Variant has been save.", success = 1 });
+                        return Json(new { msg = "Delete Stock Transaction has been Success.", success = 1 });
                     }
                 }
                 else
@@ -222,5 +226,33 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
                 return Json(new { msg = ex.Message, success = 0 });
             }
         }
+
+        public ActionResult Edit(string TransNo)
+        {
+            if (sUser == null)
+                return RedirectToAction("index", "Main", new { area = "" });
+
+            IDS.Web.UI.Models.GroupAccessLevel AccessLevel = IDS.Web.UI.Models.GroupAccessLevel.GetFormGroupAccess(sUserGroup ?? "", this.ControllerContext.RouteData.Values["controller"].ToString());
+
+            if (AccessLevel.ReadAccess == -1 || AccessLevel.EditAccess == 0)
+            {
+                return RedirectToAction("error403", "error", new { area = "" });
+            }
+
+            ViewData["Page.Insert"] = AccessLevel.CreateAccess;
+            ViewData["Page.Edit"] = AccessLevel.EditAccess;
+            ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
+            ViewData["SelectListWh"] = new SelectList(SPOS.Inventory.Stock.Warehouse.GetWareHouseForDataSource(), "Value", "Text");
+            ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text", "All");
+            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text", "All");
+            ViewData["FormAction"] = 2;
+            StockTransactionH data = StockTransactionH.GetStockTransactionHD(TransNo);
+            if (data != null)
+            {
+                return View("Create", data);
+            }
+            return null;
+        }
+
     }
 }

@@ -27,7 +27,7 @@
 
         <!-- Header -->
         <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-white">Add Stock Transaction</h5>
+            <h5 class="mb-0 text-white">Stock Transaction</h5>
         </div>
 
         <!-- Body -->
@@ -79,22 +79,22 @@
                     <div class="form-floating form-floating-outline">
                         <div class="form-floating form-floating-outline">
                             @Html.TextBoxFor(
-                                                        model => model.TransDate,
-                                                        Model == null
-                                                        ? ""
-                                                        : Model.TransDate.ToString(
-                                                        "dd/MMM/yyyy",
-                                                        System.Globalization.CultureInfo.InvariantCulture
-                                                        ),
-                                                        new
-                                                        {
-                                                            id = "TransDate",
-                                                            @class = "form-control flatpickr-date",
-                                                            type = "text",
-                                                            placeholder = "dd/MMM/yyyy",
-                                                            autocomplete = "off"
-                                                        }
-                                                        )
+                                model => model.TransDate,
+                                Model?.TransDate.HasValue == true
+                                    ? Model.TransDate.Value.ToString(
+                                        "dd/MMM/yyyy",
+                                        System.Globalization.CultureInfo.InvariantCulture
+                                    )
+                                    : "",
+                                new
+                                {
+                                    id = "TransDate",
+                                    @class = "form-control flatpickr-date",
+                                    type = "text",
+                                    placeholder = "dd/MMM/yyyy",
+                                    autocomplete = "off"
+                                }
+                            )
                             <label for="TransDate">Trans Date</label>
                         </div>
                     </div>
@@ -102,13 +102,13 @@
 
                   <div class="col-12 col-md-6 col-lg-3">
                    <div class="form-floating form-floating-outline">
-                        @Html.DropDownList(
-                            "Cabang",
-                            ViewData["SelectListBranchCode"] as SelectList,
-                            "All",
-                            new { @class = "form-control form-control-sm select2" }
-                        )
-                        <label for="Cabang">Cabang</label>
+                        @Html.DropDownListFor(
+                             model => model.BranchCode,
+                             ViewData["SelectListBranchCode"] as SelectList,
+                             "All",
+                             new { @class = "form-control form-control-sm select2" }
+                         )
+                        <label for="BranchCode">BranchCode</label>
                     </div>
                 </div>
                 <!-- Process -->
@@ -174,48 +174,48 @@
             <hr class="my-4" />
 
 
-<!-- Detail Transaction -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Transaction Details</h5>
+            <!-- Detail Transaction -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Transaction Details</h5>
 
-                <button type="button"
-                        class="btn btn-primary"
-                        onclick="addDetailRow()">
-                    <i class="ti ti-plus me-1"></i> Add Data
-                </button>
-            </div>
+                            <button type="button"
+                                    class="btn btn-primary"
+                                    onclick="addDetailRow()">
+                                <i class="ti ti-plus me-1"></i> Add Data
+                            </button>
+                        </div>
 
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover"
-                           id="detailTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 80px;">Seq</th>
-                                <th style="min-width: 180px;">ProdCode</th>
-                                <th style="width: 150px;">Qty</th>
-                                <th style="min-width: 200px;">Remark</th>
-                                <th style="width: 160px;" class="text-center">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover"
+                                       id="detailTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 80px;">Seq</th>
+                                            <th style="min-width: 180px;">ProdCode</th>
+                                            <th style="width: 150px;">Qty</th>
+                                            <th style="min-width: 200px;">Remark</th>
+                                            <th style="width: 160px;" class="text-center">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
 
-                        <tbody id="detailTableBody"></tbody>
-                    </table>
+                                    <tbody id="detailTableBody"></tbody>
+                                </table>
+                            </div>
+
+                            <div id="emptyDetailMessage"
+                                 class="text-center text-muted py-3">
+                                No detail data. Click Add Data to add a row.
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div id="emptyDetailMessage"
-                     class="text-center text-muted py-3">
-                    No detail data. Click Add Data to add a row.
-                </div>
             </div>
-        </div>
-    </div>
-</div>
 
 
 
@@ -275,6 +275,8 @@
         $('.select2').select2();
 
         $(document).ready(function () {
+            loadExistingDetails();
+
               flatpickr("#TransDate,#ProcessDate", {
                 dateFormat: "d/M/Y",
                 disableMobile: true,
@@ -320,7 +322,7 @@
                 url: '@Url.Action("GetProductList", "StockTransaction", new { area = "Inventory" })',
                 type: 'GET',
                 data: {
-                    Branch: $('#Cabang').val()
+                    Branch: $('#BranchCode').val()
                 },
                 success: function (data) {
                     productList = data || [];
@@ -427,7 +429,7 @@
             }
 
             // Validasi quantity
-            if (qtyValue === '' || !Number.isFinite(qty) || qty < 0) {
+            if (qtyValue === '' || !Number.isFinite(qty)) {
                 alert('Please enter a valid quantity.');
                 return;
             }
@@ -536,7 +538,6 @@
             $('#detailTable').toggle(!isEmpty);
         }
 
-
         function getTransactionData() {
             var details = [];
             var isValid = true;
@@ -555,7 +556,13 @@
                     return false;
                 }
 
-                if (qtyValue === '' || !Number.isFinite(qty) || qty < 0) {
+                if (qtyValue === '' || !Number.isFinite(qty)) {
+                    alert('Invalid quantity on row ' + (index + 1));
+                    isValid = false;
+                    return false;
+                }
+
+                if ($("#TransCode").val()=="STKIN" &&qty<0){
                     alert('Invalid quantity on row ' + (index + 1));
                     isValid = false;
                     return false;
@@ -578,7 +585,7 @@
                 TransNo: $('#TransNo').val(),
                 TransCode: $('#TransCode').val(),
                 TransDate: $('#TransDate').val(),
-                BranchCode: $('#Cabang').val(),
+                BranchCode: $('#BranchCode').val(),
                 WarehouseCode: $('#WarehouseCode').val(),
                 Process: Number($('#Process').val() || 0),
                 voucher: $('#voucher').val(),
@@ -589,67 +596,161 @@
             };
         }
 
-        
-    
-$('#btnSaveTransaction').on('click', function () {
-    var data = getTransactionData();
+        $('#btnSaveTransaction').on('click', function () {
+            var data = getTransactionData();
 
-    if (data === null) {
-        return;
-    }
+            if (data === null) {
+                return;
+            }
 
-    if (data.StockTransactionDetails.length === 0) {
-        alert('Please add at least one detail row.');
-        return;
-    }
+            if (data.StockTransactionDetails.length === 0) {
+                alert('Please add at least one detail row.');
+                return;
+            }
 
-    SweetAlertConfirm(
-        'Confirmation',
-        'Are you sure you want to Save this data?',
-        function () {
-            var formData = {};
-            formData['FormAction'] = $("#FormAction").val();
+            SweetAlertConfirm(
+                'Confirmation',
+                'Are you sure you want to Save this data?',
+                function () {
+                    var formData = {};
+                    formData['FormAction'] = $("#FormAction").val();
 
-            // Header transaksi
-            formData['TransNo'] = data.TransNo;
-            formData['TransCode'] = data.TransCode;
-            formData['TransDate'] = data.TransDate;
-            formData['BranchCode'] = data.BranchCode;
-            formData['WarehouseCode'] = data.WarehouseCode;
-            formData['Process'] = data.Process;
-            formData['ProcessDate'] = data.ProcessDate;
-            formData['voucher'] = data.voucher;
-            formData['Remark'] = data.Remark;
+                    // Header transaksi
+                    formData['TransNo'] = data.TransNo;
+                    formData['TransCode'] = data.TransCode;
+                    formData['TransDate'] = data.TransDate;
+                    formData['BranchCode'] = data.BranchCode;
+                    formData['WarehouseCode'] = data.WarehouseCode;
+                    formData['Process'] = data.Process;
+                    formData['ProcessDate'] = data.ProcessDate;
+                    formData['voucher'] = data.voucher;
+                    formData['Remark'] = data.Remark;
 
-            // Detail transaksi
-            data.StockTransactionDetails.forEach(function (item, index) {
-                formData[`StockTransactionDetails[${index}].SeqNo`] = item.SeqNo;
-                formData[`StockTransactionDetails[${index}].ProdCode`] = item.ProdCode;
-                formData[`StockTransactionDetails[${index}].Qty`] = item.Qty;
-                formData[`StockTransactionDetails[${index}].Remark`] = item.Remark;
-            });
+                    // Detail transaksi
+                    data.StockTransactionDetails.forEach(function (item, index) {
+                        formData[`StockTransactionDetails[${index}].SeqNo`] = item.SeqNo;
+                        formData[`StockTransactionDetails[${index}].ProdCode`] = item.ProdCode;
+                        formData[`StockTransactionDetails[${index}].Qty`] = item.Qty;
+                        formData[`StockTransactionDetails[${index}].Remark`] = item.Remark;
+                    });
 
-            $.ajax({
-                url: '@Url.Action("SaveTransaction", "StockTransaction", new { area = "Inventory" })',
-                type: 'POST',
-                data: formData,
+                    $.ajax({
+                        url: '@Url.Action("SaveTransaction", "StockTransaction", new { area = "Inventory" })',
+                        type: 'POST',
+                        data: formData,
 
-                success: function (response) {
-                    if (response.success) {
-                        alert('Transaction saved successfully.');
-                    } else {
-                        alert(response.message || 'Failed to save transaction.');
-                    }
-                },
+                        success: function (response) {
+                            if (response.success) {
+                                alert('Transaction saved successfully.');
+                            } else {
+                                alert(response.message || 'Failed to save transaction.');
+                            }
+                        },
 
-                error: function (xhr) {
-                    console.error(xhr.responseText);
-                    alert('An error occurred while saving the transaction.');
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            alert('An error occurred while saving the transaction.');
+                        }
+                    });
                 }
+            );
+        });
+
+        var existingDetails = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                        Model?.StockTransactionDetails ?? new List<SPOS.Inventory.Stock.StockTransactionD>()
+                )
+        );
+
+        function loadExistingDetails() {
+            if (!existingDetails || existingDetails.length === 0) {
+                updateDetailTable();
+                return;
+            }
+
+            loadProductList(function () {
+                $('#detailTableBody').empty();
+
+                existingDetails.forEach(function (item, index) {
+                    var row = `
+                        <tr data-mode="view">
+                            <td class="seq-number">${index + 1}</td>
+
+                            <td>
+                                <select class="form-select form-select-sm prod-code" disabled>
+                                    ${getProductOptions()}
+                                </select>
+                                <span class="view-prod d-none"></span>
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                       class="form-control form-control-sm qty-input d-none"
+                                       value="${item.Qty ?? 0}"
+                                       min="0"
+                                       step="any"
+                                       disabled />
+                                <span class="view-qty">${item.Qty ?? 0}</span>
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                       class="form-control form-control-sm remark-input d-none"
+                                       maxlength="500"
+                                       value="${item.Remark ?? ''}"
+                                       disabled />
+                                <span class="view-remark">${item.Remark ?? ''}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-sm btn-success btn-save d-none"
+                                        title="Save">
+                                    <i class="ri ri-save-line"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-warning btn-edit"
+                                        title="Edit">
+                                    <i class="ri ri-edit-line"></i>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-danger btn-delete"
+                                        title="Delete">
+                                    <i class="ri ri-delete-bin-line"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+
+                    $('#detailTableBody').append(row);
+
+                    var newRow = $('#detailTableBody tr:last');
+                    var productDropdown = newRow.find('.prod-code');
+
+                    productDropdown.select2({
+                        width: '100%',
+                        minimumResultsForSearch: 0
+                    });
+
+                    productDropdown.val(item.ProdCode).trigger('change');
+
+                    // Sembunyikan dropdown dan tampilan Select2
+                    productDropdown.addClass('d-none');
+                    newRow.find('.select2-container').addClass('d-none');
+
+                    // Tampilkan nama produk
+                    var product = productList.find(function (p) {
+                        return String(p.Value) === String(item.ProdCode);
+                    });
+
+                    newRow.find('.view-prod')
+                        .text(product ? product.Text : item.ProdCode)
+                        .removeClass('d-none');
+                });
+
+                updateDetailTable();
             });
         }
-    );
-});
-
     </script>
 }
