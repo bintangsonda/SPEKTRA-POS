@@ -11,7 +11,7 @@ namespace General.Catalog
 {
     public class ProductRecipeH
     {
-        public string RecipeCode { get; set; }
+        public int RecipeCode { get; set; }
         public string RecipeName { get; set; }
         public string BranchCode { get; set; }
         public string ProdCode { get; set; }
@@ -19,19 +19,33 @@ namespace General.Catalog
         public string OperatorID { get; set; }
         public DateTime LastUpdated { get; set; }
 
-        List<ProductRecipeD> RecipeDetail { get; set; }
+        public List<ProductRecipeD> RecipeDetail { get; set; }
 
 
-        public static List<ProductRecipeH> GetData()
+        public static List<ProductRecipeH> GetData(string BranchCode)
         {
             List<ProductRecipeH> list = null;
 
             using (SqlServer db = new SqlServer())
             {
-                db.CommandText = "Select ProductRecipeH.*, product.prodname from ProductRecipeH inner join product on product.prodcode=ProductRecipeH.prodcode";
+
+                db.CommandText = @"
+                        SELECT ProductRecipeH.*, product.prodname
+                        FROM ProductRecipeH
+                        INNER JOIN product
+                            ON product.prodcode = ProductRecipeH.prodcode and productrecipeh.BranchCode=Product.Branch
+                        WHERE (@Branch IS NULL OR ProductRecipeH.BranchCode = @Branch)
+                    ";
+                if (BranchCode == "All" || BranchCode==null)
+                {
+                    db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, DBNull.Value);
+                }
+                else
+                {
+                    db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, BranchCode);
+                }
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();
-
                 db.ExecuteReader();
 
                 using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
@@ -43,7 +57,7 @@ namespace General.Catalog
                         while (dr.Read())
                         {
                             ProductRecipeH Datatables = new ProductRecipeH();
-                            Datatables.RecipeCode = IDS.Tool.GeneralHelper.NullToString(dr["RecipeCode"]);
+                            Datatables.RecipeCode = IDS.Tool.GeneralHelper.NullToInt(dr["RecipeCode"],0);
                             Datatables.RecipeName = IDS.Tool.GeneralHelper.NullToString(dr["RecipeName"]);
                             Datatables.BranchCode = IDS.Tool.GeneralHelper.NullToString(dr["BranchCode"]);
                             Datatables.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
@@ -73,24 +87,32 @@ namespace General.Catalog
                     cmd.CommandText = "InsProductRecipe";
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, ExecCode);
-                    cmd.AddParameter("@RecipeCode", System.Data.SqlDbType.VarChar, RecipeCode);
+                    var paramRecipeCode = new Microsoft.Data.SqlClient.SqlParameter(
+                        "@RecipeCode",
+                        System.Data.SqlDbType.Int
+                    );
+                    paramRecipeCode.Direction = System.Data.ParameterDirection.InputOutput;
+                    paramRecipeCode.Value = RecipeCode;
+                    cmd.DbCommand.Parameters.Add(paramRecipeCode);
+                    //cmd.AddParameter("@RecipeCode", System.Data.SqlDbType.Int, RecipeCode);
                     cmd.AddParameter("@BranchCode", System.Data.SqlDbType.VarChar, BranchCode);
                     cmd.AddParameter("@RecipeName", System.Data.SqlDbType.VarChar, RecipeName);
                     cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, ProdCode);
                     cmd.AddParameter("@OperatorID", System.Data.SqlDbType.VarChar, OperatorID);
-                    cmd.AddParameter("@LastUpdate", System.Data.SqlDbType.DateTime, LastUpdated);
-
-                    cmd.AddParameter("@OperatorID", System.Data.SqlDbType.VarChar, OperatorID);
 
                     cmd.BeginTransaction();
                     result = cmd.ExecuteNonQuery();
-
+                    if (ExecCode == 1)
+                    {
+                        RecipeCode = Convert.ToInt32(paramRecipeCode.Value); ;
+                    }
+                   
                     if (RecipeDetail != null && RecipeDetail.Count > 0)
                     {
                         cmd.CommandText = "InsProductRecipeDetail";
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, 0);
-                        cmd.AddParameter("@RecipeCode", System.Data.SqlDbType.VarChar,RecipeCode);
+                        cmd.AddParameter("@RecipeCode", System.Data.SqlDbType.Int, RecipeCode);
                         cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, "");
                         cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, 0);
                         cmd.AddParameter("@SeqNo", System.Data.SqlDbType.Money, 0);
@@ -99,10 +121,10 @@ namespace General.Catalog
                         int count = 1;
                         foreach (var data in RecipeDetail)
                         {
-                            cmd.CommandText = "InsVariantDetail";
+                            cmd.CommandText = "InsProductRecipeDetail";
                             cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                            cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, 0);
-                            cmd.AddParameter("@RecipeCode", System.Data.SqlDbType.VarChar, RecipeCode);
+                            cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, 1);
+                            cmd.AddParameter("@RecipeCode", System.Data.SqlDbType.Int, RecipeCode);
                             cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, data.ProdCode);
                             cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, data.Qty);
                             cmd.AddParameter("@SeqNo", System.Data.SqlDbType.Money, data.seqNo);
@@ -147,7 +169,7 @@ namespace General.Catalog
 
             using (SqlServer db = new SqlServer())
             {
-                db.CommandText = "select ProductRecipeH.*,ProductRecipeD.Name from ProductRecipeH left join ProductRecipeD on ProductRecipeH.RecipeCode=ProductRecipeD.RecipeCode  where ProductRecipeH.RecipeCode=@RecipeCode";
+                db.CommandText = "select ProductRecipeH.*,productrecipeD.ProdCode as DProdCode,productrecipeD.Qty from ProductRecipeH inner join productrecipeD on productRecipeD.RecipeCode=ProductRecipeH.RecipeCode where ProductRecipeH.RecipeCode=@RecipeCode";
                 db.AddParameter("@RecipeCode", System.Data.SqlDbType.VarChar, RecipeCode);
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();
@@ -161,11 +183,15 @@ namespace General.Catalog
                     {
                         while (dr.Read())
                         {
-                            
-                            Data1.RecipeCode = IDS.Tool.GeneralHelper.NullToString(dr["VarianCode"]);
-                            Data1.RecipeName = IDS.Tool.GeneralHelper.NullToString(dr["VarianName"]);
-                            Data1.BranchCode = IDS.Tool.GeneralHelper.NullToString(dr["VarianStatus"]);
-                            Data1.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["VarianType"]);
+                            ProductRecipeD details = new ProductRecipeD();
+                            Data1.RecipeCode = IDS.Tool.GeneralHelper.NullToInt(dr["RecipeCode"],0);
+                            Data1.RecipeName = IDS.Tool.GeneralHelper.NullToString(dr["RecipeName"]);
+                            Data1.BranchCode = IDS.Tool.GeneralHelper.NullToString(dr["BranchCode"]);
+                            Data1.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            details.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["DProdCode"]);                           
+                            details.Qty = IDS.Tool.GeneralHelper.NullToDecimal(dr["Qty"],0);
+                            Data1.RecipeDetail.Add(details);
+
                         }
                     }
 
@@ -198,7 +224,7 @@ namespace General.Catalog
                             ProdName = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]),
                             BranchCode = IDS.Tool.GeneralHelper.NullToString(dr["BranchCode"]),
                             RecipeName = IDS.Tool.GeneralHelper.NullToString(dr["RecipeName"]),
-                            RecipeCode = IDS.Tool.GeneralHelper.NullToString(dr["RecipeCode"]),
+                            RecipeCode = IDS.Tool.GeneralHelper.NullToInt(dr["RecipeCode"],0),
                             RecipeDetail = new List<ProductRecipeD>()
                         };
 

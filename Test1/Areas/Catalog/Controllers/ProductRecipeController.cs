@@ -25,7 +25,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             sHO = _contextAccessor?.HttpContext?.Session.GetString(IDS.Tool.GlobalVariable.SESSION_USER_BRANCH_HO_STATUS);
             _env = env;
         }
-        public JsonResult GetData()
+        public JsonResult GetData(string Branch)
         {
             if (sUser == null)
                 throw new Exception("You do not have access to access this page");
@@ -47,7 +47,8 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                 int totalRecords = 0; // Total keseluruhan data
                 int totalRecordsShowing = 0; // Total data setelah filter / search
 
-                List<ProductRecipeH> datalist = ProductRecipeH.GetData();
+
+                List<ProductRecipeH> datalist = ProductRecipeH.GetData(Branch);
                 if (datalist != null)
                 {
                     totalRecords = datalist.Count;
@@ -64,7 +65,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                     {
                         string searchValueLower = searchValue.ToLower();
 
-                        datalist = datalist.Where(x => x.RecipeCode.ToLower().Contains(searchValueLower) ||
+                        datalist = datalist.Where(x => x.RecipeCode.ToString().Contains(searchValueLower) ||
                                                  x.RecipeName.ToLower().Contains(searchValueLower) ||
                                                  x.ProdCode.ToString().Contains(searchValueLower) ||
                                                  x.ProdName.ToString().Contains(searchValueLower) ||                                                
@@ -133,7 +134,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             return Json(products);
         }
 
-        public ActionResult Create(int? FormAction, General.Catalog.VariantHeader dataModal)
+        public ActionResult Create(int? FormAction, General.Catalog.ProductRecipeH dataModal)
         {
             if (sUser == null)
                 return RedirectToAction("index", "Main", new { area = "" });
@@ -169,14 +170,12 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                     {
                         if ((int)FormAction == 1)
                         {
-                            if (string.IsNullOrWhiteSpace(dataModal.VarianCode))
-                                return Json(new { msg = "Failed, data is empty!", success = 0 });
-                            else
-                                return Json(new { msg = "New Variant has been save. Variant with Code: " + dataModal.VarianCode, success = 1, sno = dataModal.VarianCode });
+                            return Json(new { msg = "New Recipe has been save. Variant with Code: " + dataModal.RecipeCode, success = 1, sno = dataModal.RecipeCode });
+
                         }
                         else
                         {
-                            return Json(new { msg = "Edit Variant has been save.", success = 1 });
+                            return Json(new { msg = "Edit Recipe has been save.", success = 1, sno = dataModal.RecipeCode });
                         }
                     }
                     else
@@ -193,7 +192,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             }
         }
 
-        public ActionResult Delete(VariantHeader DataModal)
+        public ActionResult Delete(ProductRecipeH DataModal)
         {
             if (sUser == null)
                 return RedirectToAction("index", "Main", new { area = "" });
@@ -225,17 +224,16 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                     try
                     {
                         DataModal.OperatorID = currentUser;
-                        DataModal.VarianName = "Empty";
-                        DataModal.VarianStatus = false;
-                        DataModal.VarianMode = false;
-                        DataModal.VarianType = false;
+                        DataModal.RecipeName = "Empty";
+                        DataModal.ProdCode = "";
+                        DataModal.BranchCode = "";
 
                         int result = DataModal.InsUpDel(3);
                         if (result < 1)
                         {
-                            return Json(new { msg = "Failed to Delete Variant Code : " + DataModal.VarianCode, success = 0 });
+                            return Json(new { msg = "Failed to Delete Recipe Code : " + DataModal.RecipeCode, success = 0 });
                         }
-                        return Json(new { msg = "success Delete Data", success = 1 });
+                        return Json(new { msg = "success Delete Data", success = 1 ,sno= DataModal.RecipeCode });
                     }
                     catch (Exception ex)
                     {
@@ -253,7 +251,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             }
         }
 
-        public ActionResult Edit(string VariantCode)
+        public ActionResult Edit(string RecipeCode)
         {
             if (sUser == null)
                 return RedirectToAction("index", "Main", new { area = "" });
@@ -270,7 +268,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
 
             ViewData["FormAction"] = 2;
-            VariantHeader data = VariantHeader.GetDataByVariantCode(VariantCode);
+            ProductRecipeH data = ProductRecipeH.GetDataByRecipeCode(RecipeCode);
             if (data != null)
             {
                 return Json(data);
