@@ -233,13 +233,15 @@
                 </a>
 
 
-
-                <button type="button"
-                        class="btn btn-success SaveInsert"
-                        id="btnSaveTransaction">
-                    <i class="ri ri-check-fill me-1"></i>
-                    Save
-                </button>
+                @if (Model == null || Model.Process == 0)
+                {
+                    <button type="button"
+                            class="btn btn-success SaveInsert"
+                            id="btnSaveTransaction">
+                        <i class="ri ri-check-fill me-1"></i>
+                        Save
+                    </button>
+                }
 
                 <a href="@Url.Action("Index", "StockTransaction", new { area = "Inventory" })"
                    class="btn btn-danger">
@@ -276,7 +278,11 @@
 
         $(document).ready(function () {
             loadExistingDetails();
-
+            if($("#FormAction").val()==2){
+                $("#BranchCode").attr("disabled","disabled")
+                $("#TransCode").attr("disabled","disabled")
+                $("#TransDate").attr("disabled","disabled")
+            }
               flatpickr("#TransDate,#ProcessDate", {
                 dateFormat: "d/M/Y",
                 disableMobile: true,

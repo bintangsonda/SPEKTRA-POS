@@ -12,7 +12,53 @@
     <link rel="stylesheet" href="~/assets/css/custom.css" />
 
 }
+<style>
+    
+.btn-process,
+.btn-process:hover,
+.btn-process:focus,
+.btn-process:active {
+    background-color: #28ed0e !important;
+    border-color: #28ed0e!important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
 
+/* Saat tombol ditekan */
+.btn-process:active {
+    background-color: #28ed0e !important;
+    border-color: #28ed0e !important;
+}
+
+/* Warna ikon juga putih */
+.btn-process i {
+    color: #ffffff !important;
+}
+
+
+.btn-cancel,
+.btn-cancel:hover,
+.btn-cancel:focus,
+.btn-cancel:active {
+    background-color: #f21818 !important;
+    border-color: #f21818!important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* Saat tombol ditekan */
+.btn-cancel:active {
+    background-color: #f21818 !important;
+    border-color: #f21818 !important;
+}
+
+/* Warna ikon juga putih */
+.btn-cancel i {
+    color: #ffffff !important;
+}
+
+
+</style>
 @Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
 @Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
 @Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
@@ -325,6 +371,136 @@
                                     }
                                 ]
                             },
+                            {
+                                buttons: [
+                                    {
+                                        text: `
+                                            <i class="icon-base ri ri-check-line icon-sm me-0 d-inline-block"></i>
+                                            <span class="d-none d-sm-inline-block">Process</span>
+                                        `,
+                                        className: 'btn btn-process add-new me-2 d-flex align-items-center',
+
+                                        action: function (e, dt, node, config) {
+
+                                            // Ambil semua row yang dipilih
+                                            let selectedRows = dt.rows({ selected: true }).data();
+
+                                            // Ambil nilai TransNo
+                                            let transNos = [];
+                                            let status = [];
+                                            selectedRows.each(function (row) {
+                                                transNos.push(row.TransNo);
+                                                status.push(row.Process);
+                                            });
+                                            if (status.some(s => s != 0)) {
+                                                alert('Gagal diproses karena terdapat data yang statusnya bukan open.');
+                                                return;
+                                            }
+                                          
+
+                                            if (transNos.length === 0) {
+                                                alert('Please select at least one transaction.');
+                                                return;
+                                            }
+
+
+                                             SweetAlertConfirm(
+                                            'Confirmation',
+                                            'Are you sure you want to Save this data?',
+                                            function () {
+                                                    $.ajax({
+                                                        url: '@Url.Action("Process", "StockTransaction", new { Area = "Inventory" })',
+                                                        type: 'POST',
+                                                        traditional: true,
+                                                        data: {
+                                                            transNos: transNos,
+                                                            processType: 2,
+                                                        },
+                                                        success: function (response) {
+                                                            if (response.success) {
+                                                                alert(response.message);
+                                                                dt.ajax.reload();
+                                                            } else {
+                                                                alert(response.message);
+                                                            }
+                                                        },
+                                                        error: function (xhr) {
+                                                            alert('Failed to process transactions.');
+                                                            console.error(xhr.responseText);
+                                                        }
+                                                    });
+                                            }
+                                        )
+                                            
+                                        }
+                                    }
+                                ]
+                            },
+
+                            {
+                                buttons: [
+                                    {
+                                        text: `
+                                            <i class="icon-base ri ri-close-line icon-sm me-0 d-inline-block"></i>
+                                            <span class="d-none d-sm-inline-block">Cancel</span>
+                                        `,
+                                        className: 'btn btn-cancel add-new me-2 d-flex align-items-center',
+
+                                        action: function (e, dt, node, config) {
+
+                                            // Ambil semua row yang dipilih
+                                            let selectedRows = dt.rows({ selected: true }).data();
+
+                                            // Ambil nilai TransNo
+                                            let transNos = [];
+                                            let status = [];
+
+                                            selectedRows.each(function (row) {
+                                                transNos.push(row.TransNo);
+                                                status.push(row.Process);
+                                            });
+                                            if (status.some(s => s != 1)) {
+                                                alert('Gagal diproses karena terdapat data yang statusnya bukan proses.');
+                                                return;
+                                            }
+                                          
+                                            if (transNos.length === 0) {
+                                                alert('Please select at least one transaction.');
+                                                return;
+                                            }
+
+                                             SweetAlertConfirm(
+                                            'Confirmation',
+                                            'Are you sure you want to Save this data?',
+                                            function () {
+                                                    $.ajax({
+                                                        url: '@Url.Action("Process", "StockTransaction", new { Area = "Inventory" })',
+                                                        type: 'POST',
+                                                        traditional: true,
+                                                        data: {
+                                                            transNos: transNos,
+                                                            processType: 2,
+                                                        },
+                                                        success: function (response) {
+                                                            if (response.success) {
+                                                                alert(response.message);
+                                                                dt.ajax.reload();
+                                                            } else {
+                                                                alert(response.message);
+                                                            }
+                                                        },
+                                                        error: function (xhr) {
+                                                            alert('Failed to process transactions.');
+                                                            console.error(xhr.responseText);
+                                                        }
+                                                    });
+                                            }
+                                        )
+                                            
+                                        }
+                                    }
+                                ]
+                            },
 
                        
                             {
@@ -359,8 +535,8 @@
 
         $('.datatables-custom').on('click', '.edit-record', function () {
             const code = $(this).data('code');
-            window.location.href =
-                '@Url.Action("Edit", "StockTransaction", new { Area = "Inventory" })'
+            window.location.href ='@Url.Action("Edit", "StockTransaction", new { Area = "Inventory" })'
+                
                 + '?TransNo=' + encodeURIComponent(code);
 
             

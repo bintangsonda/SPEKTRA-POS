@@ -179,6 +179,66 @@ namespace SPOS.Inventory.Stock
         }
 
 
+        
+        public static int ProcessStock(List<string> transNos,int process)
+        {
+            int result = 0;
+            DateTime today = DateTime.Now;
+            using (IDS.DataAccess.SqlServer cmd = new IDS.DataAccess.SqlServer())
+            {
+                try
+                {
+                    cmd.Open();
+                 
+                    cmd.CommandText = "update stocktransh set process=@Process, processdate=@Today where transno=@TransNo";
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.BeginTransaction();
+                    foreach (var i in transNos)
+                    {
+                        cmd.ClearParameter();
+                        cmd.AddParameter("@Process", System.Data.SqlDbType.TinyInt, process);
+                        cmd.AddParameter("@TransNo", System.Data.SqlDbType.VarChar, i);
+                        cmd.AddParameter("@Today", System.Data.SqlDbType.DateTime, today);
+                        result = cmd.ExecuteNonQuery();
+                        if (result < 0)
+                        {
+                            cmd.RollbackTransaction();
+                            result = 0;
+                        }
+                    }
+                    cmd.CommitTransaction();
+                }
+                catch (SqlException sex)
+                {
+                    if (cmd.Transaction != null)
+                        cmd.RollbackTransaction();
+
+                    switch (sex.Number)
+                    {
+                        case 2627:
+                            throw new Exception("Category code is already exists. Please choose other loan code.");
+                        default:
+                            throw;
+                    }
+                }
+                catch
+                {
+                    if (cmd.Transaction != null)
+                        cmd.RollbackTransaction();
+
+                    throw;
+                }
+                finally
+                {
+                    cmd.Close();
+                }
+            }
+
+            return result;
+        }
+
+
+
         public static StockTransactionH GetStockTransactionHD(string TransNo)
         {
             StockTransactionH Data1 = null;

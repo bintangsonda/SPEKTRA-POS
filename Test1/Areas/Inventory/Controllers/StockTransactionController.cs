@@ -254,5 +254,37 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             return null;
         }
 
+        [HttpPost]
+        public IActionResult Process(List<string> transNos,int processType)//1==process 0==cancel
+        {
+            if (transNos == null || transNos.Count == 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "No transactions selected."
+                });
+            }
+            int result = 0;
+            result = SPOS.Inventory.Stock.StockTransactionH.ProcessStock(transNos,processType);
+            if (result > 0)
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "Stock Transactions processed successfully."
+                });
+            }
+            else
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Stock Transactions processed failed."
+                });
+            }
+            
+        }
+
     }
 }
