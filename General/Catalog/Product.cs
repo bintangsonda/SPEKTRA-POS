@@ -378,6 +378,42 @@ namespace General.Catalog
 
             return list;
         }
+        public static List<SelectListItem> GetProductWithoutCodeForDataSource()
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+
+            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
+            {
+                db.CommandText = "select * from product";
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (SqlDataReader dr = db.DbDataReader as SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                        SelectListItem product2 = new SelectListItem();
+                        product2.Value = "All";
+                        product2.Text = "All";
+                        list.Add(product2);
+                        while (dr.Read())
+                        {
+                            SelectListItem product = new SelectListItem();
+                            product.Value = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            product.Text = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]).Replace(@"""", "&#8221;").Replace("@", "&#64;").TrimEnd();
+
+                            list.Add(product);
+                        }
+                    }
+                }
+
+                db.Close();
+            }
+
+            return list;
+        }
 
         public static List<SelectListItem> GetBranchCode()
         {

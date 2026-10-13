@@ -246,6 +246,8 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text", "All");
             ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text", "All");
             ViewData["FormAction"] = 2;
+            ViewBag.UserMenu = MainMenu;
+            ViewBag.UserLogin = sUser.ToString();
             StockTransactionH data = StockTransactionH.GetStockTransactionHD(TransNo);
             if (data != null)
             {

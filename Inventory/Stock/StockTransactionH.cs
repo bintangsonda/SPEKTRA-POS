@@ -3,6 +3,7 @@ using IDS.DataAccess;
 using Microsoft.Data.SqlClient;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -106,6 +107,10 @@ namespace SPOS.Inventory.Stock
                     {
                         result = cmd.ExecuteNonQuery();
                     }
+                    else if (ExecCode == 2)
+                    {
+                        result = cmd.ExecuteNonQuery();
+                    }
                     else
                     {
                         object obj = cmd.ExecuteScalar();
@@ -204,6 +209,58 @@ namespace SPOS.Inventory.Stock
                         {
                             cmd.RollbackTransaction();
                             result = 0;
+                        }
+                    }
+                    foreach(var i in transNos)
+                    {
+                        string BranchCode = "";
+                        string TransCode = "";
+                        List<StockTransactionD> listD = new List<StockTransactionD>();
+                        cmd.CommandText = "select stocktransH.Branch,stocktransH.TransCode,StockTransD.* from stocktransH inner join StockTransD on StockTransD.TransNo=StockTransH.TransNo where StockTransH.TransNo=@TransNo";
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.ClearParameter();
+                        cmd.AddParameter("@TransNo", System.Data.SqlDbType.VarChar, i);
+                        cmd.ExecuteReader();
+                        using (SqlDataReader dr = cmd.DbDataReader as SqlDataReader)
+                        {
+                            if (dr.HasRows)
+                            {
+                                while (dr.Read())
+                                {
+                                    StockTransactionD stockTransaction = new StockTransactionD();
+                                    stockTransaction.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]); ;
+                                    BranchCode = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
+                                    TransCode = IDS.Tool.GeneralHelper.NullToString(dr["TransCode"]);
+                                    stockTransaction.Qty = IDS.Tool.GeneralHelper.NullToDecimal(dr["Qty"], 0);
+                                    listD.Add(stockTransaction);
+                                }
+                            }
+
+                            if (!dr.IsClosed)
+                                dr.Close();
+                        }
+                        foreach(var a in listD)
+                        {
+                            cmd.CommandText = "AddQtyStock";
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.ClearParameter();
+                            cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, a.ProdCode);
+                            cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, a.Qty);
+                            cmd.AddParameter("@Branch", System.Data.SqlDbType.VarChar, BranchCode);
+                            if (TransCode == "STKIN")
+                            {
+                                cmd.AddParameter("@Type", System.Data.SqlDbType.Int, 2);
+                            }
+                            else if (TransCode == "STKAD")
+                            {
+                                cmd.AddParameter("@Type", System.Data.SqlDbType.Int, 3);
+                            }
+                            result = cmd.ExecuteNonQuery();
+                            if (result < 0)
+                            {
+                                cmd.RollbackTransaction();
+                                result = 0;
+                            }
                         }
                     }
                     cmd.CommitTransaction();

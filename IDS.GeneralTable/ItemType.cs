@@ -149,8 +149,12 @@ namespace IDS.GeneralTable
                 {
                     if (dr.HasRows)
                     {
-                        SelectListItem a = new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem();
-
+                        SelectListItem a = new SelectListItem
+                        {
+                            Text = "All",
+                            Value = "All"
+                        };
+                        branches.Add(a);
                         while (dr.Read())
                         {
                             SelectListItem branch = new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem();

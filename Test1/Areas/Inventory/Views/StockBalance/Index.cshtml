@@ -22,22 +22,17 @@
         border-spacing: 0;
     }
 
-    #tableData th,
-    #tableData td {
+    #tableData.dataTable thead th {
+        padding: 2px 8px !important;
+        line-height: 12px !important;
+        height: 1px !important;
+        vertical-align: middle !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
         border-right: 1px solid rgba(255, 255, 255, 0.08);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    #tableData th:first-child,
-    #tableData td:first-child {
-        border-left: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    #tableData thead th {
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-</style>
-<!--Table Data-->
+</style><!--Table Data-->
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center">
@@ -51,49 +46,55 @@
         <div class="card-header border-bottom">
             <div class="row g-2 align-items-end">
 
-                <!-- Date From -->
-                <div class="col-sm-2">
-                    <div class="form-floating form-floating-outline">
-                      @Html.TextBox(
+               <div class="col-sm-3">
+                    <div class="row g-2">
+                        <!-- Date From -->
+                        <div class="col-6">
+                            <div class="form-floating form-floating-outline">
+                                @Html.TextBox(
                                     "FromDate",
-                                    DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                                    DateTime.Now.ToString("dd/MMM/yyyy",
+                                        System.Globalization.CultureInfo.InvariantCulture),
                                     new {
                                         id = "DateFrom",
                                         @class = "form-control form-control-sm",
                                         type = "text",
-                                        placeholder = "dd/mmm/yyyy",
+                                        placeholder = "dd/mmm/yyyy"
                                     }
                                 )
-                                <label for="txtFromDate">Date From</label>
-                    </div>
-                </div>
+                                <label for="DateFrom">Date From</label>
+                            </div>
+                        </div>
 
-                <!-- Date To -->
-                <div class="col-sm-2">
-                    <div class="form-floating form-floating-outline">
-                        @Html.TextBox(
+                        <!-- Date To -->
+                        <div class="col-6">
+                            <div class="form-floating form-floating-outline">
+                                @Html.TextBox(
                                     "ToDate",
-                                    DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                                    DateTime.Now.ToString("dd/MMM/yyyy",
+                                        System.Globalization.CultureInfo.InvariantCulture),
                                     new {
                                         id = "DateTo",
                                         @class = "form-control form-control-sm",
                                         type = "text",
-                                        placeholder = "dd/mmm/yyyy",
+                                        placeholder = "dd/mmm/yyyy"
                                     }
                                 )
-                                <label for="txtToDate">Date To</label>
+                                <label for="DateTo">Date To</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Gudang -->
+                <!-- ProdType -->
                 <div class="col-sm-2">
                     <div class="form-floating form-floating-outline">
                         @Html.DropDownList(
-                            "Gudang",
-                            ViewData["SelectListWh"] as SelectList,
+                            "ProdType",
+                            ViewData["ProdTypeList"] as SelectList,
                             new { @class = "form-control form-control-sm select2" }
                         )
-                        <label for="Gudang">Gudang</label>
+                        <label for="ProdType">Prod Type</label>
                     </div>
                 </div>
 
@@ -111,7 +112,7 @@
                 </div>
 
                 <!-- Produk -->
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <div class="form-floating form-floating-outline">
                         @Html.DropDownList(
                             "Produk",
@@ -139,15 +140,13 @@
                 <thead>
                     <tr>
                         <th>Dates</th>
-                        <th>Product Code</th>
-                        <th>Product Name</th>
-                        <th>Branch</th>
-                        <th>Gudang</th>
-                        <th>Begin Balance</th>
+                        <th>Prod Name</th>
+                        <th>Cabang</th>
+                        <th>BegBal</th>
                         <th>Qty In</th>
                         <th>Qty Out</th>
                         <th>Qty Adj</th>
-                        <th>End Balance</th>
+                        <th>EndBal</th>
                     </tr>
                 </thead>
             </table>
@@ -230,17 +229,15 @@
                     data:{
                         DateFromSelected: $('#DateFrom').val(),
                         DateToSelected: $('#DateTo').val(),
-                        werehouse: $('#Gudang').val(),
+                        prodType: $('#ProdType').val(),
                         prodCode: $('#Produk').val(),
                         Branch: $('#Cabang').val(),
                     },
                 },
                 columns: [
                     { "data": "Date", "name": "Date" },
-                    { "data": "prod.ProdCode", "name": "prod.ProdCode" },
                     { "data": "prod.ProdName", "name": "prod.ProdName"},
                     { "data": "Branch", "name": "Branch" },
-                    { "data": "wh.Name", "name": "wh.Name" },
                     { "data": "BeginBalance", "name": "BeginBalance" },
                     { "data": "QtyIn", "name": "QtyIn" },
                     { "data": "QtyOut", "name": "QtyOut" },
@@ -249,6 +246,7 @@
                 ],
                 columnDefs: [  
                     {
+                        "width":"80px",
                         "targets": [0]
                     },
                     {
@@ -272,12 +270,7 @@
                     {
                         "targets": [7]
                     },
-                    {
-                        "targets": [8]
-                    },
-                    {
-                        "targets": [9]
-                    },
+
 
                 ],
                 select: {

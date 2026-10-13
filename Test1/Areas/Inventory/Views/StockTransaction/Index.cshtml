@@ -299,7 +299,8 @@
                         <div class="d-flex align-items-center">
                             <a href="javascript:;"
                                 class="btn btn-icon btn-text-danger rounded-pill delete-record"
-                                data-code="${full.TransNo}">
+                                data-code="${full.TransNo}"
+                                data-status="${full.Process}">
                                 <i class="icon-base ri ri-delete-bin-7-line icon-md text-danger"></i>
                             </a>
                             <a href="javascript:;"
@@ -341,7 +342,7 @@
                 select: {
                     style: 'os',
                 },
-                order: [[2, 'desc']],
+                order: [[1, 'desc']],
                 layout: {
                     topStart: {
                         rowClass: 'row m-2 my-0 mt-0 justify-content-between',
@@ -414,7 +415,7 @@
                                                         traditional: true,
                                                         data: {
                                                             transNos: transNos,
-                                                            processType: 2,
+                                                            processType: 1,
                                                         },
                                                         success: function (response) {
                                                             if (response.success) {
@@ -545,6 +546,11 @@
         $('.datatables-custom').on('click', '.delete-record', function () {
             if ($('#PageDelete').val() == 1) {
                 const code = $(this).data('code');
+                const status = $(this).data('status');
+                if(status!=0){
+                    alert("delete failed, please select Open Status Data");
+                    return false;
+                }
                 SweetAlertConfirm(
                     'Delete Confirmation',
                     'Are you sure you want to delete this data, Trans No:' + code,

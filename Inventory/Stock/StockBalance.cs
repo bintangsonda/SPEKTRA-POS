@@ -26,7 +26,7 @@ namespace SPOS.Inventory.Stock
 
         public StockBalance() { }
 
-        public static List<StockBalance> GetStockBalances( DateTime DateFrom,DateTime DateTo, string wh, string prodcode,string Branch)
+        public static List<StockBalance> GetStockBalances( DateTime DateFrom,DateTime DateTo, string prodType, string prodcode,string Branch)
         {
             List<StockBalance> list = new List<StockBalance>();
 
@@ -36,7 +36,14 @@ namespace SPOS.Inventory.Stock
                 db.CommandType = System.Data.CommandType.StoredProcedure;
                 db.AddParameter("@DateFrom", System.Data.SqlDbType.DateTime, DateFrom);
                 db.AddParameter("@DateTo", System.Data.SqlDbType.DateTime, DateTo);
-                db.AddParameter("@Wh", System.Data.SqlDbType.VarChar, wh);
+                if (prodType == "All")
+                {
+                    db.AddParameter("@ProdType", System.Data.SqlDbType.VarChar, DBNull.Value);
+                }
+                else
+                {
+                    db.AddParameter("@ProdType", System.Data.SqlDbType.VarChar, prodType);
+                }
                 if (prodcode == "All")
                 {
                     db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, DBNull.Value);

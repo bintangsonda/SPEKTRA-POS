@@ -428,6 +428,10 @@
             var qty = Number(qtyValue);
             var remark = row.find('.remark-input').val();
 
+            if(prodCode==""||qtyValue==""){
+                alert("Please fill all field!");
+                return;
+            }
             // Validasi produk
             if (!prodCode) {
                 alert('Please select a product.');
@@ -451,7 +455,7 @@
                 : prodCode;
 
             row.find('.view-prod').text(productText);
-            row.find('.view-qty').text(qtyValue);
+            row.find('.view-qty').text(qty);
             row.find('.view-remark').text(remark);
 
             // Nonaktifkan dan sembunyikan dropdown
@@ -648,6 +652,11 @@
                         success: function (response) {
                             if (response.success) {
                                 alert('Transaction saved successfully.');
+                               if($("#FormAction").val()==1){
+                                    $("#TransNo").val(response.sno);
+                                        window.location = '@Url.Action("Edit", "StockTransaction", new { area = "Inventory" })'+ '?TransNo=' + encodeURIComponent(response.sno);
+                               }
+                                
                             } else {
                                 alert(response.message || 'Failed to save transaction.');
                             }

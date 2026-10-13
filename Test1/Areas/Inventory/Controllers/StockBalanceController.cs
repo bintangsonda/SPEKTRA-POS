@@ -28,7 +28,7 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             _env = env;
         }
 
-        public JsonResult GetData(string DateFromSelected, string DateToSelected, string werehouse, string prodCode, string Branch)
+        public JsonResult GetData(string DateFromSelected, string DateToSelected, string prodType, string prodCode, string Branch)
         {
             if (sUser == null)
                 throw new Exception("You do not have access to access this page");
@@ -69,11 +69,11 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
                     throw new Exception("You do not have access to access this page");
 
                 List<SPOS.Inventory.Stock.StockBalance> datalist = new List<SPOS.Inventory.Stock.StockBalance>();
-                if (string.IsNullOrEmpty(werehouse))
+                if (string.IsNullOrEmpty(prodType))
                 {
-                    werehouse = "ALL";
+                    prodType = "All";
                 }
-                datalist = StockBalance.GetStockBalances(DateFrom, DateTo, werehouse, prodCode, Branch);
+                datalist = StockBalance.GetStockBalances(DateFrom, DateTo, prodType, prodCode, Branch);
 
                 if (datalist != null)
                 {
@@ -140,6 +140,7 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
 
             ViewData["SelectListWh"] = new SelectList(SPOS.Inventory.Stock.Warehouse.GetWareHouseForDataSource(), "Value", "Text");
+            ViewData["ProdTypeList"] = new SelectList(IDS.GeneralTable.ItemType.GetCboItemType(), "Value", "Text");
             ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text","All");
             ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text","All");
             ViewBag.UserMenu = MainMenu;
