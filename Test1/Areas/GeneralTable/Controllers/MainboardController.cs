@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IDS.GeneralTable;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IDS.Web.UI.Controllers
 {
@@ -17,14 +19,45 @@ namespace IDS.Web.UI.Controllers
         }
 
         // GET: GeneralTable/DashboardStatistic
-        public ActionResult Index()
+        public ActionResult Index(DateTime? dateFrom,
+            DateTime? dateTo,
+            string branchCode = "")
         {
             if (sUser == null)
                 return RedirectToAction("index", "Main", new { area = "" });
 
+            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text", "All");
+
             ViewBag.UserMenu = MainMenu;
 
-            return View();
+            DateTime from = dateFrom?.Date
+                ?? DateTime.Today.AddDays(-6);
+
+            DateTime to = dateTo?.Date
+                ?? DateTime.Today;
+
+            // Validasi rentang tanggal.
+            if (from > to)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Tanggal awal tidak boleh melebihi tanggal akhir.");
+
+                from = to;
+            }
+            if (branchCode == "All")
+            {
+                branchCode = "";
+            }
+            // Ambil data dashboard dari class.
+            SalesDashboard dashboard =
+                SalesDashboard.GetDashboard(
+                    from,
+                    to,
+                    branchCode ?? "");
+
+            // Kirim data ke View.
+            return View(dashboard);
         }
     }
 }

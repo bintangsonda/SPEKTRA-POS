@@ -1,44 +1,567 @@
-﻿@{
-    ViewBag.Title = "Mainboard";
+﻿
+@model IDS.GeneralTable.SalesDashboard
+
+@using System.Linq
+@using System.Text.Json
+@using System.Globalization
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/assets/css/custom.css" />
+
+}
+@{
+    ViewBag.Title = "Sales Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var culture = CultureInfo.GetCultureInfo("id-ID");
 }
 
-
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="row g-6">
-        <!-- Gamification Card -->
-        <div class="col-md-12 col-xxl-8">
-            <div class="card">
-                <div class="d-flex align-items-end row">
-                    <div class="col-md-6 order-2 order-md-1">
-                        <div class="card-body">
-                            <h4 class="card-title mb-4">Welcoming <span class="fw-bold"></span> 🎉</h4>
-                            <p class="mb-0">Hope you’re having a great day. Let’s get things done!</p>
-                            <br />
-                            <button type="button" class="btn btn-primary" onclick="LoadShiftForm()">
-                                Open / Close Shift
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between
+                align-items-center gap-3 mb-4">
+
+        <div>
+            <h4 class="mb-1">Sales Dashboard</h4>
+            <p class="text-muted mb-0">
+                Ringkasan penjualan dan performa bisnis POS
+            </p>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                onclick="LoadShiftForm()">
+            <i class="bx bx-time-five me-1"></i>
+            Open / Close Shift
+        </button>
+
+    </div>
+
+    <!-- FILTER -->
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <form method="get"
+                  action="@Url.Action("Index", "Mainboard")">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Awal</label>
+                        <input type="text"
+                               id="DateFrom"
+                               name="dateFrom"
+                               class="form-control"
+                               value="@Model.DateFrom.ToString("dd/MMM/yyyy")"
+                               placeholder="Pilih tanggal"
+                               required />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Akhir</label>
+                        <input type="text"
+                               id="DateTo"
+                               name="dateTo"
+                               class="form-control"
+                               value="@Model.DateTo.ToString("dd/MMM/yyyy")"
+                               placeholder="Pilih tanggal"
+                               required />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Cabang
+                        </label>
+
+                        <div class="d-flex gap-2">
+                            @Html.DropDownList(
+                            "BranchCode",
+                            ViewData["SelectListBranchCode"] as SelectList,
+                            new { @class = "form-control form-control-sm select2" }
+                        )
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                <i class="ri ri-search-line me-1"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-6 text-center text-md-end order-1 order-md-2">
-                        <div class="card-body pb-0 px-0 pt-2">
-                        
-                            <img src="~/assets/img/illustrations/illustration-john-light.png"
-                                 height="186"
-                                 class="scaleX-n1-rtl"
-                                 alt="View Profile" 
-                                 />
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="row g-4 mb-4">
+
+        <!-- TOTAL SALES -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between
+                                align-items-start">
+
+                        <div>
+                            <span class="text-muted">
+                                Total Penjualan
+                            </span>
+
+                            <h4 class="mt-2 mb-1">
+                                @Model.TotalSales.ToString("C0", culture)
+                            </h4>
                         </div>
+
+                        <div class="avatar">
+                            <span class="avatar-initial rounded
+                                         bg-label-success">
+                                <i class="ri ri-wallet-line fs-3"></i>
+                            </span>
+                        </div>
+
                     </div>
+
+                    <small class="text-muted">
+                        Berdasarkan transaksi selesai
+                    </small>
+
                 </div>
             </div>
         </div>
-        <!--/ Gamification Card -->
+
+        <!-- TOTAL TRANSACTIONS -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between
+                                align-items-start">
+
+                        <div>
+                            <span class="text-muted">
+                                Total Transaksi
+                            </span>
+
+                            <h4 class="mt-2 mb-1">
+                                @Model.TotalTransactions.ToString("N0", culture)
+                            </h4>
+                        </div>
+
+                        <div class="avatar">
+                            <span class="avatar-initial rounded
+                                         bg-label-primary">
+                                <i class="ri ri-receipt-line fs-3"></i>
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <small class="text-muted">
+                        Status transaksi = Processed
+                    </small>
+
+                </div>
+            </div>
+        </div>
+
+      
+        <!-- PENDING TRANSACTIONS -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="text-muted">
+                                Transaksi Pending
+                            </span>
+
+                            <h4 class="mt-2 mb-1">
+                                @Model.TotalPendingTransactions.ToString("N0",
+                                    System.Globalization.CultureInfo.GetCultureInfo("id-ID"))
+                            </h4>
+                        </div>
+
+                        <div class="avatar">
+                            <span class="avatar-initial rounded bg-label-warning">
+                                <i class="ri ri-folder-keyhole-line fs-3"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <small class="text-muted">
+                        Transaksi yang belum dibayar
+                    </small>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- AVERAGE TRANSACTION -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between
+                                align-items-start">
+
+                        <div>
+                            <span class="text-muted">
+                                Rata-rata Transaksi
+                            </span>
+
+                            <h4 class="mt-2 mb-1">
+                                @Model.AverageTransaction.ToString("C0", culture)
+                            </h4>
+                        </div>
+
+                        <div class="avatar">
+                            <span class="avatar-initial rounded
+                                         bg-label-info">
+                                <i class="ri ri-bar-chart-line fs-3"></i>
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <small class="text-muted">
+                        Penjualan per transaksi
+                    </small>
+
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- SALES CHART & TOP PRODUCTS -->
+    <div class="row g-4 mb-4">
+
+        <!-- SALES CHART -->
+        <div class="col-12 col-xl-8">
+            <div class="card h-100">
+
+                <div class="card-header
+                            d-flex justify-content-between
+                            align-items-center">
+
+                    <div>
+                        <h5 class="mb-1">Grafik Penjualan</h5>
+                        <small class="text-muted">
+                            Tren penjualan per hari
+                        </small>
+                    </div>
+
+                    <i class="bx bx-line-chart fs-3 text-primary"></i>
+
+                </div>
+
+                <div class="card-body">
+                    <div style="position: relative; height: 320px;">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TOP PRODUCTS -->
+        <div class="col-12 col-xl-4">
+            <div class="card h-100">
+
+                <div class="card-header">
+                    <h5 class="mb-1">Top 5 Barang Terlaris</h5>
+                    <small class="text-muted">
+                        Berdasarkan kuantitas terjual
+                    </small>
+                </div>
+
+                <div class="card-body">
+
+                    @if (Model.TopProducts == null ||
+                         !Model.TopProducts.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="ri ri-inbox-unarchive-list fs-1 text-muted"></i>
+                            <p class="text-muted mb-0">
+                                Belum ada data produk.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th class="text-end">Qty</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var item in Model.TopProducts)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="fw-semibold">
+                                                    @item.ProdName
+                                                </div>
+                                                <small class="text-muted">
+                                                    @item.ProdCode
+                                                </small>
+                                            </td>
+
+                                            <td class="text-end fw-semibold">
+                                                @item.QuantitySold.ToString("N0", culture)
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="card mb-4">
+
+        <div class="card-header
+                    d-flex justify-content-between
+                    align-items-center">
+
+            <div>
+                <h5 class="mb-1">Transaksi Terbaru</h5>
+                <small class="text-muted">
+                    Daftar transaksi selesai pada periode terpilih
+                </small>
+            </div>
+
+            <i class="bx bx-history fs-3 text-primary"></i>
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+
+                <thead>
+                    <tr>
+                        <th>No. Transaksi</th>
+                        <th>Tanggal</th>
+                        <th>Cabang</th>
+                        <th class="text-end">Total Penjualan</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.RecentTransactions == null ||
+                         !Model.RecentTransactions.Any())
+                    {
+                        <tr>
+                            <td colspan="4"
+                                class="text-center text-muted py-4">
+                                Belum ada transaksi pada periode ini.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var trx in Model.RecentTransactions)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @trx.TransCode
+                                </td>
+
+                                <td>
+                                    @trx.TransDate.ToString("dd MMM yyyy HH:mm")
+                                </td>
+
+                                <td>
+                                    @trx.BranchCode
+                                </td>
+
+                                <td class="text-end fw-semibold">
+                                    @trx.TotalAmount.ToString("C0", culture)
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
 </div>
 
-                        <script>
-                            function LoadShiftForm(){
-                                document.location = '@Url.Action("Index", "Shift", new { Area = "Employee" })';
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/select2/select2.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/popular.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/auto-focus.js"></script>
+    <script src="~/assets/vendor/libs/cleave-zen/cleave-zen.js"></script>
+    <script src="~/assets/js/forms-selects.js"></script>
+    <script src="~/assets/vendor/libs/tagify/tagify.js"></script>
+    <script src="~/assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="~/assets/vendor/libs/bloodhound/bloodhound.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+<script>
+    $(document).ready(function () {
+        var savedDateFrom = sessionStorage.getItem('DateFrom');
+        var savedDateTo = sessionStorage.getItem('DateTo');
+        var savedBranch = sessionStorage.getItem('BranchCode');
+        // Inisialisasi Select2 terlebih dahulu
+        $('.select2').select2();
+
+        // Pilih All setelah Select2 siap
+
+        // Inisialisasi Flatpickr
+       flatpickr("#DateFrom", {
+            dateFormat: "d/M/Y",
+            disableMobile: true,
+            static: true,
+            defaultDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+        });
+
+        flatpickr("#DateTo", {
+            dateFormat: "d/M/Y",
+            disableMobile: true,
+            static: true,
+            defaultDate: new Date()
+        });
+
+        // Isi kembali tanggal
+        if (savedDateFrom) {
+            $('#DateFrom').val(savedDateFrom);
+        }
+
+        if (savedDateTo) {
+            $('#DateTo').val(savedDateTo);
+        }
+
+        // Isi kembali branch
+        if (savedBranch !== null) {
+            $('#BranchCode').val(savedBranch).trigger('change');
+        }
+        $('form').on('submit', function (e) {
+            //cek dulu
+            var dateFrom = flatpickr.parseDate($('#DateFrom').val(), "d/M/Y");
+            var dateTo = flatpickr.parseDate($('#DateTo').val(), "d/M/Y");
+
+            if ( dateFrom > dateTo) {
+                   e.preventDefault();
+                alert("Please set Date From must be greater than Date To");
+                   return false;
+              
+            }
+            sessionStorage.setItem('DateFrom', $('#DateFrom').val());
+            sessionStorage.setItem('DateTo', $('#DateTo').val());
+            sessionStorage.setItem('BranchCode', $('#BranchCode').val() || '');
+        });
+
+    });
+
+    const salesLabels = @Html.Raw(
+        JsonSerializer.Serialize(
+            Model.SalesChart.Select(x => x.Label)));
+
+    const salesValues = @Html.Raw(
+        JsonSerializer.Serialize(
+            Model.SalesChart.Select(x => x.TotalSales)));
+
+    const rupiahFormatter = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+    });
+
+    const salesCanvas = document.getElementById('salesChart');
+
+    if (salesCanvas) {
+        new Chart(salesCanvas, {
+            type: 'line',
+
+            data: {
+                labels: salesLabels,
+
+                datasets: [{
+                    label: 'Penjualan',
+                    data: salesValues,
+                    borderColor: '#696cff',
+                    backgroundColor: 'rgba(105,108,255,0.12)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointHoverRadius: 6
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return rupiahFormatter.format(
+                                    context.parsed.y
+                                );
                             }
-                        </script>
+                        }
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            callback: function(value) {
+                                return rupiahFormatter.format(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function LoadShiftForm() {
+        document.location =
+            '@Url.Action("Index", "Shift", new { Area = "Employee" })';
+    }
+</script>
+}

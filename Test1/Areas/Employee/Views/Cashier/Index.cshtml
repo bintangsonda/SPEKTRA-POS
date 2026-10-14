@@ -49,11 +49,13 @@
 
     /* TOOLBAR */
     .toolbar {
-        display: flex;
-        justify-content: space-between;
-        margin: 12px 0;
-        padding: 0 8px;
-    }
+    display: flex;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    margin-top: 0 !important;
+    margin-bottom: 6px;
+    padding: 0 8px;
+}
     .header {
         flex: 0 0 auto;
     }
@@ -429,10 +431,11 @@
 <div class="pos-container">
     <div class="left-panel">
         <div class="header">
-            <div class="branch-name">@Model.BranchName<br><small> user : @Model.OperatorID</small></div>
+            @* <div class="branch-name">@Model.BranchName<br><small> user : @Model.OperatorID</small></div> *@
+            <div class="branch-name">@Model.BranchName</div>
             <div class="TransDate-LeftPanel">@Model.TransDate.ToString("dd-MMM-yyyy")</div>
         </div>
-        <div class="toolbar row g-3 align-items-end">
+        <div class="toolbar row g-3 align-items-start">
 
     <!-- CATEGORY -->
     <div class="col-12 col-md-6">

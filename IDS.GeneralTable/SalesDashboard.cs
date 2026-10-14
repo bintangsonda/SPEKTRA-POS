@@ -48,6 +48,11 @@ namespace IDS.GeneralTable
         public List<RecentSalesTransaction> RecentTransactions
         { get; set; } = new List<RecentSalesTransaction>();
 
+
+        // TRANSAKSI PENDING
+        public int TotalPendingTransactions { get; set; }
+
+
         // ==========================================
         // CONSTRUCTOR
         // ==========================================
@@ -84,6 +89,8 @@ namespace IDS.GeneralTable
             LoadSalesChart(dashboard);
             LoadTopProducts(dashboard);
             LoadRecentTransactions(dashboard);
+            LoadPendingTransactions(dashboard);
+
 
             return dashboard;
         }
@@ -368,7 +375,49 @@ namespace IDS.GeneralTable
                 db.Close();
             }
         }
+
+
+        private static void LoadPendingTransactions(SalesDashboard dashboard)
+        {
+            using (DataAccess.SqlServer db = new DataAccess.SqlServer())
+            {
+                db.CommandText = @"
+            SELECT COUNT(*) AS TotalPendingTransactions
+            FROM TransInvH
+            WHERE TransDate >= @DateFrom
+              AND TransDate < @DateTo
+              AND Status = 0
+              AND (
+                    @BranchCode = ''
+                    OR BranchCode = @BranchCode
+                  );";
+
+                db.CommandType = CommandType.Text;
+
+                AddFilterParameters(db, dashboard);
+
+                db.Open();
+                db.ExecuteReader();
+
+                using (SqlDataReader dr =
+                    db.DbDataReader as SqlDataReader)
+                {
+                    if (dr != null && dr.Read())
+                    {
+                        dashboard.TotalPendingTransactions =
+                            Convert.ToInt32(
+                                dr["TotalPendingTransactions"]);
+                    }
+                }
+
+                db.Close();
+            }
+        }
+
     }
+
+
+
 
     // ==============================================
     // MODEL GRAFIK
