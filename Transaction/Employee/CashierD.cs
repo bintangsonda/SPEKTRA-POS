@@ -16,6 +16,7 @@ namespace Transaction.Employee
         public decimal Price { get; set; }
         public int Qty { get; set; }
         public string OrderType { get; set; }
+        public string SalesType { get; set; }
         public string VariantCode { get; set; }
         public string VariantName { get; set; }
         public string VariantSeqNo { get; set; }

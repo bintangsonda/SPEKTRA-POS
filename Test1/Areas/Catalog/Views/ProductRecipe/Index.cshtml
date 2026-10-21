@@ -187,7 +187,7 @@
 
                                     <div class="row g-3">
                                         <!-- Recipe Code -->
-                                        <div class="col-12 col-md-4">
+                                        <div class="col-12 col-md-3">
                                             <div class="form-floating form-floating-outline mb-3">
                                                 @Html.TextBoxFor(model => model.RecipeCode, new
                                                                                                 {
@@ -201,7 +201,7 @@
                                         </div>
 
                                         <!-- Recipe Name -->
-                                        <div class="col-12 col-md-4">
+                                        <div class="col-12 col-md-3">
                                             <div class="form-floating form-floating-outline mb-3">
                                                 @Html.TextBoxFor(model => model.RecipeName, new
                                                                                                 {
@@ -220,6 +220,15 @@
                                                                                                 ViewData["BranchList"] as SelectList,
                                                                                                 new { @class = "form-control form-control-sm select2" })
                                                 <label>Outlet</label>
+                                            </div>
+                                        </div>
+                                         <!-- SalesType -->
+                                        <div class="col-12 col-md-2">
+                                            <div class="form-floating form-floating-outline mb-3">
+                                                @Html.DropDownListFor(model => model.SalesType,
+                                                        ViewData["SalesTypeList"] as SelectList,
+                                                        new { @class = "form-control form-control-sm select2" })
+                                                <label>Online/Offline</label>
                                             </div>
                                         </div>
                                     </div>
@@ -582,6 +591,7 @@
                         $("#RecipeCode").val(code)
                         $("#ProdCode").val(data.ProdCode)
                         $("#BranchCode").val(data.BranchCode)
+                         $("#SalesType").val(data.SalesType)
                          $("#BranchCode").prop("disabled",true)
 
                         $("#tableVarianList tbody").empty();
@@ -721,6 +731,7 @@
                 const name = $("#RecipeName").val();
                 const branch = $("#BranchCode").val();
                 const prodcode = $("#ProdCode").val();
+                const salestype = $("#SalesType").val();
 
                 if (
                     
@@ -750,6 +761,7 @@
                             "dataModal.RecipeName": name,
                             "dataModal.BranchCode": branch,
                             "dataModal.ProdCode": prodcode,
+                            "dataModal.SalesType": salestype,
                             "FormAction": $("#FormAction").val()
                         };
 
@@ -777,6 +789,9 @@
 
                                     $("#FormAction").val('2');
                                     $("#RecipeCode").prop("disabled", true);
+                                    $("#BranchCode").prop("disabled", true);
+                                    $("#SalesType").prop("disabled", true);
+                                    $("#ProdCode").prop("disabled", true);
                                     $("#RecipeCode").val(respond.sno)
                                     $("#defferedAmmortizeLabel").text("Edit Recipe");
                                     $("#tab-list").closest("li").show();
@@ -791,6 +806,9 @@
 
                                     $("#FormAction").val('2');
                                     $("#RecipeCode").prop("disabled", true);
+                                    $("#BranchCode").prop("disabled", true);
+                                    $("#SalesType").prop("disabled", true);
+                                    $("#ProdCode").prop("disabled", true);
                                     $("#RecipeCode").val(respond.sno)
                                     $("#defferedAmmortizeLabel").text("Edit Recipe");
                                     $("#tab-list").closest("li").show();

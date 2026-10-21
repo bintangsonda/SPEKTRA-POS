@@ -29,18 +29,44 @@
         <div class="card-body">
 
             <!-- HEADER -->
-            <div class="d-flex justify-content-between mb-3">
-                <div>
-                    <strong>No Trans :</strong> @Model.TransCode <br />
-                </div>
+           <div class="mb-3">
 
-                <div class="text-end">
-                    <strong>Total :</strong>
-                    <span class="text-primary fw-bold">
-                        Rp @String.Format("{0:N0}", Model.TransTotalAmt)
-                    </span>
-                </div>
-            </div>
+    @* Baris pertama *@
+    <div class="d-flex align-items-center flex-wrap gap-4 mb-2">
+
+        <div>
+            <strong>No Trans:</strong>
+            <span>@Model.TransCode</span>
+        </div>
+
+        <div>
+            <strong>Tipe Pesanan:</strong>
+            <span>@Model.Details[0].OrderType</span>
+        </div>
+
+        <div>
+            <strong>Bungkus/Makan di tempat:</strong>
+            <span>@Model.Details[0].SalesType</span>
+        </div>
+
+        <div class="ms-auto">
+            <strong>Total:</strong>
+            <span class="text-primary fw-bold">
+                Rp @String.Format("{0:N0}", Model.TransTotalAmt)
+            </span>
+        </div>
+
+    </div>
+
+    <hr class="my-2" />
+
+    @* Baris kedua: Catatan *@
+    <div>
+        <strong>Catatan:</strong>
+        <span>@Model.Details[0].Remark</span>
+    </div>
+
+</div>
 
             <hr />
 

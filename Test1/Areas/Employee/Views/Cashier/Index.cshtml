@@ -519,7 +519,7 @@
                         </div>
                         <div class="row gy-2 align-items-start mt-4">
                             <div class="col-12 col-md-2">
-                                <label class="fw-bold fs-6 text-black">Type :</label>
+                                <label class="fw-bold fs-6 text-black">tipe pesanan :</label>
                             </div>
 
                             <div class="col-12 col-md-10">
@@ -551,6 +551,27 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row gy-2 align-items-start mt-4">
+                            <div class="col-12 col-md-2">
+                                <label class="fw-bold fs-6 text-black">Bungkus/Makan di tempat :</label>
+                            </div>
+
+                            <div class="col-12 col-md-10">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <label class="type-option">
+                                        <input type="radio" name="salesType" value="off">
+                                        <span>makan di sini</span>
+                                    </label>
+
+                                    <label class="type-option">
+                                        <input type="radio" name="salesType" value="on">
+                                        <span>bungkus</span>
+                                    </label>
+
+                                    
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="row gy-2 align-items-center mt-4">
                             <div class="col-12 col-md-2">
@@ -579,7 +600,7 @@
 
                         <div class="row gy-2 align-items-start mt-4">
                             <div class="col-12 col-md-2">
-                                <label class="fw-bold fs-6 text-black">Remark :</label>
+                                <label class="fw-bold fs-6 text-black">catatan :</label>
                             </div>
 
                             <div class="col-12 col-md-10">
@@ -1176,7 +1197,7 @@
 
             // order type
             $('input[name="orderType"]').prop('checked', false);
-
+            $('input[name="salesType"]').prop('checked', false);
             // variant
             $('#variantContainer').empty();
             $('#variantSection').addClass('d-none');
@@ -1238,6 +1259,7 @@
             const basePrice = RemoveAllComma($(".ProdHarga").val());
 
             const orderType = $("input[name='orderType']:checked").val() || "";
+            const salesType = $("input[name='salesType']:checked").val() || "";
 
             // ===== VARIANTS =====
             let variants = [];
@@ -1284,6 +1306,7 @@
                 item.discount = discount;
                 item.remark = remark;
                 item.orderType = orderType;
+                item.salesType = salesType;
                 item.variants = variants;
 
                 // ⚠️ data inti tetap dijaga
@@ -1304,6 +1327,7 @@
                     discount: discount,
                     remark: remark,
                     orderType: orderType,
+                    salesType: salesType,
                     variants: variants
                 });
             }
@@ -1323,6 +1347,11 @@
             const orderType = $('input[name="orderType"]:checked').val();
             if (!orderType) {
                 alert('Type wajib diisi');
+                return false;
+            }
+            const salesType = $('input[name="salesType"]:checked').val();
+            if (!salesType) {
+                alert('Bungkus/Makan disini wajib diisi');
                 return false;
             }
 
@@ -1458,6 +1487,11 @@
             if (item.orderType) {
                 $(`input[name='orderType'][value="${item.orderType}"]`).prop("checked", true);
             }
+            // sales Type
+            $("input[name='salesType']").prop("checked", false);
+            if (item.salesType) {
+                $(`input[name='salesType'][value="${item.salesType}"]`).prop("checked", true);
+            }
 
             // Variant: ambil dari server
             $.ajax({
@@ -1527,6 +1561,7 @@
                     Discount: item.discount,
                     Remark: item.remark,
                     OrderType: item.orderType,
+                    SalesType: item.salesType,
                     VariantCode: item.variants.map(v => v.code).join(","),
                     VariantName: item.variants.map(v => v.type).join(","),
                     VariantValue: item.variants.map(v => v.value).join(","),
@@ -1643,7 +1678,7 @@
                         const values = d.VariantValue?.split(',') || [];
                         const prices = d.VariantHarga?.split(',') || [];
                         const ordertypes = d.OrderType?.split(',') || [];
-
+                        const salestypes = d.SalesType?.split(',') || [];
                         let variants = [];
 
                         for (let i = 0; i < codes.length; i++) {
@@ -1667,6 +1702,7 @@
                             discount: 0,
                             remark: d.Remark || "",
                             orderType: ordertypes,
+                            salesType: salestypes,
                             variants: variants
                         });
 

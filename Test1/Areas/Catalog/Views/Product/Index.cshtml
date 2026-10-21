@@ -375,38 +375,6 @@
                 width: '100%'
             });
         });
-
-        $("#ProdName").on("keyup", function () {
-            $("#PreviewName").text($(this).val() || "Nama Produk");
-        });
-
-        // Update deskripsi
-        $("#Description").on("keyup", function () {
-            $("#PreviewDesc").text($(this).val() || "Deskripsi produk");
-        });
-
-        $("#ImageFile").on("change", function () {
-            const file = this.files[0];
-
-            // Validasi extension
-            const allowed = ["image/jpeg", "image/png"];
-            if (file && !allowed.includes(file.type)) {
-                SweetAlertError('Failed!',"Hanya file JPG dan PNG yang diperbolehkan.");
-                this.value = ""; // reset
-                $("#previewImageUpload").hide();
-                return;
-            }
-
-            // Preview
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    $("#previewImageUpload").attr("src", e.target.result).show();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
         function getData() {
             return $('#tableData').DataTable({
                 bDestroy: true,
@@ -424,10 +392,10 @@
                         CategoriesFilter: $('#CategoriesFilter').val(),
                     },
                 },
-                columns: [ 
+                columns: [
                     { data: 'action', name: 'action', orderable: false },
                     { data: "ProdCode", name: "ProdCode" },
-                    { data: "ProdName", name: "ProdCode" },
+                    { data: "ProdName", name: "ProdName" },
                     { data: "CategoriesCode", name: "CategoriesCode" },
                     { data: "Branch", name: "Branch" },
                     {
@@ -556,13 +524,13 @@
                                             <i class="icon-base ri ri-add-line icon-sm me-0 d-inline-block"></i>
                                             <span class="d-none d-sm-inline-block">Add</span>
                                         `,
-                                        className: 'btn add-new me-2 d-flex align-items-center',  
+                                        className: 'btn add-new me-2 d-flex align-items-center',
                                         action: function (e, dt, node, config) {
                                             $("#ProdCode").prop("disabled",false)
                                             $("#Branch").prop("disabled",false)
                                             $("#defferedAmmortizeLabel").text("Add Product")
                                             ClearModal();
-                                            
+
                                             let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
                                             modal.show();
                                              $("#FormAction").val(1)
@@ -599,6 +567,39 @@
 
 
         }
+
+        $("#ProdName").on("keyup", function () {
+            $("#PreviewName").text($(this).val() || "Nama Produk");
+        });
+
+        // Update deskripsi
+        $("#Description").on("keyup", function () {
+            $("#PreviewDesc").text($(this).val() || "Deskripsi produk");
+        });
+
+        $("#ImageFile").on("change", function () {
+            const file = this.files[0];
+
+            // Validasi extension
+            const allowed = ["image/jpeg", "image/png"];
+            if (file && !allowed.includes(file.type)) {
+                SweetAlertError('Failed!',"Hanya file JPG dan PNG yang diperbolehkan.");
+                this.value = ""; // reset
+                $("#previewImageUpload").hide();
+                return;
+            }
+
+            // Preview
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#previewImageUpload").attr("src", e.target.result).show();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        
 
         $("#btnAddListVarian").on("click", function () {
             let isValid = true;
@@ -899,7 +900,7 @@
 
 
                 if(code==null||name==null||outlet==null||category==null||description==null||harga==null
-                ||code==""||name==""||outlet==""||category==""||description==""||harga==""||itemtype=""||UOM=""){
+                ||code==""||name==""||outlet==""||category==""||description==""||harga==""||itemtype==""||UOM==""){
                     SweetAlertError('Failed!', "All Field is Mandatory!");
                     return false;
                 }

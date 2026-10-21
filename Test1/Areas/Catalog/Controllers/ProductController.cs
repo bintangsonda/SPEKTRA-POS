@@ -96,9 +96,9 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
 
                         datalist = datalist.Where(x => x.ProdCode.ToLower().Contains(searchValueLower) ||
                                                  x.Branch.ToLower().Contains(searchValueLower) ||
-                                                 x.CategoriesCode.ToString().Contains(searchValueLower) ||
-                                                 x.ProdName.ToString().Contains(searchValueLower) ||
-                                                 x.Description.ToString().Contains(searchValueLower) ||                                              
+                                                 x.CategoriesCode.ToString().ToLower().Contains(searchValueLower) ||
+                                                 x.ProdName.ToString().ToLower().Contains(searchValueLower) ||
+                                                 x.Description.ToString().ToLower().Contains(searchValueLower) ||                                              
                                                  x.OperatorID.ToString().ToLower().Contains(searchValueLower) ||
                                                  x.LastUpdate.ToString(IDS.Tool.GlobalVariable.DEFAULT_DATETIME_FORMAT).ToLower().Contains(searchValueLower)
                                                  ).ToList();

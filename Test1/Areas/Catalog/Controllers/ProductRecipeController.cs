@@ -67,8 +67,8 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
 
                         datalist = datalist.Where(x => x.RecipeCode.ToString().Contains(searchValueLower) ||
                                                  x.RecipeName.ToLower().Contains(searchValueLower) ||
-                                                 x.ProdCode.ToString().Contains(searchValueLower) ||
-                                                 x.ProdName.ToString().Contains(searchValueLower) ||                                                
+                                                 x.ProdCode.ToString().ToLower().Contains(searchValueLower) ||
+                                                 x.ProdName.ToString().ToLower().Contains(searchValueLower) ||                                                
                                                  x.OperatorID.ToString().ToLower().Contains(searchValueLower) ||
                                                  x.LastUpdated.ToString(IDS.Tool.GlobalVariable.DEFAULT_DATETIME_FORMAT).ToLower().Contains(searchValueLower)
                                                  ).ToList();
@@ -111,6 +111,16 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             
             ViewData["ProdCodeList"] = new SelectList(General.Catalog.Product.GetProductList(sBranchCode.ToString()), "Value", "Text", sBranchCode.ToString());
             ViewData["BranchList"] = new SelectList(IDS.GeneralTable.Branch.GetBranchForDatasource(), "Value", "Text", sBranchCode.ToString());
+            ViewData["SalesType"] = new SelectList(
+                new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "OFF", Text = "OFF" },
+                    new SelectListItem { Value = "ON", Text = "ON" }
+                },
+                "Value",
+                "Text",
+                "OFF"
+            );
             var variantTypeOptions = new List<SelectListItem>
             {
                 new SelectListItem { Value = "0", Text = "Hanya Pilih 1" },
@@ -227,7 +237,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                         DataModal.RecipeName = "Empty";
                         DataModal.ProdCode = "";
                         DataModal.BranchCode = "";
-
+                        DataModal.SalesType = "";
                         int result = DataModal.InsUpDel(3);
                         if (result < 1)
                         {

@@ -254,6 +254,7 @@ namespace Transaction.Employee
                             cmd.AddParameter("@VariantHarga", System.Data.SqlDbType.VarChar, data.VariantHarga);
                             cmd.AddParameter("@Remarks", System.Data.SqlDbType.VarChar, data.Remark);
                             cmd.AddParameter("@OrderType", System.Data.SqlDbType.VarChar, data.OrderType);
+                            cmd.AddParameter("@SalesType", System.Data.SqlDbType.VarChar, data.SalesType);
                             cmd.AddParameter("@Type", System.Data.SqlDbType.Int, 1);
                             result = cmd.ExecuteNonQuery();
                         }
@@ -333,7 +334,7 @@ namespace Transaction.Employee
 
             using (SqlServer db = new SqlServer())
             {
-                db.CommandText = "select H.TransCode,H.BranchCode,H.TransTotalAmt,D.SeqNo,D.ProdCode,D.ProdName,D.ProdAmt,D.Qty,D.OrderType,D.VariantCode,D.VariantValue,D.Remarks from TransInvH H inner join TransInvD D on D.TransCode=H.TransCode and H.BranchCode=D.BranchCode and H.TransCode=@TransCode";
+                db.CommandText = "select H.TransCode,H.BranchCode,H.TransTotalAmt,D.SeqNo,D.ProdCode,D.ProdName,D.ProdAmt,D.Qty,D.OrderType,D.SalesType,D.VariantCode,D.VariantValue,D.Remarks from TransInvH H inner join TransInvD D on D.TransCode=H.TransCode and H.BranchCode=D.BranchCode and H.TransCode=@TransCode";
                 db.AddParameter("@TransCode", SqlDbType.VarChar, TransCode);
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();
@@ -359,6 +360,7 @@ namespace Transaction.Employee
                             DataDetail.VariantValue = IDS.Tool.GeneralHelper.NullToString(dr["VariantValue"]);
                             DataDetail.Remark = IDS.Tool.GeneralHelper.NullToString(dr["Remarks"]);
                             DataDetail.OrderType = IDS.Tool.GeneralHelper.NullToString(dr["OrderType"]);
+                            DataDetail.SalesType = IDS.Tool.GeneralHelper.NullToString(dr["SalesType"]);
                             Res.Details.Add(DataDetail);
                         }
                     }
@@ -378,7 +380,7 @@ namespace Transaction.Employee
 
             using (SqlServer db = new SqlServer())
             {
-                db.CommandText = "select H.TransCode,H.BranchCode,H.TransTotalAmt,D.SeqNo,D.ProdCode,D.ProdName,D.ProdAmt,D.Qty,D.OrderType,D.VariantCode,D.VariantValue,D.Remarks from TransInvH H inner join TransInvD D on D.TransCode=H.TransCode and H.BranchCode=D.BranchCode and H.TransCode=@TransCode";
+                db.CommandText = "select H.TransCode,H.BranchCode,H.TransTotalAmt,D.SeqNo,D.ProdCode,D.ProdName,D.ProdAmt,D.Qty,D.OrderType,D.SalesType,D.VariantCode,D.VariantValue,D.Remarks from TransInvH H inner join TransInvD D on D.TransCode=H.TransCode and H.BranchCode=D.BranchCode and H.TransCode=@TransCode";
                 db.AddParameter("@TransCode", SqlDbType.VarChar, TransCode);
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();
@@ -405,6 +407,7 @@ namespace Transaction.Employee
                             DataDetail.VariantValue = IDS.Tool.GeneralHelper.NullToString(dr["VariantValue"]);
                             DataDetail.Remark = IDS.Tool.GeneralHelper.NullToString(dr["Remarks"]);
                             DataDetail.OrderType = IDS.Tool.GeneralHelper.NullToString(dr["OrderType"]);
+                            DataDetail.SalesType = IDS.Tool.GeneralHelper.NullToString(dr["SalesType"]);
                             Res.Details.Add(DataDetail);
                             data.Add(Res);
                         }
