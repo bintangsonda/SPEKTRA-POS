@@ -123,6 +123,21 @@
                            Product Variant
                         </button>
                     </li>
+                   
+                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-list"
+                                data-bs-toggle="tab" data-bs-target="#pane-online"
+                                type="button" role="tab">
+                           Pesan Online
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-list"
+                                data-bs-toggle="tab" data-bs-target="#pane-offline"
+                                type="button" role="tab">
+                           Pesan Offline
+                        </button>
+                    </li>
                 </ul>
                 <hr />
                  <div class="tab-content">
@@ -145,6 +160,10 @@
                                     <div class="form-floating form-floating-outline mb-3">
                                         @Html.DropDownListFor(model => model.ItemType,ViewData["ItemTypeList"] as SelectList, new { @class = "form-control form-control-sm select2" })
                                         <label>Item Type</label>
+                                    </div>
+                                      <div class="form-floating form-floating-outline mb-3">
+                                        @Html.DropDownListFor(model => model.Branch,ViewData["BranchList"] as SelectList, new { @class = "form-control form-control-sm select2",@disabled="disabled" })
+                                        <label>Outlet</label>
                                     </div>
                                     <div class="form-floating form-floating-outline mb-3">
                                         @Html.DropDownListFor(model => model.CategoriesCode, ViewData["CategoriesList"] as SelectList, new { @class = "form-control form-control-sm select2" })
@@ -241,6 +260,72 @@
                                 </tbody>
                             </table>
                       </div>
+                    <div class="tab-pane fade" id="pane-online" role="tabpanel">
+                        <!-- Dropdown ProdCode di atas tabel -->
+
+
+                        <!-- Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0"># Recipe</h6>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-primary"
+                                    id="btnAddOnline">
+                                + Tambah
+                            </button>
+                        </div>
+
+                        <!-- Tabel -->
+                        <table class="table table-bordered" id="tableOnlineList">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">#</th>
+                                    <th style="width: 250px;">ProdCode</th>
+                                    <th style="width: 150px;">Qty</th>
+                                    <th style="width: 180px;">Satuan</th>
+                                    <th class="text-center" style="width: 100px;">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- Otomatis terisi dari JavaScript -->
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="tab-pane fade" id="pane-offline" role="tabpanel">
+                        <!-- Dropdown ProdCode di atas tabel -->
+
+
+                        <!-- Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0"># Recipe</h6>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-primary"
+                                    id="btnAddOffline">
+                                + Tambah
+                            </button>
+                        </div>
+
+                        <!-- Tabel Offline -->
+                        <table class="table table-bordered" id="tableOfflineList">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">#</th>
+                                    <th style="width: 250px;">ProdCode</th>
+                                    <th style="width: 150px;">Qty</th>
+                                    <th style="width: 180px;">Satuan</th>
+                                    <th class="text-center" style="width: 100px;">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- Otomatis terisi dari JavaScript -->
+                            </tbody>
+                        </table>
+
+                    </div>
                 </div>
             </div>
 
@@ -600,7 +685,307 @@
         });
 
         
+        $("#btnAddOnline").on("click", function () {
+            let isValid = true;
+            // Validasi semua row sebelumnya harus terpilih
+            $("#tableOnlineList tbody tr").each(function () {
+                let value = $(this).find("td:nth-child(2) select").val()?.trim();
+                if (!value) {
+                    isValid = false;
+                    return false;
+                }
+            });
 
+            if (!isValid) {
+                SweetAlertError('Failed!', "Semua Row Online harus dipilih dulu!");
+                return;
+            }
+            // Validasi semua row sebelumnya
+            $("#tableOnlineList tbody tr").each(function () {
+                let value = $(this).find(".prodcode-online").val();
+
+                if (!value) {
+                    isValid = false;
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                SweetAlertError("Failed!", "Semua ProdCode harus dipilih dulu!");
+                return;
+            }
+
+            // Buat row baru
+            let row = $(`
+                <tr>
+                    <td class="text-center"></td>
+
+                    <td>
+                        <select class="form-control form-control-sm prodcode-online"
+                                style="width: 100%;">
+                            <option value="">-- Pilih ProdCode --</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <input type="number"
+                               class="form-control form-control-sm qty-online"
+                               value="1"
+                               min="0"
+                               step="any">
+                    </td>
+
+                    <td>
+                        <input type="text"
+                               class="form-control form-control-sm satuan-online"
+                               disabled>
+                    </td>
+
+                    <td class="text-center">
+                        <button type="button"
+                                class="btn btn-sm btn-danger btnDelRowOnline p-1 px-2">
+                            <i class="ri ri-delete-bin-line icon-18px"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+
+            // Tambahkan row ke tabel
+            $("#tableOnlineList tbody").append(row);
+
+            // Perbarui nomor urut berdasarkan jumlah row
+            updateNomorOnline();
+
+            let select = row.find(".prodcode-online");
+
+            // Ambil data product dari controller
+            $.ajax({
+                url: '@Url.Action("GetDataProduct", "Product")',
+                type: "GET",
+                data: {
+                    Branch: $("#Branch").val()
+                },
+                success: function (response) {
+
+                    select.empty();
+                    select.append(new Option("-- Pilih ProdCode --", ""));
+
+                    $.each(response, function (i, item) {
+
+                        // Ambil text produk
+                        let fullText = item.text ?? item.Text ?? "";
+
+                        // Pisahkan berdasarkan " - "
+                        let parts = fullText.split(" - ");
+
+                        // Nama produk saja
+                        let prodName = parts[0];
+
+                        // Ambil UOM setelah " - "
+                        let uom = parts.length > 1
+                            ? parts.slice(1).join(" - ")
+                            : "";
+
+                        // Buat option dropdown dengan nama produk saja
+                        let option = new Option(
+                            prodName,
+                            item.value ?? item.Value
+                        );
+
+                        // Simpan UOM pada option
+                        option.setAttribute("data-uom", uom);
+
+                        select.append(option);
+                    });
+
+                    select.select2({
+                        placeholder: "-- Pilih ProdCode --",
+                        allowClear: true,
+                        width: "100%",
+                        dropdownParent: $("#pane-online")
+                    });
+                },
+                error: function (xhr) {
+                    SweetAlertError("Failed!", "Gagal mengambil data product.");
+                }
+            });
+        });
+
+        // Fungsi memperbarui nomor urut
+        function updateNomorOnline() {
+            $("#tableOnlineList tbody tr").each(function (index) {
+                $(this).find("td:first").text(index + 1);
+            });
+        }
+
+        // Hapus row dan perbarui nomor urut
+        $(document).on("click", ".btnDelRowOnline", function () {
+            $(this).closest("tr").remove();
+            updateNomorOnline();
+        });
+        $(document).on("change", ".prodcode-online", function () {
+            let selectedOption = $(this).find("option:selected");
+
+            let uom = selectedOption.attr("data-uom") || "";
+
+
+            $(this)
+                .closest("tr")
+                .find(".satuan-online")
+                .val(uom);
+        });
+
+        $("#btnAddOffline").on("click", function () {
+            let isValid = true;
+
+            // Validasi semua row sebelumnya harus terpilih
+            $("#tableOfflineList tbody tr").each(function () {
+                let value = $(this).find("td:nth-child(2) select").val()?.trim();
+                if (!value) {
+                    isValid = false;
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                SweetAlertError('Failed!', "Semua Row Offline harus dipilih dulu!");
+                return;
+            }
+            // Validasi semua row sebelumnya
+            $("#tableOffLineList tbody tr").each(function () {
+                let value = $(this).find(".prodcode-offline").val();
+
+                if (!value) {
+                    isValid = false;
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                SweetAlertError("Failed!", "Semua ProdCode harus dipilih dulu!");
+                return;
+            }
+
+            // Buat row baru
+            let row = $(`
+                <tr>
+                    <td class="text-center"></td>
+
+                    <td>
+                        <select class="form-control form-control-sm prodcode-offline"
+                                style="width: 100%;">
+                            <option value="">-- Pilih ProdCode --</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <input type="number"
+                               class="form-control form-control-sm qty-offline"
+                               value="1"
+                               min="0"
+                               step="any">
+                    </td>
+
+                    <td>
+                        <input type="text"
+                               class="form-control form-control-sm satuan-offline"
+                               disabled>
+                    </td>
+
+                    <td class="text-center">
+                        <button type="button"
+                                class="btn btn-sm btn-danger btnDelRowOffline p-1 px-2">
+                            <i class="ri ri-delete-bin-line icon-18px"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+
+            // Tambahkan row ke tabel
+            $("#tableOfflineList tbody").append(row);
+
+            // Perbarui nomor urut berdasarkan jumlah row
+            updateNomorOffline();
+
+            let select = row.find(".prodcode-offline");
+
+            // Ambil data product dari controller
+            $.ajax({
+                url: '@Url.Action("GetDataProduct", "Product")',
+                type: "GET",
+                data: {
+                    Branch: $("#Branch").val()
+                },
+                success: function (response) {
+
+                    select.empty();
+                    select.append(new Option("-- Pilih ProdCode --", ""));
+
+                    $.each(response, function (i, item) {
+
+                        // Ambil text produk
+                        let fullText = item.text ?? item.Text ?? "";
+
+                        // Pisahkan berdasarkan " - "
+                        let parts = fullText.split(" - ");
+
+                        // Nama produk saja
+                        let prodName = parts[0];
+
+                        // Ambil UOM setelah " - "
+                        let uom = parts.length > 1
+                            ? parts.slice(1).join(" - ")
+                            : "";
+
+                        // Buat option dropdown dengan nama produk saja
+                        let option = new Option(
+                            prodName,
+                            item.value ?? item.Value
+                        );
+
+                        // Simpan UOM pada option
+                        option.setAttribute("data-uom", uom);
+
+                        select.append(option);
+                    });
+
+                    select.select2({
+                        placeholder: "-- Pilih ProdCode --",
+                        allowClear: true,
+                        width: "100%",
+                        dropdownParent: $("#pane-offline")
+                    });
+                },
+                error: function (xhr) {
+                    SweetAlertError("Failed!", "Gagal mengambil data product.");
+                }
+            });
+        });
+
+        // Fungsi memperbarui nomor urut
+        function updateNomorOffline() {
+            $("#tableOnlineList tbody tr").each(function (index) {
+                $(this).find("td:first").text(index + 1);
+            });
+        }
+
+        // Hapus row dan perbarui nomor urut
+        $(document).on("click", ".btnDelRowOffline", function () {
+            $(this).closest("tr").remove();
+            updateNomorOffline();
+        });
+        $(document).on("change", ".prodcode-offline", function () {
+            let selectedOption = $(this).find("option:selected");
+
+            let uom = selectedOption.attr("data-uom") || "";
+
+
+            $(this)
+                .closest("tr")
+                .find(".satuan-offline")
+                .val(uom);
+        });
+        
         $("#btnAddListVarian").on("click", function () {
             let isValid = true;
 
@@ -669,7 +1054,6 @@
                     if (selectedValue) {
                         $(selectEl).val(selectedValue).trigger("change");
                     }
-                    console.log("Selected row:", selectEl);
                 }
             });
         }
@@ -710,7 +1094,6 @@
                         if (fileName) {
                             let imageUrl = `../..${fileName}`;
 
-                             console.log("ini image url "+imageUrl)
                             // preview card product
                             $("#PreviewImage")
                                 .attr("src", imageUrl)
@@ -727,7 +1110,6 @@
                        
                         if (data.VarianProduct && data.VarianProduct.length > 0) {
                             data.VarianProduct.forEach((item) => {
-                                console.log('ini data item' + item.VarianCode)
                                 // Buat row baru
                                 let row = $(`
                                     <tr>
@@ -905,7 +1287,8 @@
                     return false;
                 }
                 var VarianProduct=GetVarianProduct();
-
+                var OnlineProduct=GetOnlineProduct();
+                var OfflineProduct=GetOfflineProduct();
                 SweetAlertConfirm(
                     'Confirmation',
                     'Are you sure you want to Save this data, Product Code: ' + code+', Outlet: '+outlet+', Category: '+category,
@@ -924,7 +1307,9 @@
                         formData.append("Harga", harga);    
                         formData.append("UOM", uom);
                         formData.append("ItemType", itemtype);
-                        formData.append("VarianProduct", JSON.stringify(VarianProduct)),                     
+                        formData.append("VarianProduct", JSON.stringify(VarianProduct)), 
+                        formData.append("ProdukOnline", JSON.stringify(OnlineProduct)), 
+                        formData.append("ProdukOffline", JSON.stringify(OfflineProduct)), 
                         formData.append("FormAction", $("#FormAction").val());
                         $.ajax({
                             type: "POST",
@@ -1015,6 +1400,45 @@
                     VarianCode: nama,
                 });
 
+            });
+
+            return result;
+        }
+
+        function GetOnlineProduct() {
+            let result = [];
+
+            $("#tableOnlineList tbody tr").each(function () {
+                let productcode = $(this).find(".prodcode-online").val();
+                let productqty = $(this).find(".qty-online").val();
+
+                // Skip baris jika ProdCode atau Qty kosong
+                if (!productcode || !productqty) return;
+
+                result.push({
+                    ProdCode: productcode,
+                    Qty: parseFloat(productqty),
+                    On_Off: "Online"
+                });
+            });
+
+            return result;
+        }
+         function GetOfflineProduct() {
+            let result = [];
+
+            $("#tableOfflineList tbody tr").each(function () {
+                let productcode = $(this).find(".prodcode-offline").val();
+                let productqty = $(this).find(".qty-offline").val();
+
+                // Skip baris jika ProdCode atau Qty kosong
+                if (!productcode || !productqty) return;
+
+                result.push({
+                    ProdCode: productcode,
+                    Qty: parseFloat(productqty),
+                    On_Off: "Offline"
+                });
             });
 
             return result;

@@ -175,6 +175,44 @@ namespace IDS.GeneralTable
 
             return branches;
         }
+
+        public static List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> GetCboItemTypeWithoutAll ()
+        {
+            List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> branches = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+
+            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer(true))
+            {
+                db.CommandText = "select ItemTypeCode,ItemTypeName from ItemType";
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                       
+                        while (dr.Read())
+                        {
+                            SelectListItem branch = new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem();
+                            branch.Text = IDS.Tool.GeneralHelper.NullToString(dr["ItemTypeCode"]) + " - " + IDS.Tool.GeneralHelper.NullToString(dr["ItemTypeName"]);
+                            branch.Value = IDS.Tool.GeneralHelper.NullToString(dr["ItemTypeCode"]);
+                            branches.Add(branch);
+                        }
+                    }
+
+                    if (!dr.IsClosed)
+                        dr.Close();
+                }
+
+                db.Close();
+            }
+
+            branches = branches.OrderBy(x => x.Text).ToList();
+
+            return branches;
+        }
         public static List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> GetCboItemTypeTransaction()
         {
             List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> branches = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();

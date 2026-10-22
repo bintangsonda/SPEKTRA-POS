@@ -46,7 +46,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             ViewData["FormAction"] = 1;
             ViewData["BranchList"] = new SelectList(IDS.GeneralTable.Branch.GetBranchForDatasource(), "Value", "Text", sBranchCode.ToString());
             ViewData["CategoriesList"] = new SelectList(General.Catalog.Categories.GetCboCategories (), "Value", "Text", sBranchCode.ToString());
-            ViewData["ItemTypeList"] = new SelectList(IDS.GeneralTable.ItemType.GetCboItemType(), "Value", "Text");
+            ViewData["ItemTypeList"] = new SelectList(IDS.GeneralTable.ItemType.GetCboItemTypeWithoutAll(), "Value", "Text");
             ViewData["UOMList"] = new SelectList(IDS.GeneralTable.UOM.GetCboUOM(), "Value", "Text");
 
 
@@ -133,6 +133,10 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
         string Status,
         decimal Harga,
         string VarianProduct,
+        string ProdukOnline,
+        string ProdukOffline,
+        string UOM,
+        string ItemType,
         int FormAction)
         {
             if (sUser == null)
@@ -171,10 +175,22 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                     dataModal.Status = (Status == "true" || Status == "True" || Status == "1") ? true : false;
                     dataModal.Harga = Harga;
                     dataModal.OperatorID = currentUser;
+                    dataModal.UOM = UOM;
+                    dataModal.ItemType = ItemType;
                     if (!string.IsNullOrEmpty(VarianProduct))
                     {
                         var variantList = JsonConvert.DeserializeObject<List<VariantHeader>>(VarianProduct);
                         dataModal.VarianProduct = variantList;
+                    }
+                    if (!string.IsNullOrEmpty(ProdukOnline))
+                    {
+                        var produkonlineList = JsonConvert.DeserializeObject<List<ProductFormula>>(ProdukOnline);
+                        dataModal.ProdukOnline = produkonlineList;
+                    }
+                    if (!string.IsNullOrEmpty(ProdukOffline))
+                    {
+                        var produkofflineList = JsonConvert.DeserializeObject<List<ProductFormula>>(ProdukOffline);
+                        dataModal.ProdukOffline = produkofflineList;
                     }
                     string folderName = ProdCode + "-" + Branch + "-" + CategoriesCode;
                     string fileName = "";
@@ -360,6 +376,13 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
         {
             List<SelectListItem> list = new List<SelectListItem>();
             list = Product.GetDataVarianProduct();
+            return Json(list);
+        }
+
+        public JsonResult GetDataProduct(string Branch)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+            list = Product.GetProductList(Branch);
             return Json(list);
         }
 
