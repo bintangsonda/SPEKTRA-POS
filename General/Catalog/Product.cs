@@ -27,6 +27,7 @@ namespace General.Catalog
         public List<VariantHeader> VarianProduct { get; set; }
         public List<ProductFormula> ProdukOnline { get; set; }
         public List<ProductFormula> ProdukOffline { get; set; }
+        public List<VariantDetail> VarianDetailProduct { get; set; }
         public string UOM { get; set; }
         public string ItemType { get; set; }
 
@@ -145,7 +146,7 @@ namespace General.Catalog
                     cmd.CommitTransaction();
 
 
-                    if (result > 0 && VarianProduct!=null)
+                    if (result > 0 && VarianProduct.Count > 0)
                     {
                         cmd.ClearParameter();
                         cmd.CommandText = "InsProductVariant";
@@ -177,7 +178,7 @@ namespace General.Catalog
                         
                     }
 
-                    if (result > 0 && ProdukOnline.Count<>0)
+                    if (result > 0 && ProdukOnline.Count>0)
                     {
                         cmd.ClearParameter();
                         cmd.CommandText = "InsProductFormula";
@@ -213,7 +214,7 @@ namespace General.Catalog
 
                     }
 
-                    if (result > 0 && ProdukOffline.Count<>0)
+                    if (result > 0 && ProdukOffline.Count>0)
                     {
                         cmd.ClearParameter();
                         cmd.CommandText = "InsProductFormula";
@@ -338,7 +339,7 @@ namespace General.Catalog
 
             using (SqlServer db = new SqlServer())
             {
-                db.CommandText = "select * from Product P left join productvariant V on V.prodcode=P.ProdCode and V.branch=P.Branch where P.Prodcode=@ProdCode and P.Branch=@Branch";
+                db.CommandText = "select * from Product where Prodcode=@ProdCode and Branch=@Branch";
                 db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, ProdCode);
                 db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, Branch);
 
@@ -354,7 +355,9 @@ namespace General.Catalog
                     {
                         while (dr.Read())
                         {
-                            VariantHeader details = new VariantHeader();
+                            VariantDetail variants = new VariantDetail();
+                            ProductFormula ProdukOnline = new ProductFormula();
+                            ProductFormula ProdukOffline = new ProductFormula();
                             Products.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
                             Products.Branch = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
                             Products.CategoriesCode = IDS.Tool.GeneralHelper.NullToString(dr["CategoriesCode"]);
@@ -366,8 +369,9 @@ namespace General.Catalog
                             Products.Harga = IDS.Tool.GeneralHelper.NullToDecimal(dr["Harga"], 0);
                             Products.Image = IDS.Tool.GeneralHelper.NullToString(dr["Image"]);
                             Products.OperatorID = IDS.Tool.GeneralHelper.NullToString(dr["OperatorID"]);
-                            details.VarianCode = IDS.Tool.GeneralHelper.NullToString(dr["VariantCode"]);
-                            Products.VarianProduct.Add(details);
+                            Products.VarianDetailProduct.Add(variants);
+                            Products.ProdukOnline.Add(ProdukOnline);
+                            Products.ProdukOffline.Add(ProdukOffline);
                         }
                            
                         
@@ -376,6 +380,43 @@ namespace General.Catalog
                     if (!dr.IsClosed)
                         dr.Close();
                 }
+                if (Products != null)
+                {
+                    db.CommandText = "select * from ProductVariant inner join VariantD on VariantD.VarianCode=ProductVariant.VariantCode where prodcode=@ProdCode and Branch=@Branch ";
+                    db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, Products.ProdCode);
+                    db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, Products.Branch);
+
+                    db.CommandType = System.Data.CommandType.Text;
+                    db.Open();
+
+                    db.ExecuteReader();
+                    using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                    {
+                        if (dr.HasRows)
+                        {
+                            while (dr.Read())
+                            {
+                                VariantDetail variantDetail = new VariantDetail();
+                                variantDetail.VariantCode = IDS.Tool.GeneralHelper.NullToString(dr["VarianCode"]);
+                                variantDetail.VariantCode = IDS.Tool.GeneralHelper.NullToString(dr["VarianCode"]);
+
+                                Products.VarianDetailProduct.Add(variantDetail);
+                            }
+
+
+                        }
+
+                        if (!dr.IsClosed)
+                            dr.Close();
+                    }
+                }
+               
+                
+
+
+
+
+
                 db.Close();
             }
             return Products;
@@ -413,6 +454,8 @@ namespace General.Catalog
 
             return list;
         }
+
+      
 
         public static List<SelectListItem> GetProductForDataSource()
         {
