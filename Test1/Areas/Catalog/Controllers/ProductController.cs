@@ -382,7 +382,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
         public JsonResult GetDataProduct(string Branch)
         {
             List<SelectListItem> list = new List<SelectListItem>();
-            list = Product.GetProductList(Branch);
+            list = Product.GetProductListWithItemType(Branch,"PKG");
             return Json(list);
         }
 

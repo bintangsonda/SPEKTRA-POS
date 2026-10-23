@@ -991,7 +991,8 @@
 
             // Validasi semua row sebelumnya harus terpilih
             $("#tableVarianList tbody tr").each(function () {
-                let value = $(this).find("td:nth-child(2) select").val()?.trim();
+                let value = $(this).find(".variant-select").val()?.trim();
+
                 if (!value) {
                     isValid = false;
                     return false;
@@ -1003,10 +1004,13 @@
                 return;
             }
 
+            // Nomor urut berdasarkan jumlah row saat ini
+            let rowNumber = $("#tableVarianList tbody tr").length + 1;
+
             // Buat row baru
             let row = $(`
                 <tr>
-                    <td class="text-center">${hargaIndex}</td>
+                    <td class="text-center">${rowNumber}</td>
                     <td>
                         <select class="form-control form-control-sm variant-select">
                         </select>
@@ -1019,17 +1023,19 @@
                 </tr>
             `);
 
-            // Append row
+            // Tambahkan row
             $("#tableVarianList tbody").append(row);
 
-            // Ambil select-nya
+            // Load pilihan variant
             let select = row.find(".variant-select");
-
-            // Load data varian ke select tersebut
             LoadVariant(select, "");
-
-            hargaIndex++;
         });
+
+        function updateVariantRowNumber() {
+            $("#tableVarianList tbody tr").each(function (index) {
+                $(this).find("td:first").text(index + 1);
+            });
+        }
 
         $(document).on("click", ".btnDelRow", function () {
             $(this).closest("tr").remove();
@@ -1058,106 +1064,302 @@
             });
         }
 
+       
+       
         $('.datatables-custom').on('click', '.edit-record', function () {
             const code = $(this).data('code');
             const descrip = $(this).data('descrip');
             const name = $(this).data('name');
-
             const outlet = $(this).data('outlet');
             const category = $(this).data('categories');
-            $("#PreviewName").text(name)
-            $("#PreviewDesc").text(descrip)
+
+            $("#PreviewName").text(name);
+            $("#PreviewDesc").text(descrip);
             $("#ImageFile").val("");
-            $("#previewImageUpload").attr("src", "").hide();  
-             $.ajax({
+            $("#previewImageUpload").attr("src", "").hide();
+
+            $.ajax({
                 type: 'GET',
                 url: '@Url.Action("Edit", "Product", new { Area = "Catalog" })',
-                data: { ProdCode: code,Branch:outlet },
+                data: {
+                    ProdCode: code,
+                    Branch: outlet
+                },
+
                 success: function (data) {
                     SweetAlertClose();
-                    let hargaIndex = 1;
-                    if (data) {
-                        $("#ProdCode").val(code)
-                        $("#Branch").val(outlet).trigger("change");
-                        $("#CategoriesCode").val(category).trigger("change");
 
-                        $("#ProdCode").prop("disabled",true)
-                        $("#Branch").prop("disabled",true)
-                        
-                        $("#ProdName").val(data.ProdName)
-                        $("#Harga").val(AddCommaDecimal(data.Harga))
-                        $("#Description").val(data.Description)
-                        $("#cboStatus").prop("checked", data.Status);
-                        //buat munculin gambar
-                        let foldername =code+'-'+outlet;
-                        let fileName = data.Image;  
-                        if (fileName) {
-                            let imageUrl = `../..${fileName}`;
-
-                            // preview card product
-                            $("#PreviewImage")
-                                .attr("src", imageUrl)
-                                .show();
-                        } else {
-                            // kalau ga ada gambar
-                            $("#PreviewImage").attr("src", "");
-                        }
-                        //buat munculin gambar
-
-
-                        dataVarian = [];
-                        $("#tableVarianList tbody").empty();
-                       
-                        if (data.VarianProduct && data.VarianProduct.length > 0) {
-                            data.VarianProduct.forEach((item) => {
-                                // Buat row baru
-                                let row = $(`
-                                    <tr>
-                                        <td class="text-center">${hargaIndex}</td>
-                                        <td>
-                                            <select class="form-control form-control-sm variant-select">
-                                                <option value="">Loading...</option>
-                                            </select>
-                                        </td>
-                                        <td class="text-center">
-                                            <button type="button" class="btn btn-sm btn-danger btnDelRow p-1 px-2">
-                                                <i class="ri ri-delete-bin-line icon-18px"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `);
-
-                                $("#tableVarianList tbody").append(row);
-
-                                // pilih elemen select
-                                let select = row.find(".variant-select");
-
-                                // Load data variant → lalu pilih value
-                                LoadVariant(select, item.VarianCode);
-
-                                hargaIndex++;
-                            });
-
-                            $("#defferedAmmortizeLabel").text("Edit Product")
-
-                            let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
-                            modal.show();
-
-                            $("#FormAction").val(2);
-
-                        } else {
-                            SweetAlertError('Not Found', 'Product data could not be found.');
-                        }
-
+                    if (!data || !data.ProdCode) {
+                        SweetAlertError(
+                            'Not Found',
+                            'Product data could not be found.'
+                        );
+                        return;
                     }
+
+                    // 1. DATA UTAMA PRODUCT
+                    $("#ProdCode").val(data.ProdCode);
+                    $("#Branch").val(data.Branch).trigger("change");
+                    $("#CategoriesCode")
+                        .val(data.CategoriesCode || category)
+                        .trigger("change");
+
+                    $("#ProdCode").prop("disabled", true);
+                    $("#Branch").prop("disabled", true);
+
+                    $("#ProdName").val(data.ProdName);
+                    $("#Harga").val(AddCommaDecimal(data.Harga));
+                    $("#Description").val(data.Description);
+                    $("#cboStatus").prop("checked", data.Status);
+
+                    // 2. PREVIEW GAMBAR
+                    if (data.Image) {
+                        const imageUrl = `../..${data.Image}`;
+
+                        $("#PreviewImage")
+                            .attr("src", imageUrl)
+                            .show();
+                    } else {
+                        $("#PreviewImage").attr("src", "").hide();
+                    }
+
+                    // 3. RESET TABEL VARIANT
+                    dataVarian = [];
+                    $("#tableVarianList tbody").empty();
+
+                    const variants = data.VarianDetailProduct || [];
+
+                    variants.forEach(function (item, index) {
+                        const row = $(`
+                            <tr>
+                                <td class="text-center">${index + 1}</td>
+                                <td>
+                                    <select class="form-control form-control-sm variant-select">
+                                        <option value="">Loading...</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger btnDelRow p-1 px-2">
+                                        <i class="ri ri-delete-bin-line icon-18px"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+
+                        $("#tableVarianList tbody").append(row);
+                        LoadVariant(row.find(".variant-select"), item.VariantCode);
+                    });
+
+                    // 4. RESET TABEL ONLINE & OFFLINE
+                    $("#tableOnlineList tbody").empty();
+                    $("#tableOfflineList tbody").empty();
+
+                    // Helper untuk mengisi tabel Online dan Offline
+                    function loadProductRows(products, type) {
+                        const isOnline = type === "online";
+
+                        const table = isOnline
+                            ? "#tableOnlineList"
+                            : "#tableOfflineList";
+
+                        const selectClass = isOnline
+                            ? "prodcode-online"
+                            : "prodcode-offline";
+
+                        const qtyClass = isOnline
+                            ? "qty-online"
+                            : "qty-offline";
+
+                        const satuanClass = isOnline
+                            ? "satuan-online"
+                            : "satuan-offline";
+
+                        const deleteClass = isOnline
+                            ? "btnDelRowOnline"
+                            : "btnDelRowOffline";
+
+                        const tbody = $(table + " tbody");
+
+                        products.forEach(function (item, index) {
+                            const row = $(`
+                                <tr>
+                                    <td class="text-center">${index + 1}</td>
+                                    <td>
+                                        <select class="form-control form-control-sm ${selectClass}"
+                                                style="width:100%">
+                                            <option value="">-- Pilih ProdCode --</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number"
+                                               class="form-control form-control-sm ${qtyClass}"
+                                               min="0"
+                                               step="any"
+                                               value="${item.Qty ?? 1}">
+                                    </td>
+                                    <td>
+                                        <input type="text"
+                                               class="form-control form-control-sm ${satuanClass}"
+                                               disabled>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger ${deleteClass} p-1 px-2">
+                                            <i class="ri ri-delete-bin-line icon-18px"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+
+                            tbody.append(row);
+                        });
+
+                        if (!products.length) return;
+
+                        // Ambil produk berdasarkan Branch
+                        $.ajax({
+                            url: '@Url.Action("GetDataProduct", "Product")',
+                            type: "GET",
+                            data: {
+                                Branch: data.Branch || outlet
+                            },
+                            success: function (response) {
+                                tbody.find("tr").each(function (index) {
+                                    const row = $(this);
+                                    const item = products[index];
+                                    const select = row.find("." + selectClass);
+
+                                    select.empty();
+                                    select.append(
+                                        new Option("-- Pilih ProdCode --", "")
+                                    );
+
+                                    $.each(response, function (i, product) {
+                                        const fullText =
+                                            product.text ?? product.Text ?? "";
+
+                                        const parts = fullText.split(" - ");
+
+                                        const prodName = parts[0];
+
+                                        const uom = parts.length > 1
+                                            ? parts.slice(1).join(" - ")
+                                            : "";
+
+                                        const option = new Option(
+                                            prodName,
+                                            product.value ?? product.Value
+                                        );
+
+                                        option.setAttribute("data-uom", uom);
+                                        select.append(option);
+                                    });
+
+                                    select.select2({
+                                        placeholder: "-- Pilih ProdCode --",
+                                        allowClear: true,
+                                        width: "100%",
+                                        dropdownParent: $("#ModalInsert")
+                                    });
+
+                                    // Pilih produk yang tersimpan
+                                    select.val(item.ProdCode).trigger("change");
+                                });
+                            },
+                            error: function (xhr) {
+                                console.error(xhr.responseText);
+                                SweetAlertError(
+                                    "Failed!",
+                                    "Gagal mengambil data product."
+                                );
+                            }
+                        });
+                    }
+
+                    // 5. ISI PRODUK ONLINE
+                    loadProductRows(data.ProdukOnline || [], "online");
+
+                    // 6. ISI PRODUK OFFLINE
+                    loadProductRows(data.ProdukOffline || [], "offline");
+
+                    // 7. TAMPILKAN MODAL EDIT
+                    $("#defferedAmmortizeLabel").text("Edit Product");
+                    $("#FormAction").val(2);
+
+                    const modalElement = document.getElementById("ModalInsert");
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
                 },
+
                 error: function () {
-                    SweetAlertError('Error', 'Failed to load Product data. Please try again.');
+                    SweetAlertError(
+                        'Error',
+                        'Failed to load Product data. Please try again.'
+                    );
                 }
             });
-
         });
 
+        // Isi satuan ketika ProdCode dipilih
+        $(document).on(
+            "change",
+            ".prodcode-online, .prodcode-offline",
+            function () {
+                const uom = $(this)
+                    .find("option:selected")
+                    .attr("data-uom") || "";
+
+                $(this)
+                    .closest("tr")
+                    .find(".satuan-online, .satuan-offline")
+                    .val(uom);
+            }
+        );
+
+
+        function renderProductFormula(tableSelector, items, type) {
+            const tbody = $(`${tableSelector} tbody`);
+            tbody.empty();
+
+            if (!items || items.length === 0) {
+                return;
+            }
+
+            items.forEach(function (item) {
+                const row = $(`
+                    <tr>
+                        <td>
+                            <select class="form-control form-control-sm prodcode-${type}">
+                                <option value="">Pilih Produk</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number"
+                                   class="form-control form-control-sm qty-${type}"
+                                   min="0"
+                                   step="any">
+                        </td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-danger btnDelRow">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `);
+
+                tbody.append(row);
+
+                const productSelect = row.find(`.prodcode-${type}`);
+
+                // Salin opsi dari dropdown produk yang sudah tersedia.
+                // Ganti #ProdCodeOptions dengan ID dropdown sumber yang kamu gunakan.
+                $("#ProdCodeOptions option").clone().appendTo(productSelect);
+
+                productSelect.val(item.ProdCode).trigger("change");
+                row.find(`.qty-${type}`).val(item.Qty);
+            });
+        }
         $('.datatables-custom').on('click', '.delete-record', function () {
             if ($('#PageDelete').val() == 1) {
                 const code = $(this).data('code');

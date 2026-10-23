@@ -336,6 +336,10 @@ namespace General.Catalog
         public static Product GetDataEditProduct(string ProdCode,string Branch)
         {
             Product Products = null;
+            Products = new Product();
+            Products.VarianDetailProduct = new List<VariantDetail>();
+            Products.ProdukOnline = new List<ProductFormula>();
+            Products.ProdukOffline = new List<ProductFormula>();
 
             using (SqlServer db = new SqlServer())
             {
@@ -349,15 +353,11 @@ namespace General.Catalog
                 db.ExecuteReader();
                 using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
                 {
-                    Products = new Product();
-                    Products.VarianProduct = new List<VariantHeader>();
+                    
                     if(dr.HasRows)
                     {
                         while (dr.Read())
                         {
-                            VariantDetail variants = new VariantDetail();
-                            ProductFormula ProdukOnline = new ProductFormula();
-                            ProductFormula ProdukOffline = new ProductFormula();
                             Products.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
                             Products.Branch = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
                             Products.CategoriesCode = IDS.Tool.GeneralHelper.NullToString(dr["CategoriesCode"]);
@@ -369,9 +369,6 @@ namespace General.Catalog
                             Products.Harga = IDS.Tool.GeneralHelper.NullToDecimal(dr["Harga"], 0);
                             Products.Image = IDS.Tool.GeneralHelper.NullToString(dr["Image"]);
                             Products.OperatorID = IDS.Tool.GeneralHelper.NullToString(dr["OperatorID"]);
-                            Products.VarianDetailProduct.Add(variants);
-                            Products.ProdukOnline.Add(ProdukOnline);
-                            Products.ProdukOffline.Add(ProdukOffline);
                         }
                            
                         
@@ -382,7 +379,7 @@ namespace General.Catalog
                 }
                 if (Products != null)
                 {
-                    db.CommandText = "select * from ProductVariant inner join VariantD on VariantD.VarianCode=ProductVariant.VariantCode where prodcode=@ProdCode and Branch=@Branch ";
+                    db.CommandText = "select * from ProductVariant where prodcode=@ProdCode and Branch=@Branch ";
                     db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, Products.ProdCode);
                     db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, Products.Branch);
 
@@ -397,13 +394,50 @@ namespace General.Catalog
                             while (dr.Read())
                             {
                                 VariantDetail variantDetail = new VariantDetail();
-                                variantDetail.VariantCode = IDS.Tool.GeneralHelper.NullToString(dr["VarianCode"]);
-                                variantDetail.VariantCode = IDS.Tool.GeneralHelper.NullToString(dr["VarianCode"]);
-
+                                variantDetail.VariantCode = IDS.Tool.GeneralHelper.NullToString(dr["VariantCode"]);
                                 Products.VarianDetailProduct.Add(variantDetail);
                             }
 
 
+                        }
+
+                        if (!dr.IsClosed)
+                            dr.Close();
+                    }
+                    db.CommandText = @"
+                                        SELECT ProdDetailCode, Qty, On_Off
+                                        FROM ProductFormula
+                                        WHERE productheadercode = @ProdCode
+                                          AND productheaderbranch = @Branch";
+
+                    db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, Products.ProdCode);
+                    db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, Products.Branch);
+
+                    db.CommandType = System.Data.CommandType.Text;
+                    db.ExecuteReader();
+
+                    using (Microsoft.Data.SqlClient.SqlDataReader dr =
+                           db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                    {
+                        while (dr.Read())
+                        {
+                            string onOff = IDS.Tool.GeneralHelper.NullToString(dr["On_Off"]);
+
+                            ProductFormula formula = new ProductFormula
+                            {
+                                ProdCode = IDS.Tool.GeneralHelper.NullToString(
+                                    dr["ProdDetailCode"]),
+                                Qty = IDS.Tool.GeneralHelper.NullToDecimal(dr["Qty"], 0)
+                            };
+
+                            if (onOff == "Online")
+                            {
+                                Products.ProdukOnline.Add(formula);
+                            }
+                            else if (onOff == "Offline")
+                            {
+                                Products.ProdukOffline.Add(formula);
+                            }
                         }
 
                         if (!dr.IsClosed)
@@ -608,6 +642,41 @@ namespace General.Catalog
             {
                 db.CommandText = "select ProdCode,ProdName,UOM from Product where status=1 and branch=@Branch";
                 db.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            SelectListItem spacc = new SelectListItem();
+                            spacc.Value = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            spacc.Text = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]) + " - " + IDS.Tool.GeneralHelper.NullToString(dr["UOM"]);
+
+                            list.Add(spacc);
+                        }
+                    }
+                }
+
+                db.Close();
+            }
+
+            return list;
+        }
+
+        public static List<SelectListItem> GetProductListWithItemType(string Branch,string ItemType)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+
+            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
+            {
+                db.CommandText = "select ProdCode,ProdName,UOM from Product where status=1 and branch=@Branch and itemtype=@ItemType and status=1";
+                db.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                db.AddParameter("@ItemType", SqlDbType.VarChar, ItemType);
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();
 
