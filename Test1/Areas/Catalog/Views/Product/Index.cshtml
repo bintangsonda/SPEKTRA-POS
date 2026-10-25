@@ -964,7 +964,7 @@
 
         // Fungsi memperbarui nomor urut
         function updateNomorOffline() {
-            $("#tableOnlineList tbody tr").each(function (index) {
+            $("#tableOfflineList tbody tr").each(function (index) {
                 $(this).find("td:first").text(index + 1);
             });
         }
@@ -1585,6 +1585,8 @@
             $("#previewImageUpload").attr("src", "").hide();  
             $("#PreviewImage").attr("src", "");
              $("#tableVarianList tbody").empty();
+             $("#tableOnlineList tbody").empty();
+             $("#tableOfflineList tbody").empty();
              hargaIndex=1;
         }
 
@@ -1620,7 +1622,7 @@
                 result.push({
                     ProdCode: productcode,
                     Qty: parseFloat(productqty),
-                    On_Off: "Online"
+                    On_Off: "ON"
                 });
             });
 
@@ -1639,7 +1641,7 @@
                 result.push({
                     ProdCode: productcode,
                     Qty: parseFloat(productqty),
-                    On_Off: "Offline"
+                    On_Off: "OFF"
                 });
             });
 

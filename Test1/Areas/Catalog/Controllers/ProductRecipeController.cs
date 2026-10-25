@@ -109,7 +109,7 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
             ViewData["FormAction"] = 1;
             
-            ViewData["ProdCodeList"] = new SelectList(General.Catalog.Product.GetProductList(sBranchCode.ToString()), "Value", "Text", sBranchCode.ToString());
+            ViewData["ProdCodeList"] = new SelectList(General.Catalog.Product.GetProductList(sBranchCode.ToString()), "Value", "Text");
             ViewData["BranchList"] = new SelectList(IDS.GeneralTable.Branch.GetBranchForDatasource(), "Value", "Text", sBranchCode.ToString());
             ViewData["SalesType"] = new SelectList(
                 new List<SelectListItem>

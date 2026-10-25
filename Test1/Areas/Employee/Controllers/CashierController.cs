@@ -141,6 +141,8 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
                     int type =Transaction.Employee.CashierH.CekExistTransCode(dataTransaksi.TransCode);
                     int result = dataTransaksi.InsUpDel(type);
                     int resultStockBalance = 0;
+                    int resultStockPackage = 0;
+
                     if (result > 0)
                     {
                         
@@ -150,15 +152,21 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
                         }
                         else
                         {
-                            //update stock
+                            //update stock Product makanan
                             for (int i = 0; i < dataTransaksi.Details.Count; i++)
                             {
-                                resultStockBalance = SPOS.Inventory.Stock.StockBalance.AddQtyOut(dataTransaksi.Details[i].ProductCode, dataTransaksi.Details[i].Qty, dataTransaksi.BranchCode);
+                                resultStockBalance = SPOS.Inventory.Stock.StockBalance.AddQtyOut(dataTransaksi.Details[i].ProductCode, dataTransaksi.Details[i].Qty, dataTransaksi.BranchCode, dataTransaksi.Details[i].SalesType);
                                 if (resultStockBalance < 1)
                                 {
                                     return Json(new { msg = "Process Bill Successfully,But Update Stock Failed!", success = 1, sno = dataTransaksi.TransCode });
                                 }
                             }
+                            ////update Stock Package
+                            //resultStockPackage = SPOS.Inventory.Stock.StockBalance.AddQtyPackageOut(dataTransaksi.TransCode);
+                            //if (resultStockPackage < 1)
+                            //{
+                            //    return Json(new { msg = "Process Bill Successfully, Stock Balance Updated Succesfully,But Update Stock Pacakge Failed!", success = 1, sno = dataTransaksi.TransCode });
+                            //}
                             return Json(new { msg = "Process Bill Successfully", success = 1, sno = dataTransaksi.TransCode });
                         }
                     }

@@ -187,6 +187,7 @@ namespace General.Catalog
                         cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
                         cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
                         cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOnline[0].On_Off);
+                        cmd.AddParameter("@SeqNo", SqlDbType.Int, 0);
 
                         cmd.BeginTransaction();
                         result = cmd.ExecuteNonQuery();
@@ -223,7 +224,7 @@ namespace General.Catalog
                         cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
                         cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
                         cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOffline[0].On_Off);
-
+                        cmd.AddParameter("@SeqNo", SqlDbType.Int, 0);
                         cmd.BeginTransaction();
                         result = cmd.ExecuteNonQuery();
                         cmd.CommitTransaction();

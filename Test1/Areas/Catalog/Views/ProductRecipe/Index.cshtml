@@ -190,12 +190,12 @@
                                         <div class="col-12 col-md-3">
                                             <div class="form-floating form-floating-outline mb-3">
                                                 @Html.TextBoxFor(model => model.RecipeCode, new
-                                                                                                {
+                                                {
                                                     @class = "form-control",
-                                                                                                placeholder = "AUTO",
-                                                                                                maxlength = 5,
-                                                                                                @readonly = "readonly"
-                                                                                                })
+                                                    placeholder = "AUTO",
+                                                    maxlength = 5,
+                                                    @readonly = "readonly"
+                                                })
                                                 <label for="RecipeCode">Recipe Code</label>
                                             </div>
                                         </div>
@@ -204,11 +204,11 @@
                                         <div class="col-12 col-md-3">
                                             <div class="form-floating form-floating-outline mb-3">
                                                 @Html.TextBoxFor(model => model.RecipeName, new
-                                                                                                {
+                                                {
                                                     @class = "form-control",
-                                                                                                placeholder = "Input Text Here",
-                                                                                                @maxlength = 50
-                                                                                                })
+                                                    placeholder = "Input Text Here",
+                                                    @maxlength = 50
+                                                })
                                                 <label>Recipe Name</label>
                                             </div>
                                         </div>
@@ -217,8 +217,8 @@
                                         <div class="col-12 col-md-4">
                                             <div class="form-floating form-floating-outline mb-3">
                                                 @Html.DropDownListFor(model => model.BranchCode,
-                                                                                                ViewData["BranchList"] as SelectList,
-                                                                                                new { @class = "form-control form-control-sm select2" })
+                                                    ViewData["BranchList"] as SelectList,
+                                                    new { @class = "form-control form-control-sm select2" })
                                                 <label>Outlet</label>
                                             </div>
                                         </div>
@@ -237,9 +237,12 @@
                                     <div class="row g-3">
                                         <div class="col-12 col-md-12">
                                             <div class="form-floating form-floating-outline mb-3">
-                                                @Html.DropDownListFor(model => model.ProdCode,
-                                                                                                ViewData["ProdCodeList"] as SelectList,
-                                                                                                new { @class = "form-control form-control-sm select2" })
+                                                 @Html.DropDownListFor(
+                                                    model => model.ProdCode,
+                                                    ViewData["ProdCodeList"] as SelectList,
+                                                    "-- Pilih Product --",
+                                                    new { @class = "form-control form-control-sm select2" }
+                                                )
                                                 <label>Product</label>
                                             </div>
                                         </div>
@@ -343,7 +346,21 @@
         var table = null;
 
         $(document).ready(function () {
-            $('.select2').select2();
+            $('#Cabang').select2({
+                placeholder: 'Pilih Cabang',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Dropdown di dalam modal
+            $('#ModalInsert #BranchCode, #ModalInsert #SalesType, #ModalInsert #ProdCode')
+                .select2({
+                    placeholder: 'Pilih',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $('#ModalInsert'),
+                    minimumResultsForSearch: 0
+                });
             table=getData();
             if ($('#PageInsert').val() == 0) {
                 $('.AddNew').prop('disabled', true);
@@ -545,7 +562,6 @@
                         <input type="text"
                                class="form-control form-control-sm text-center"
                                style="max-width: 80px; margin: auto;"
-                               onkeyup="AddCommaDecimal(this)"
                                placeholder="Qty" />
                     </td>
 
@@ -560,14 +576,16 @@
 
             hargaIndex++;
 
-            $("#tableVarianList tbody tr:last .select2").select2({
+            const newDropdown = $("#tableVarianList tbody tr:last .select2");
+
+            newDropdown.select2({
                 width: "100%",
                 placeholder: "-- Pilih Product --",
                 allowClear: true,
                 minimumResultsForSearch: 0,
-                dropdownParent: $("#pane-list")
+                dropdownParent: $("#ModalInsert")
             });
-
+            
         });
      
         
@@ -589,10 +607,10 @@
                         $("#RecipeName").val(data.RecipeName)
                         $("#RecipeCode").prop("disabled",true)
                         $("#RecipeCode").val(code)
-                        $("#ProdCode").val(data.ProdCode)
-                        $("#BranchCode").val(data.BranchCode)
-                         $("#SalesType").val(data.SalesType)
-                         $("#BranchCode").prop("disabled",true)
+                        $("#ProdCode").val(data.ProdCode).select2();
+                        $("#BranchCode").val(data.BranchCode).select2();
+                        $("#SalesType").val(data.SalesType).select2();
+                         // $("#BranchCode").prop("disabled",true)
 
                         $("#tableVarianList tbody").empty();
 
@@ -718,8 +736,7 @@
         $("#btnAddNew").on('click', function () {
             ClearModal();
             $("#defferedAmmortizeLabel").text("Add Recipe");
-            $("#VarianCode").prop("disabled", false);
-
+            
             $("#FormAction").val(1);
         });
 
@@ -836,9 +853,11 @@
                 .val("");
             $("#RecipeCode").val("")
             $("#RecipeName").val("");
-            $("#Branch").val(0).trigger('change');
+            $("#BranchCode").val(0).trigger('change');
             $("#ProdCode").val(0).trigger('change');
-
+            $("#BranchCode").prop("disabled", false);
+            $("#SalesType").prop("disabled", false);
+            $("#ProdCode").prop("disabled", false);
             $("#tableVarianList tbody").empty();
             hargaIndex=1;
 

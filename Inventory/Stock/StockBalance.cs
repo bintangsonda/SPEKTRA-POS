@@ -100,7 +100,7 @@ namespace SPOS.Inventory.Stock
             return list;
         }
 
-        public static int AddQtyOut(string ProdCode,decimal Qty,string BranchCode)
+        public static int AddQtyOut(string ProdCode,decimal Qty,string BranchCode,string OnOff)//qty out untuk stock gramasi ,qty, serta barang package
         {
             int hasil = 0;
             using (SqlServer db = new IDS.DataAccess.SqlServer(true))
@@ -114,6 +114,33 @@ namespace SPOS.Inventory.Stock
                 db.Open();
                 db.BeginTransaction();
                 hasil=db.ExecuteNonQuery();
+
+                db.ClearParameter();
+                db.CommandText = "AddQtyStockFormula";
+                db.CommandType = System.Data.CommandType.StoredProcedure;
+                db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, ProdCode);
+                db.AddParameter("@Qty", System.Data.SqlDbType.Decimal, Qty);
+                db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, BranchCode);
+                db.AddParameter("@OnOff", System.Data.SqlDbType.VarChar, OnOff);
+                db.Open();
+                hasil = db.ExecuteNonQuery();
+                db.CommitTransaction();
+                db.Close();
+            }
+
+            return hasil;
+        }
+        public static int AddQtyPackageOut(string TransCode)//qty out untuk stock gramasi ,qty, serta barang package
+        {
+            int hasil = 0;
+            using (SqlServer db = new IDS.DataAccess.SqlServer(true))
+            {
+                db.CommandText = "AddQtyStockPackage";
+                db.CommandType = System.Data.CommandType.StoredProcedure;
+                db.AddParameter("@TransCode", System.Data.SqlDbType.VarChar, TransCode);
+                db.Open();
+                db.BeginTransaction();
+                hasil = db.ExecuteNonQuery();
                 db.CommitTransaction();
                 db.Close();
             }
