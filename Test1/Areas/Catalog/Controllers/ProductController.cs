@@ -309,7 +309,8 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                         DataModal.Status = false;
                         DataModal.Description = "Empty";
                         DataModal.Harga = 0;
-
+                        DataModal.UOM = "Empty";
+                        DataModal.ItemType = "Empty";
                         int result = DataModal.InsUpDel(3);
                         if (result < 1)
                         {

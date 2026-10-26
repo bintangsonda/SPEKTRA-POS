@@ -139,6 +139,10 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
         }
         public JsonResult GetProductList(string Branch)
         {
+            if (string.IsNullOrEmpty(Branch))
+            {
+                Branch = sBranchCode;
+            }
             var products = Product.GetProductList(Branch);
 
             return Json(products);
@@ -174,6 +178,13 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
                 {
 
                     dataModal.OperatorID = currentUser;
+                    //cek apakah prodcode sudah pernah diinput sebelumnya
+                    int cekProdCode = dataModal.CekProdCode();
+                    if (cekProdCode == 1)
+                    {
+                        return Json(new { msg = "Product code already exists. Please select another product code.", success = 0, sno = dataModal.ProdCode });
+
+                    }
                     int result = dataModal.InsUpDel((int)FormAction);
 
                     if (result > 0)

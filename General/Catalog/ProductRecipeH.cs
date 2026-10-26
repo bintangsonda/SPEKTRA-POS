@@ -1,4 +1,5 @@
 ﻿using IDS.DataAccess;
+using IDS.GeneralTable;
 using Microsoft.Data.SqlClient;
 using Microsoft.VisualBasic;
 using System;
@@ -263,6 +264,38 @@ namespace General.Catalog
 
                     db.Close();
                 }
+            }
+
+            return result;
+        }
+
+        public int CekProdCode()
+        {
+            int result = 0;
+
+            using (SqlServer db = new SqlServer())
+            {
+                db.CommandText = @"
+            SELECT CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM ProductRecipeH
+                    WHERE ProdCode = @ProdCode
+                      AND BranchCode = @BranchCode
+                      AND SalesType = @SalesType
+                )
+                THEN 1
+                ELSE 0
+            END";
+
+                db.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, ProdCode);
+                db.AddParameter("@BranchCode", System.Data.SqlDbType.VarChar, BranchCode);
+                db.AddParameter("@SalesType", System.Data.SqlDbType.VarChar, SalesType);
+
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                result = Convert.ToInt32(db.ExecuteScalar());
             }
 
             return result;

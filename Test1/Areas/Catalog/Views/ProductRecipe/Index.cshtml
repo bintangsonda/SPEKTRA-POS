@@ -482,8 +482,7 @@
                                             ClearModal();
                                             let modal = new bootstrap.Modal(document.getElementById('ModalInsert'));
                                             modal.show();
-                                                 // ➜ Sembunyikan tab "Varian Harga"
-                                                $("#tab-list").closest("li").hide();
+                                                
 
                                                 // ➜ Pastikan tetap berada di tab Info
                                                 $("#tab-info").click();
@@ -749,19 +748,18 @@
                 const branch = $("#BranchCode").val();
                 const prodcode = $("#ProdCode").val();
                 const salestype = $("#SalesType").val();
-
+                var resDetail = GetRecipeDetail();
                 if (
                     
                     name == null || name === "" ||
                     branch == null || branch === "" ||
-                    prodcode == null || prodcode === ""
+                    prodcode == null || prodcode === ""||resDetail.length === 0
                 ) {
                     SweetAlertError('Failed!', "All Field are Mandatory!");
                     return false;
                 }
 
-                // Ambil detail dari tabel varian
-                var resDetail = GetRecipeDetail();
+              
 
 
                 SweetAlertConfirm(
@@ -881,7 +879,6 @@
                 });
             });
 
-            console.log("Recipe Detail:", result);
 
             return result;
         }

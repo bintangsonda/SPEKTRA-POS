@@ -145,111 +145,114 @@ namespace General.Catalog
                     result = cmd.ExecuteNonQuery();
                     cmd.CommitTransaction();
 
-
-                    if (result > 0 && VarianProduct.Count > 0)
+                    if (ExecCode != 3)
                     {
-                        cmd.ClearParameter();
-                        cmd.CommandText = "InsProductVariant";
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.AddParameter("@Type", SqlDbType.TinyInt, 3);
-                        cmd.AddParameter("@ProdCode", SqlDbType.VarChar, ProdCode);
-                        cmd.AddParameter("@Branch", SqlDbType.VarChar, Branch);
-                        cmd.AddParameter("@VariantCode", SqlDbType.VarChar, "empty");
-                        cmd.BeginTransaction();
-                        result = cmd.ExecuteNonQuery();
-                        cmd.CommitTransaction();
-                        if (VarianProduct.Count > 0)
+                        if (result > 0 && VarianProduct.Count > 0)
                         {
-                            for (int i = 0; i < VarianProduct.Count; i++)
+                            cmd.ClearParameter();
+                            cmd.CommandText = "InsProductVariant";
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.AddParameter("@Type", SqlDbType.TinyInt, 3);
+                            cmd.AddParameter("@ProdCode", SqlDbType.VarChar, ProdCode);
+                            cmd.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                            cmd.AddParameter("@VariantCode", SqlDbType.VarChar, "empty");
+                            cmd.BeginTransaction();
+                            result = cmd.ExecuteNonQuery();
+                            cmd.CommitTransaction();
+                            if (VarianProduct.Count > 0)
                             {
-                                cmd.ClearParameter();
-                                cmd.CommandText = "InsProductVariant";
-                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                                cmd.AddParameter("@Type", SqlDbType.TinyInt, 1);
-                                cmd.AddParameter("@ProdCode", SqlDbType.VarChar, ProdCode);
-                                cmd.AddParameter("@Branch", SqlDbType.VarChar, Branch);
-                                cmd.AddParameter("@VariantCode", SqlDbType.VarChar, VarianProduct[i].VarianCode);
-                                cmd.BeginTransaction();
-                                result = cmd.ExecuteNonQuery();
-                                cmd.CommitTransaction();
+                                for (int i = 0; i < VarianProduct.Count; i++)
+                                {
+                                    cmd.ClearParameter();
+                                    cmd.CommandText = "InsProductVariant";
+                                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                                    cmd.AddParameter("@Type", SqlDbType.TinyInt, 1);
+                                    cmd.AddParameter("@ProdCode", SqlDbType.VarChar, ProdCode);
+                                    cmd.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                                    cmd.AddParameter("@VariantCode", SqlDbType.VarChar, VarianProduct[i].VarianCode);
+                                    cmd.BeginTransaction();
+                                    result = cmd.ExecuteNonQuery();
+                                    cmd.CommitTransaction();
 
+                                }
                             }
-                        }
-                        
-                    }
 
-                    if (result > 0 && ProdukOnline.Count>0)
-                    {
-                        cmd.ClearParameter();
-                        cmd.CommandText = "InsProductFormula";
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, ExecCode);
-                        cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
-                        cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
-                        cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOnline[0].On_Off);
-                        cmd.AddParameter("@SeqNo", SqlDbType.Int, 0);
-
-                        cmd.BeginTransaction();
-                        result = cmd.ExecuteNonQuery();
-                        cmd.CommitTransaction();
-                        if (ProdukOnline.Count > 0)
-                        {
-                            for (int i = 0; i < ProdukOnline.Count; i++)
-                            {
-                                cmd.ClearParameter();
-                                cmd.CommandText = "InsProductFormula";
-                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                                cmd.AddParameter("@Type", SqlDbType.TinyInt, 1);
-                                cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
-                                cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
-                                cmd.AddParameter("@SeqNo", SqlDbType.VarChar, i+1);
-                                cmd.AddParameter("@ProdDetailCode", SqlDbType.VarChar, ProdukOnline[i].ProdCode);
-                                cmd.AddParameter("@Qty", SqlDbType.VarChar, ProdukOnline[i].Qty);
-                                cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOnline[i].On_Off);
-                                cmd.BeginTransaction();
-                                result = cmd.ExecuteNonQuery();
-                                cmd.CommitTransaction();
-
-                            }
                         }
 
-                    }
-
-                    if (result > 0 && ProdukOffline.Count>0)
-                    {
-                        cmd.ClearParameter();
-                        cmd.CommandText = "InsProductFormula";
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, ExecCode);
-                        cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
-                        cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
-                        cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOffline[0].On_Off);
-                        cmd.AddParameter("@SeqNo", SqlDbType.Int, 0);
-                        cmd.BeginTransaction();
-                        result = cmd.ExecuteNonQuery();
-                        cmd.CommitTransaction();
-                        if (ProdukOffline.Count > 0)
+                        if (result > 0 && ProdukOnline.Count > 0)
                         {
-                            for (int i = 0; i < ProdukOffline.Count; i++)
-                            {
-                                cmd.ClearParameter();
-                                cmd.CommandText = "InsProductFormula";
-                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                                cmd.AddParameter("@Type", SqlDbType.TinyInt, 1);
-                                cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
-                                cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
-                                cmd.AddParameter("@SeqNo", SqlDbType.VarChar, i + 1);
-                                cmd.AddParameter("@ProdDetailCode", SqlDbType.VarChar, ProdukOffline[i].ProdCode);
-                                cmd.AddParameter("@Qty", SqlDbType.VarChar, ProdukOffline[i].Qty);
-                                cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOffline[i].On_Off);
-                                cmd.BeginTransaction();
-                                result = cmd.ExecuteNonQuery();
-                                cmd.CommitTransaction();
+                            cmd.ClearParameter();
+                            cmd.CommandText = "InsProductFormula";
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, ExecCode);
+                            cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
+                            cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
+                            cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOnline[0].On_Off);
+                            cmd.AddParameter("@SeqNo", SqlDbType.Int, 0);
 
+                            cmd.BeginTransaction();
+                            result = cmd.ExecuteNonQuery();
+                            cmd.CommitTransaction();
+                            if (ProdukOnline.Count > 0)
+                            {
+                                for (int i = 0; i < ProdukOnline.Count; i++)
+                                {
+                                    cmd.ClearParameter();
+                                    cmd.CommandText = "InsProductFormula";
+                                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                                    cmd.AddParameter("@Type", SqlDbType.TinyInt, 1);
+                                    cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
+                                    cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
+                                    cmd.AddParameter("@SeqNo", SqlDbType.VarChar, i + 1);
+                                    cmd.AddParameter("@ProdDetailCode", SqlDbType.VarChar, ProdukOnline[i].ProdCode);
+                                    cmd.AddParameter("@Qty", SqlDbType.VarChar, ProdukOnline[i].Qty);
+                                    cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOnline[i].On_Off);
+                                    cmd.BeginTransaction();
+                                    result = cmd.ExecuteNonQuery();
+                                    cmd.CommitTransaction();
+
+                                }
                             }
+
                         }
 
+                        if (result > 0 && ProdukOffline.Count > 0)
+                        {
+                            cmd.ClearParameter();
+                            cmd.CommandText = "InsProductFormula";
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, ExecCode);
+                            cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
+                            cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
+                            cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOffline[0].On_Off);
+                            cmd.AddParameter("@SeqNo", SqlDbType.Int, 0);
+                            cmd.BeginTransaction();
+                            result = cmd.ExecuteNonQuery();
+                            cmd.CommitTransaction();
+                            if (ProdukOffline.Count > 0)
+                            {
+                                for (int i = 0; i < ProdukOffline.Count; i++)
+                                {
+                                    cmd.ClearParameter();
+                                    cmd.CommandText = "InsProductFormula";
+                                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                                    cmd.AddParameter("@Type", SqlDbType.TinyInt, 1);
+                                    cmd.AddParameter("@ProductHeaderCode", SqlDbType.VarChar, ProdCode);
+                                    cmd.AddParameter("@ProductHeaderBranch", SqlDbType.VarChar, Branch);
+                                    cmd.AddParameter("@SeqNo", SqlDbType.VarChar, i + 1);
+                                    cmd.AddParameter("@ProdDetailCode", SqlDbType.VarChar, ProdukOffline[i].ProdCode);
+                                    cmd.AddParameter("@Qty", SqlDbType.VarChar, ProdukOffline[i].Qty);
+                                    cmd.AddParameter("@OnOff", SqlDbType.VarChar, ProdukOffline[i].On_Off);
+                                    cmd.BeginTransaction();
+                                    result = cmd.ExecuteNonQuery();
+                                    cmd.CommitTransaction();
+
+                                }
+                            }
+
+                        }
                     }
+                   
 
 
                 }
