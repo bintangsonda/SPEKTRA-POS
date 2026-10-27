@@ -543,48 +543,68 @@
                 }
             }
 
-            $("#tableVarianList tbody").append(`
-                <tr>
-                            <td class="text-center align-middle">${rowCount + 1}</td>
+            const branch = $("#BranchCode").val();
 
-                    <td class="text-center align-middle">
-                        <select class="form-select form-select-sm text-center select2">
-                            <option value="">-- Pilih Product --</option>
-                            ${$("#ProdCode option").map(function () {
-                                if ($(this).val() === "") return "";
-                                return `<option value="${$(this).val()}">${$(this).text()}</option>`;
-                            }).get().join("")}
-                        </select>
-                    </td>
+            if (!branch) {
+                SweetAlertError('Failed!', "Branch harus dipilih!");
+                return;
+            }
 
-                    <td class="text-center align-middle">
-                        <input type="text"
-                               class="form-control form-control-sm text-center"
-                               style="max-width: 80px; margin: auto;"
-                               placeholder="Qty" />
-                    </td>
+            $.ajax({
+                url: '@Url.Action("GetProductListForDetail", "ProductRecipe", new { Area = "Catalog" })',
+                type: 'GET',
+                data: { Branch: branch },
+                success: function (response) {
 
-                    <td class="text-center align-middle">
-                        <button type="button"
-                                class="btn btn-sm btn-danger btnDelRow p-1 px-2">
-                            <i class="ri ri-delete-bin-line icon-18px"></i>
-                        </button>
-                    </td>
-                </tr>
-            `);
+                    let options = '<option value="">-- Pilih Product --</option>';
 
-            hargaIndex++;
+                    $.each(response, function (index, item) {
+                        options += `<option value="${item.Value}">${item.Text}</option>`;
+                    });
 
-            const newDropdown = $("#tableVarianList tbody tr:last .select2");
+                    $("#tableVarianList tbody").append(`
+                        <tr>
+                            <td class="text-center align-middle">
+                                ${rowCount + 1}
+                            </td>
 
-            newDropdown.select2({
-                width: "100%",
-                placeholder: "-- Pilih Product --",
-                allowClear: true,
-                minimumResultsForSearch: 0,
-                dropdownParent: $("#ModalInsert")
+                            <td class="text-center align-middle">
+                                <select class="form-select form-select-sm text-center select2">
+                                    ${options}
+                                </select>
+                            </td>
+
+                            <td class="text-center align-middle">
+                                <input type="text"
+                                       class="form-control form-control-sm text-center"
+                                       style="max-width: 80px; margin: auto;"
+                                       placeholder="Qty" />
+                            </td>
+
+                            <td class="text-center align-middle">
+                                <button type="button"
+                                        class="btn btn-sm btn-danger btnDelRow p-1 px-2">
+                                    <i class="ri ri-delete-bin-line icon-18px"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+
+                    const newDropdown = $("#tableVarianList tbody tr:last .select2");
+
+                    newDropdown.select2({
+                        width: "100%",
+                        placeholder: "-- Pilih Product --",
+                        allowClear: true,
+                        minimumResultsForSearch: 0,
+                        dropdownParent: $("#ModalInsert")
+                    });
+                },
+                error: function (xhr) {
+                    SweetAlertError('Failed!', "Gagal mengambil data product!");
+                    console.error(xhr.responseText);
+                }
             });
-            
         });
      
         

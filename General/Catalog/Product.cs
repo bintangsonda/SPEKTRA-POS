@@ -434,11 +434,11 @@ namespace General.Catalog
                                 Qty = IDS.Tool.GeneralHelper.NullToDecimal(dr["Qty"], 0)
                             };
 
-                            if (onOff == "Online")
+                            if (onOff == "ON")
                             {
                                 Products.ProdukOnline.Add(formula);
                             }
-                            else if (onOff == "Offline")
+                            else if (onOff == "OFF")
                             {
                                 Products.ProdukOffline.Add(formula);
                             }
@@ -645,6 +645,40 @@ namespace General.Catalog
             using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
             {
                 db.CommandText = "select ProdCode,ProdName,UOM from Product where status=1 and branch=@Branch";
+                db.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            SelectListItem spacc = new SelectListItem();
+                            spacc.Value = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            spacc.Text = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]) + " - " + IDS.Tool.GeneralHelper.NullToString(dr["UOM"]);
+
+                            list.Add(spacc);
+                        }
+                    }
+                }
+
+                db.Close();
+            }
+
+            return list;
+        }
+
+        public static List<SelectListItem> GetProductListForDetail(string Branch)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+
+            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
+            {
+                db.CommandText = "select ProdCode,ProdName,UOM from Product where status=1 and branch=@Branch and ItemType in('RAW','SYR')";
                 db.AddParameter("@Branch", SqlDbType.VarChar, Branch);
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();

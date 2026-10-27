@@ -148,6 +148,17 @@ namespace SPOS.Web.UI.Areas.Catalog.Controllers
             return Json(products);
         }
 
+        public JsonResult GetProductListForDetail(string Branch)
+        {
+            if (string.IsNullOrEmpty(Branch))
+            {
+                Branch = sBranchCode;
+            }
+            var products = Product.GetProductListForDetail(Branch);
+
+            return Json(products);
+        }
+
         public ActionResult Create(int? FormAction, General.Catalog.ProductRecipeH dataModal)
         {
             if (sUser == null)
