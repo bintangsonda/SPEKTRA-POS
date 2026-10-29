@@ -127,6 +127,55 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
             return Json(products);
         }
 
+        [HttpGet]
+        public ActionResult Create(string POHNo)
+        {
+            if (sUser == null)
+                return RedirectToAction("index", "Main", new { area = "" });
+
+            IDS.Web.UI.Models.GroupAccessLevel AccessLevel = IDS.Web.UI.Models.GroupAccessLevel.GetFormGroupAccess(Convert.ToString(sUserGroup), this.ControllerContext.RouteData.Values["controller"].ToString());
+
+            if (AccessLevel.ReadAccess == -1 ||
+                (string.IsNullOrEmpty(POHNo) && AccessLevel.CreateAccess == 0) ||
+                (!string.IsNullOrEmpty(POHNo) && AccessLevel.EditAccess == 0))
+            {
+                return RedirectToAction("error403", "error", new { area = "" });
+            }
+
+            ViewData["Page.Insert"] = AccessLevel.CreateAccess;
+            ViewData["Page.Edit"] = AccessLevel.EditAccess;
+            ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
+
+            PurchaseOrderH model;
+
+            if (string.IsNullOrEmpty(POHNo))
+            {
+                // Mode Add
+                ViewData["FormAction"] = 1;
+                model = new PurchaseOrderH();
+                model.POHDate = DateTime.Now;
+                model.Status = 0;
+                model.BranchCode = sBranchCode;
+                model.PODetail = new List<PurchaseOrderD>();
+            }
+            else
+            {
+                // Mode Edit
+                ViewData["FormAction"] = 2;
+                model = PurchaseOrderH.GetDataByPOHNo(POHNo);
+                if (model == null)
+                    return RedirectToAction("Index", "PurchaseOrder", new { Area = "Employee" });
+            }
+
+            ViewData["BranchList"] = new SelectList(IDS.GeneralTable.Branch.GetBranchForDatasource(), "Value", "Text", model.BranchCode);
+            ViewData["ProdCodeList"] = new SelectList(General.Catalog.Product.GetProductListForPO(string.IsNullOrEmpty(model.BranchCode) ? sBranchCode : model.BranchCode), "Value", "Text");
+
+            ViewBag.UserMenu = MainMenu;
+
+            return View(model);
+        }
+
+        [HttpPost]
         public ActionResult Create(int? FormAction, Transaction.Employee.PurchaseOrderH dataModal)
         {
             if (sUser == null)
@@ -247,29 +296,114 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
             }
         }
 
-        public ActionResult Edit(string POHNo)
+        public ActionResult Proses(PurchaseOrderH DataModal)
         {
             if (sUser == null)
                 return RedirectToAction("index", "Main", new { area = "" });
 
-            IDS.Web.UI.Models.GroupAccessLevel AccessLevel = IDS.Web.UI.Models.GroupAccessLevel.GetFormGroupAccess(sUserGroup ?? "", this.ControllerContext.RouteData.Values["controller"].ToString());
+            IDS.Web.UI.Models.GroupAccessLevel AccessLevel = IDS.Web.UI.Models.GroupAccessLevel.GetFormGroupAccess(Convert.ToString(sUserGroup), this.ControllerContext.RouteData.Values["controller"].ToString());
 
             if (AccessLevel.ReadAccess == -1 || AccessLevel.EditAccess == 0)
             {
                 return RedirectToAction("error403", "error", new { area = "" });
             }
 
-            ViewData["Page.Insert"] = AccessLevel.CreateAccess;
-            ViewData["Page.Edit"] = AccessLevel.EditAccess;
-            ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
-
-            ViewData["FormAction"] = 2;
-            PurchaseOrderH data = PurchaseOrderH.GetDataByPOHNo(POHNo);
-            if (data != null)
+            ModelState.Clear();
+            if (DataModal != null)
             {
-                return Json(data);
+                string currentUser = sUser as string;
+
+                if (string.IsNullOrWhiteSpace(currentUser))
+                {
+                    return Json("SessionTimeOut");
+                }
+
+                try
+                {
+                    // Ambil data PO dari DB agar POHDate asli terbaca (JS hanya mengirim POHNo)
+                    PurchaseOrderH data = PurchaseOrderH.GetDataByPOHNo(DataModal.POHNo);
+                    if (data == null)
+                    {
+                        return Json(new { msg = "Purchase Order No : " + DataModal.POHNo + " not found", success = 0 });
+                    }
+
+                    data.LastUpdateBy = currentUser;
+
+                    int result = data.Proses();
+                    if (result < 1)
+                    {
+                        return Json(new { msg = "Failed to Process Purchase Order No : " + data.POHNo, success = 0 });
+                    }
+                    return Json(new { msg = "Purchase Order No : " + data.POHNo + " has been processed. Stock has been updated.", success = 1, sno = data.POHNo });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { msg = ex.Message, success = 0 });
+                }
             }
-            return null;
+            else
+            {
+                return Json(new { msg = "Failed!, Not Valid Mode!" });
+            }
+        }
+
+        public ActionResult CancelProses(PurchaseOrderH DataModal)
+        {
+            if (sUser == null)
+                return RedirectToAction("index", "Main", new { area = "" });
+
+            IDS.Web.UI.Models.GroupAccessLevel AccessLevel = IDS.Web.UI.Models.GroupAccessLevel.GetFormGroupAccess(Convert.ToString(sUserGroup), this.ControllerContext.RouteData.Values["controller"].ToString());
+
+            if (AccessLevel.ReadAccess == -1 || AccessLevel.EditAccess == 0)
+            {
+                return RedirectToAction("error403", "error", new { area = "" });
+            }
+
+            ModelState.Clear();
+            if (DataModal != null)
+            {
+                string currentUser = sUser as string;
+
+                if (string.IsNullOrWhiteSpace(currentUser))
+                {
+                    return Json("SessionTimeOut");
+                }
+
+                try
+                {
+                    // Ambil data PO dari DB agar POHDate asli terbaca (JS hanya mengirim POHNo)
+                    PurchaseOrderH data = PurchaseOrderH.GetDataByPOHNo(DataModal.POHNo);
+                    if (data == null)
+                    {
+                        return Json(new { msg = "Purchase Order No : " + DataModal.POHNo + " not found", success = 0 });
+                    }
+
+                    data.LastUpdateBy = currentUser;
+
+                    int result = data.CancelProses();
+                    if (result < 1)
+                    {
+                        return Json(new { msg = "Failed to Cancel Purchase Order No : " + data.POHNo, success = 0 });
+                    }
+                    return Json(new { msg = "Purchase Order No : " + data.POHNo + " has been canceled. Stock has been reverted.", success = 1, sno = data.POHNo });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { msg = ex.Message, success = 0 });
+                }
+            }
+            else
+            {
+                return Json(new { msg = "Failed!, Not Valid Mode!" });
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Edit(string POHNo)
+        {
+            // Render halaman Create dalam mode Edit (form terisi data PO).
+            // Semua logika (cek akses, load data, BranchList, ProdCodeList) ada di Create(POHNo).
+            return Create(POHNo);
         }
 
     }

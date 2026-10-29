@@ -1,0 +1,610 @@
+@model Transaction.Employee.PurchaseOrderH
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Purchase Order";
+    bool isEditMode = Convert.ToInt32(ViewData["FormAction"]) == 2;
+}
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/assets/css/custom.css" />
+
+}
+@Html.Hidden("PageEdit", Convert.ToInt32(ViewData["Page.Edit"]))
+@Html.Hidden("PageDelete", Convert.ToInt32(ViewData["Page.Delete"]))
+@Html.Hidden("PageInsert", Convert.ToInt32(ViewData["Page.Insert"]))
+@Html.Hidden("FormAction", Convert.ToInt32(ViewData["FormAction"]))
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="card">
+        <div class="card-header bg-primary py-2 px-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold text-white" id="pageTitle">
+                @(isEditMode ? "Edit Purchase Order" : "Add Purchase Order")
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <!-- ================== -->
+            <!--   PO INFO          -->
+            <!-- ================== -->
+            <div class="row g-3 mt-3">
+                <!-- PO No -->
+                <div class="col-12 col-md-3">
+                    <div class="form-floating form-floating-outline mb-3">
+                        @Html.TextBoxFor(model => model.POHNo, new
+                        {
+                            @class = "form-control",
+                            placeholder = "AUTO",
+                            maxlength = 20,
+                            @readonly = "readonly"
+                        })
+                        <label for="POHNo">PO No</label>
+                    </div>
+                </div>
+
+                <!-- PO Date -->
+                <div class="col-12 col-md-3">
+                    <div class="form-floating form-floating-outline mb-3">
+                        @Html.TextBoxFor(model => model.POHDate, "{0:yyyy-MM-dd}", new
+                        {
+                            @class = "form-control",
+                            placeholder = "PO Date",
+                            @readonly = "readonly"
+                        })
+                        <label for="POHDate">PO Date</label>
+                    </div>
+                </div>
+
+                <!-- Branch -->
+                <div class="col-12 col-md-3">
+                    <div class="form-floating form-floating-outline mb-3">
+                        @Html.DropDownListFor(model => model.BranchCode,
+                            ViewData["BranchList"] as SelectList,
+                            "-- Select Branch --",
+                            new { @class = "form-control form-control-sm select2" })
+                        <label for="BranchCode">Branch</label>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="col-12 col-md-3">
+                    <div class="form-floating form-floating-outline mb-3">
+                        @Html.TextBoxFor(model => model.Status, new
+                        {
+                            @class = "form-control",
+                            @readonly = "readonly"
+                        })
+                        <label for="Status">Status (0=Open)</label>
+                    </div>
+                </div>
+
+                <!-- Supplier -->
+                <div class="col-12 col-md-6">
+                    <div class="form-floating form-floating-outline mb-3">
+                        @Html.TextBoxFor(model => model.Supplier, new
+                        {
+                            @class = "form-control",
+                            placeholder = "Supplier Name",
+                            maxlength = 100
+                        })
+                        <label for="Supplier">Supplier</label>
+                    </div>
+                </div>
+
+                <!-- Remark -->
+                <div class="col-12 col-md-6">
+                    <div class="form-floating form-floating-outline mb-3">
+                        @Html.TextBoxFor(model => model.Remark, new
+                        {
+                            @class = "form-control",
+                            placeholder = "Remark",
+                            maxlength = 200
+                        })
+                        <label for="Remark">Remark</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- ================== -->
+            <!--   ITEM DETAIL      -->
+            <!-- ================== -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">Item Detail</h6>
+                <button type="button" class="btn btn-sm btn-primary" id="btnAddListPO">
+                    + Tambah
+                </button>
+            </div>
+
+            <table class="table table-bordered text-center align-middle" id="tablePOList">
+                <thead>
+                    <tr>
+                        <th style="width:20px">#</th>
+                        <th style="width:280px">Product</th>
+                        <th style="width:90px">UOM</th>
+                        <th style="width:110px">Qty</th>
+                        <th style="width:130px">Price</th>
+                        <th style="width:130px">Subtotal</th>
+                        <th style="width:30px">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.PODetail != null)
+                    {
+                        var prodList = ViewData["ProdCodeList"] as IEnumerable<SelectListItem>;
+                        int no = 0;
+                        foreach (var d in Model.PODetail)
+                        {
+                            no++;
+                            <tr>
+                                <td class="text-center align-middle row-no">@no</td>
+                                <td class="text-center align-middle">
+                                    <select class="form-select form-select-sm text-center select2 prod-select">
+                                        <option value="">-- Pilih Product --</option>
+                                        @foreach (var p in prodList)
+                                        {
+                                            if (p.Value == d.ProdCode)
+                                            {
+                                                <option value="@p.Value" selected="selected">@p.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@p.Value">@p.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <input type="text"
+                                           class="form-control form-control-sm text-center uom-input"
+                                           style="max-width: 90px; margin: auto;"
+                                           readonly
+                                           placeholder="UOM"
+                                           value="@d.UOM" />
+                                </td>
+                                <td class="text-center align-middle">
+                                    <input type="text"
+                                           class="form-control form-control-sm text-center qty-input"
+                                           style="max-width: 90px; margin: auto;"
+                                           onkeyup="AddCommaDecimal(this)"
+                                           oninput="recalcRow(this)"
+                                           placeholder="Qty"
+                                           value="@d.Qty.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                </td>
+                                <td class="text-center align-middle">
+                                    <input type="text"
+                                           class="form-control form-control-sm text-center price-input"
+                                           style="max-width: 110px; margin: auto;"
+                                           onkeyup="AddCommaDecimal(this)"
+                                           oninput="recalcRow(this)"
+                                           placeholder="Price"
+                                           value="@d.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                </td>
+                                <td class="text-center align-middle subtotal-cell">@((d.Qty * d.Price).ToString("N2", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                <td class="text-center align-middle">
+                                    <button type="button" class="btn btn-sm btn-danger btnDelRow p-1 px-2">
+                                        <i class="ri ri-delete-bin-line icon-18px"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text-end fw-bold">Total Amount</td>
+                        <td class="text-center fw-bold" id="totalAmt">0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer py-2 px-3 border-0 d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnBack">
+                <i class="ri ri-arrow-left-line me-1 icon-18px"></i> Back to List
+            </button>
+            <button type="button" class="btn btn-success btn-sm SaveInsert" id="btnSave">
+                <i class="ri ri-check-fill me-1 icon-18px"></i> Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Page -->
+<div id="loading" style="display:none; height:100%; width:100%">
+    <div class="loading-wave" id="loading-content">
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+    </div>
+    <div class="loading loading07">
+        <span data-text="S">S</span>
+        <span data-text="P">P</span>
+        <span data-text="E">E</span>
+        <span data-text="K">K</span>
+        <span data-text="T">T</span>
+        <span data-text="R">R</span>
+        <span data-text="A">A</span>
+    </div>
+</div>
+<!-- Loading Page -->
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/moment/moment.js"></script>
+    <script src="~/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/select2/select2.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/popular.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/bootstrap5.js"></script>
+    <script src="~/assets/vendor/libs/@@form-validation/auto-focus.js"></script>
+    <script src="~/assets/vendor/libs/cleave-zen/cleave-zen.js"></script>
+    <script src="~/assets/js/forms-selects.js"></script>
+    <script src="~/assets/vendor/libs/tagify/tagify.js"></script>
+    <script src="~/assets/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="~/assets/vendor/libs/bloodhound/bloodhound.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script type="text/javascript">
+        const indexUrl = '@Url.Action("Index", "PurchaseOrder", new { Area = "Employee" })';
+        const saveUrl = '@Url.Action("Create", "PurchaseOrder", new { Area = "Employee" })';
+
+        var productOptionsHtml = '<option value="">-- Pilih Product --</option>';
+
+        $(document).ready(function () {
+            flatpickr("#POHDate", {
+                dateFormat: "Y-m-d",
+                disableMobile: true
+            });
+
+            $("#BranchCode").select2({
+                width: "100%",
+                placeholder: "-- Select Branch --",
+                allowClear: true
+            });
+
+            // Init select2 untuk baris detail yang dirender server-side (mode Edit)
+            $("#tablePOList tbody .select2").select2({
+                width: "100%",
+                placeholder: "-- Pilih Product --",
+                allowClear: true,
+                minimumResultsForSearch: 0
+            });
+
+            recalcTotal();
+
+            // Muat opsi product untuk branch saat ini (dipakai tombol + Tambah)
+            refreshProductOptions($("#BranchCode").val());
+        });
+
+        // ============ PRODUCT OPTIONS ============
+
+        function refreshProductOptions(branch) {
+            if (!branch) {
+                productOptionsHtml = '<option value="">-- Pilih Product --</option>';
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("GetProductListForPO", "PurchaseOrder", new { Area = "Employee" })',
+                type: 'GET',
+                data: { Branch: branch },
+                success: function (response) {
+                    productOptionsHtml = '<option value="">-- Pilih Product --</option>';
+                    $.each(response, function (index, item) {
+                        productOptionsHtml += `<option value="${item.Value}">${item.Text}</option>`;
+                    });
+                },
+                error: function (xhr) {
+                    SweetAlertError('Failed!', "Gagal mengambil data product!");
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+
+        // ============ DETAIL ROW ============
+
+        function buildDetailRowHtml() {
+            return `
+                <tr>
+                    <td class="text-center align-middle row-no"></td>
+
+                    <td class="text-center align-middle">
+                        <select class="form-select form-select-sm text-center select2 prod-select">
+                            ${productOptionsHtml}
+                        </select>
+                    </td>
+
+                    <td class="text-center align-middle">
+                        <input type="text"
+                               class="form-control form-control-sm text-center uom-input"
+                               style="max-width: 90px; margin: auto;"
+                               readonly
+                               placeholder="UOM" />
+                    </td>
+
+                    <td class="text-center align-middle">
+                        <input type="text"
+                               class="form-control form-control-sm text-center qty-input"
+                               style="max-width: 90px; margin: auto;"
+                               onkeyup="AddCommaDecimal(this)"
+                               oninput="recalcRow(this)"
+                               placeholder="Qty" />
+                    </td>
+
+                    <td class="text-center align-middle">
+                        <input type="text"
+                               class="form-control form-control-sm text-center price-input"
+                               style="max-width: 110px; margin: auto;"
+                               onkeyup="AddCommaDecimal(this)"
+                               oninput="recalcRow(this)"
+                               placeholder="Price" />
+                    </td>
+
+                    <td class="text-center align-middle subtotal-cell">0</td>
+
+                    <td class="text-center align-middle">
+                        <button type="button" class="btn btn-sm btn-danger btnDelRow p-1 px-2">
+                            <i class="ri ri-delete-bin-line icon-18px"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function renumberRows() {
+            $("#tablePOList tbody tr").each(function (index) {
+                $(this).find("td.row-no").text(index + 1);
+            });
+        }
+
+        function parseNumber(value) {
+            return parseFloat((value || "").replace(/,/g, "")) || 0;
+        }
+
+        function recalcRow(input) {
+            let row = $(input).closest("tr");
+            let qty = parseNumber(row.find(".qty-input").val());
+            let price = parseNumber(row.find(".price-input").val());
+            let subtotal = qty * price;
+
+            row.find(".subtotal-cell").text(subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+            recalcTotal();
+        }
+
+        function recalcTotal() {
+            let total = 0;
+            $("#tablePOList tbody tr").each(function () {
+                let row = $(this);
+                let qty = parseNumber(row.find(".qty-input").val());
+                let price = parseNumber(row.find(".price-input").val());
+                total += qty * price;
+            });
+
+            $("#totalAmt").text(total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        }
+
+        $("#btnAddListPO").on("click", function () {
+
+            let rowCount = $("#tablePOList tbody tr").length;
+
+            if (rowCount > 0) {
+                let lastRow = $("#tablePOList tbody tr").last();
+
+                const ProdCode = lastRow.find(".prod-select").val();
+                const Qty = lastRow.find(".qty-input").val()?.trim();
+                const Price = lastRow.find(".price-input").val()?.trim();
+
+                if (!ProdCode || !Qty || !Price) {
+                    SweetAlertError(
+                        'Failed!',
+                        "Product, Qty dan Price harus diisi dulu!"
+                    );
+                    return;
+                }
+            }
+
+            const branch = $("#BranchCode").val();
+
+            if (!branch) {
+                SweetAlertError('Failed!', "Branch harus dipilih!");
+                return;
+            }
+
+            if (!productOptionsHtml || productOptionsHtml.indexOf('option') < 0) {
+                refreshProductOptions(branch);
+            }
+
+            $("#tablePOList tbody").append(buildDetailRowHtml());
+
+            const newDropdown = $("#tablePOList tbody tr:last .select2");
+
+            newDropdown.select2({
+                width: "100%",
+                placeholder: "-- Pilih Product --",
+                allowClear: true,
+                minimumResultsForSearch: 0
+            });
+
+            renumberRows();
+        });
+
+        // Saat product dipilih di baris detail, isi UOM dari teks option ("ProdName - UOM")
+        $(document).on("change", ".prod-select", function () {
+            let row = $(this).closest("tr");
+            let selectedText = $(this).find("option:selected").text() || "";
+            let uom = "";
+
+            if ($(this).val() && selectedText.includes(" - ")) {
+                uom = selectedText.substring(selectedText.lastIndexOf(" - ") + 3);
+            }
+
+            row.find(".uom-input").val(uom);
+        });
+
+        $(document).on("click", ".btnDelRow", function () {
+            $(this).closest("tr").remove();
+            renumberRows();
+            recalcTotal();
+        });
+
+        // Branch berubah -> refresh opsi product & kosongkan detail
+        $("#BranchCode").on("change", function () {
+            var branchCode = $(this).val();
+            $("#tablePOList tbody").empty();
+            recalcTotal();
+            refreshProductOptions(branchCode);
+        });
+
+        // ============ SAVE ============
+
+        function GetPODetail() {
+            let result = [];
+
+            $("#tablePOList tbody tr").each(function (index) {
+                let row = $(this);
+
+                let prodCode = row.find(".prod-select").val();
+                let uom = row.find(".uom-input").val()?.trim();
+                let qty = row.find(".qty-input").val()?.trim();
+                let price = row.find(".price-input").val()?.trim();
+
+                if (!prodCode || !qty) return;
+
+                result.push({
+                    SeqNo: index + 1,
+                    ProdCode: prodCode,
+                    UOM: uom,
+                    Qty: parseNumber(qty),
+                    Price: parseNumber(price)
+                });
+            });
+
+
+            return result;
+        }
+
+        $('#btnSave').on('click', function () {
+            if ($('#PageInsert').val() != 1 && $('#FormAction').val() == 1) {
+                SweetAlertError('Failed!', "You do not have access to insert data!");
+                return false;
+            }
+
+            const code = $("#POHNo").val();
+            const podate = $("#POHDate").val();
+            const branch = $("#BranchCode").val();
+            const supplier = $("#Supplier").val();
+            var resDetail = GetPODetail();
+            if (
+                podate == null || podate === "" ||
+                branch == null || branch === "" ||
+                supplier == null || supplier === "" ||
+                resDetail.length === 0
+            ) {
+                SweetAlertError('Failed!', "PO Date, Branch, Supplier and at least 1 Item Detail are Mandatory!");
+                return false;
+            }
+
+            SweetAlertConfirm(
+                'Confirmation',
+                'Are you sure you want to Save this data, PO No: ' + code,
+                function () {
+
+                    var a = document.getElementById('loading');
+                    a.style.display = "block";
+
+                    // Data utama
+                    var ajaxData = {
+                        "dataModal.POHNo": code,
+                        "dataModal.POHDate": podate,
+                        "dataModal.BranchCode": branch,
+                        "dataModal.Supplier": supplier,
+                        "dataModal.Remark": $("#Remark").val(),
+                        "dataModal.Status": 0,
+                        "FormAction": $("#FormAction").val()
+                    };
+
+                    // Data detail untuk model binder ASP.NET MVC
+                    resDetail.forEach(function (item, index) {
+                        ajaxData[`dataModal.PODetail[${index}].SeqNo`] = item.SeqNo;
+                        ajaxData[`dataModal.PODetail[${index}].ProdCode`] = item.ProdCode;
+                        ajaxData[`dataModal.PODetail[${index}].UOM`] = item.UOM;
+                        ajaxData[`dataModal.PODetail[${index}].Qty`] = item.Qty;
+                        ajaxData[`dataModal.PODetail[${index}].Price`] = item.Price;
+                    });
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: saveUrl,
+                        data: ajaxData,
+                        dataType: "json",
+
+                        success: function (respond) {
+                            a.style.display = "none";
+                            if (respond.success == 1) {
+                                SweetAlertSuccessWithCallback('Success!', respond.msg, function () {
+                                    window.location.href = '@Url.Action("Create", "PurchaseOrder", new { Area = "Employee" })'
+                                        + '?POHNo=' + encodeURIComponent(respond.sno);
+                                });
+                            }
+                            else if (respond.success == 0) {
+                                SweetAlertError('Failed!', respond.msg);
+                            }
+                            else {
+                                SweetAlertError('Failed!', respond.msg);
+                            }
+                        },
+
+                        error: function (xhr, status, error) {
+                            a.style.display = "none";
+
+                            console.error("AJAX Error:", error);
+                            console.error("Response:", xhr.responseText);
+
+                            SweetAlertError('Failed!', "Failed to save data.");
+                        }
+                    });
+                }
+            );
+        });
+
+        // ============ BACK ============
+
+        $("#btnBack").on('click', function () {
+            window.location.href = indexUrl;
+        });
+
+        function AddCommaDecimal(numb) {
+
+            if (numb === null || numb === undefined || numb === "") {
+                return "-";
+            }
+
+            let num = parseFloat(numb.toString().replace(/,/g, ""));
+
+            if (isNaN(num)) return "-";
+
+            // Jika bilangan bulat → tanpa decimal
+            if (Number.isInteger(num)) {
+                return num.toLocaleString("en-US");
+            }
+
+            // Jika ada pecahan → max 2 decimal, tanpa .00
+            return num.toLocaleString("en-US", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        }
+
+    </script>
+}

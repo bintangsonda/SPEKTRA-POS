@@ -104,7 +104,16 @@ namespace Transaction.Employee
                     cmd.DbCommand.Parameters.Add(paramPOHNo);
 
                     cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, ExecCode);
-                    cmd.AddParameter("@POHDate", System.Data.SqlDbType.DateTime, POHDate);
+                    if (ExecCode == 3)
+                    {
+                        cmd.AddParameter("@POHDate", System.Data.SqlDbType.DateTime, DateTime.Now);
+
+                    }
+                    else
+                    {
+                        cmd.AddParameter("@POHDate", System.Data.SqlDbType.DateTime, POHDate);
+
+                    }
                     cmd.AddParameter("@BranchCode", System.Data.SqlDbType.VarChar, BranchCode);
                     cmd.AddParameter("@Supplier", System.Data.SqlDbType.VarChar, Supplier);
                     cmd.AddParameter("@Remark", System.Data.SqlDbType.VarChar, Remark);
@@ -118,32 +127,36 @@ namespace Transaction.Employee
                     {
                         POHNo = Convert.ToString(paramPOHNo.Value);
                     }
-
-                    // Detail: hapus semua detail lama dulu (untuk edit), lalu insert ulang per baris
-                    cmd.CommandText = "InsPurchaseOrderDetail";
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, 0);
-                    cmd.AddParameter("@POHNo", System.Data.SqlDbType.VarChar, POHNo);
-                    result = cmd.ExecuteNonQuery();
-
-                    if (PODetail != null && PODetail.Count > 0)
+                    if (ExecCode != 3)
                     {
-                        int seqNo = 1;
-                        foreach (var data in PODetail)
+                        // Detail: hapus semua detail lama dulu (untuk edit), lalu insert ulang per baris
+                        cmd.CommandText = "InsPurchaseOrderDetail";
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, 0);
+                        cmd.AddParameter("@POHNo", System.Data.SqlDbType.VarChar, POHNo);
+                        result = cmd.ExecuteNonQuery();
+
+                        if (PODetail != null && PODetail.Count > 0)
                         {
-                            cmd.CommandText = "InsPurchaseOrderDetail";
-                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                            cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, 1);
-                            cmd.AddParameter("@POHNo", System.Data.SqlDbType.VarChar, POHNo);
-                            cmd.AddParameter("@SeqNo", System.Data.SqlDbType.Int, seqNo);
-                            cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, data.ProdCode);
-                            cmd.AddParameter("@UOM", System.Data.SqlDbType.VarChar, data.UOM);
-                            cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, data.Qty);
-                            cmd.AddParameter("@Price", System.Data.SqlDbType.Decimal, data.Price);
-                            result = cmd.ExecuteNonQuery();
-                            seqNo++;
+                            int seqNo = 1;
+                            foreach (var data in PODetail)
+                            {
+                                cmd.CommandText = "InsPurchaseOrderDetail";
+                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                                cmd.AddParameter("@Type", System.Data.SqlDbType.TinyInt, 1);
+                                cmd.AddParameter("@POHNo", System.Data.SqlDbType.VarChar, POHNo);
+                                cmd.AddParameter("@SeqNo", System.Data.SqlDbType.Int, seqNo);
+                                cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, data.ProdCode);
+                                cmd.AddParameter("@UOM", System.Data.SqlDbType.VarChar, data.UOM);
+                                cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, data.Qty);
+                                cmd.AddParameter("@Price", System.Data.SqlDbType.Decimal, data.Price);
+                                result = cmd.ExecuteNonQuery();
+                                seqNo++;
+                            }
                         }
                     }
+
+                   
                     cmd.CommitTransaction();
                 }
                 catch (SqlException sex)
@@ -256,6 +269,88 @@ namespace Transaction.Employee
                 }
             }
             return data;
+        }
+
+        public int Proses()
+        {
+            int result = 0;
+            using (IDS.DataAccess.SqlServer cmd = new IDS.DataAccess.SqlServer())
+            {
+                try
+                {
+                    cmd.Open();
+                    cmd.CommandText = "ProsesPurchaseOrder";
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.AddParameter("@POHNo", System.Data.SqlDbType.VarChar, POHNo);
+                    cmd.AddParameter("@POHDate", System.Data.SqlDbType.DateTime, POHDate);
+                    cmd.AddParameter("@LastUpdateBy", System.Data.SqlDbType.VarChar, LastUpdateBy);
+
+                    cmd.BeginTransaction();
+                    result = cmd.ExecuteNonQuery();
+                    cmd.CommitTransaction();
+                }
+                catch (SqlException)
+                {
+                    if (cmd.Transaction != null)
+                        cmd.RollbackTransaction();
+
+                    throw;
+                }
+                catch
+                {
+                    if (cmd.Transaction != null)
+                        cmd.RollbackTransaction();
+
+                    throw;
+                }
+                finally
+                {
+                    cmd.Close();
+                }
+            }
+
+            return result;
+        }
+
+        public int CancelProses()
+        {
+            int result = 0;
+            using (IDS.DataAccess.SqlServer cmd = new IDS.DataAccess.SqlServer())
+            {
+                try
+                {
+                    cmd.Open();
+                    cmd.CommandText = "CancelPurchaseOrder";
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.AddParameter("@POHNo", System.Data.SqlDbType.VarChar, POHNo);
+                    cmd.AddParameter("@POHDate", System.Data.SqlDbType.DateTime, POHDate);
+                    cmd.AddParameter("@LastUpdateBy", System.Data.SqlDbType.VarChar, LastUpdateBy);
+
+                    cmd.BeginTransaction();
+                    result = cmd.ExecuteNonQuery();
+                    cmd.CommitTransaction();
+                }
+                catch (SqlException)
+                {
+                    if (cmd.Transaction != null)
+                        cmd.RollbackTransaction();
+
+                    throw;
+                }
+                catch
+                {
+                    if (cmd.Transaction != null)
+                        cmd.RollbackTransaction();
+
+                    throw;
+                }
+                finally
+                {
+                    cmd.Close();
+                }
+            }
+
+            return result;
         }
 
     }
