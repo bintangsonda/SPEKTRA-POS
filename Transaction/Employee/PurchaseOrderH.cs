@@ -26,7 +26,7 @@ namespace Transaction.Employee
         public List<PurchaseOrderD> PODetail { get; set; }
 
 
-        public static List<PurchaseOrderH> GetData(string Branch)
+        public static List<PurchaseOrderH> GetData(string Branch,DateTime DateFrom, DateTime DateTo)
         {
             List<PurchaseOrderH> list = null;
 
@@ -39,6 +39,7 @@ namespace Transaction.Employee
                                 WHERE d.POHNo = PurchaseOrderH.POHNo) AS TotalAmt
                         FROM PurchaseOrderH
                         WHERE (@Branch IS NULL OR PurchaseOrderH.BranchCode = @Branch)
+                        and POHDate >=@DateFrom and POHDate <= @DateTo
                     ";
                 if (Branch == "All" || Branch == null)
                 {
@@ -48,6 +49,9 @@ namespace Transaction.Employee
                 {
                     db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, Branch);
                 }
+                db.AddParameter("@DateFrom", System.Data.SqlDbType.DateTime, DateFrom);
+                db.AddParameter("@DateTo", System.Data.SqlDbType.DateTime, DateTo);
+
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();
                 db.ExecuteReader();

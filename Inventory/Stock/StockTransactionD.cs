@@ -13,6 +13,7 @@ namespace SPOS.Inventory.Stock
         public string ProdCode { get; set; }
         public decimal Qty { get; set; }
         public string Remark { get; set; }
+        public string ToBranch { get; set; }
 
 
     }

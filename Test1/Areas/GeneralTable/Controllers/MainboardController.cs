@@ -10,12 +10,15 @@ namespace IDS.Web.UI.Controllers
         private readonly IHttpContextAccessor _contextAccessor;
         private string sUser;
         private string sUserGroup;
-
+        private string sBranchCode;
+        private string sHO;
         public MainboardController(IHttpContextAccessor contextAccessor) : base(contextAccessor)
         {
             _contextAccessor = contextAccessor;
             sUser = _contextAccessor?.HttpContext?.Session.GetString(IDS.Tool.GlobalVariable.SESSION_USER_ID);
             sUserGroup = _contextAccessor?.HttpContext?.Session.GetString(IDS.Tool.GlobalVariable.SESSION_USER_GROUP_CODE);
+            sBranchCode = _contextAccessor?.HttpContext?.Session.GetString(IDS.Tool.GlobalVariable.SESSION_USER_BRANCH_CODE);
+            sHO = _contextAccessor?.HttpContext?.Session.GetString(IDS.Tool.GlobalVariable.SESSION_USER_BRANCH_HO_STATUS);
         }
 
         // GET: GeneralTable/DashboardStatistic
@@ -26,8 +29,23 @@ namespace IDS.Web.UI.Controllers
             if (sUser == null)
                 return RedirectToAction("index", "Main", new { area = "" });
 
-            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text", "All");
+            var branch = sBranchCode;
 
+            var branchList = IDS.GeneralTable.Branch.GetBranchForDatasource();
+
+            if (sUserGroup != "SuAd")
+            {
+                branchList = branchList
+                    .Where(x => x.Value == branch)
+                    .ToList();
+            }
+
+            ViewData["SelectListBranchCode"] = new SelectList(
+                branchList,
+                "Value",
+                "Text",
+                branch
+            );
             ViewBag.UserMenu = MainMenu;
 
             DateTime from = dateFrom?.Date

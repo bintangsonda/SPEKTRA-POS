@@ -65,6 +65,11 @@
                                                 {
                                                 Value = "STKAD",
                                                 Text = "Stock Adjust"
+                                                },
+                                                new SelectListItem
+                                                {
+                                                Value = "STKTF",
+                                                Text = "Stock Transfer"
                                                 }
                                                 },
                                                 "-- Select Transaction --",
@@ -105,7 +110,6 @@
                         @Html.DropDownListFor(
                              model => model.BranchCode,
                              ViewData["SelectListBranchCode"] as SelectList,
-                             "All",
                              new { @class = "form-control form-control-sm select2" }
                          )
                         <label for="BranchCode">BranchCode</label>
@@ -198,6 +202,7 @@
                                             <th style="min-width: 180px;">ProdCode</th>
                                             <th style="width: 150px;">Qty</th>
                                             <th style="min-width: 200px;">Remark</th>
+                                            <th style="min-width: 180px;" id="thToBranch" class="d-none">To Branch</th>
                                             <th style="width: 160px;" class="text-center">
                                                 Action
                                             </th>
@@ -292,6 +297,19 @@
               
         });
 
+        @{
+            // Daftar branch untuk kolom To Branch (Stock Transfer)
+            var branchSel = ViewData["SelectListBranchCode"] as IEnumerable<SelectListItem>;
+            var branchList = new List<object>();
+            if (branchSel != null)
+            {
+                foreach (var brItem in branchSel)
+                {
+                    branchList.Add(new { Value = brItem.Value, Text = brItem.Text });
+                }
+            }
+        }
+        var branchOptions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(branchList));
         var detailSeq = 0;
         var productList = [];
 
@@ -321,6 +339,105 @@
                 }[char];
             });
         }
+
+        // Opsi branch untuk kolom To Branch (kecuali branch asal)
+        function getBranchOptions(selectedValue = '', excludeValue = '') {
+            var options = '<option value="">-- Select Branch --</option>';
+
+            branchOptions.forEach(function (item) {
+                if (!item.Value || String(item.Value) === 'All') {
+                    return;
+                }
+                if (excludeValue && String(item.Value) === String(excludeValue)) {
+                    return;
+                }
+
+                options += `<option value="${escapeHtml(item.Value)}"
+                    ${String(item.Value) === String(selectedValue) ? 'selected' : ''}>
+                    ${escapeHtml(item.Text)}
+                </option>`;
+            });
+
+            return options;
+        }
+
+        // Tampilkan/sembunyikan kolom To Branch (hanya TransCode STKTF)
+        function toggleToBranchColumn() {
+            var isTransfer = $('#TransCode').val() === 'STKTF';
+
+            $('#thToBranch').toggleClass('d-none', !isTransfer);
+            $('#detailTableBody tr').each(function () {
+                $(this).find('.to-branch-cell').toggleClass('d-none', !isTransfer);
+            });
+        }
+
+        // Saat TransCode berubah, sesuaikan kolom tabel detail
+        $('#TransCode').on('change', function () {
+            updateDetailTable();
+        });
+
+        // ==== Ganti BranchCode: konfirmasi + kosongkan detail ====
+        var lastBranchCode = $('#BranchCode').val();
+        var isRevertingBranch = false;
+
+        // Kosongkan semua row detail (destroy Select2 dulu, seperti tombol .btn-delete)
+        function clearAllDetailRows() {
+            $('#detailTableBody tr').each(function () {
+                $(this).find('.prod-code').each(function () {
+                    if ($(this).hasClass('select2-hidden-accessible')) {
+                        $(this).select2('destroy');
+                    }
+                });
+            });
+
+            $('#detailTableBody').empty();
+            updateDetailTable();
+        }
+
+        $('#BranchCode').on('change', function () {
+            // Sedang mengembalikan nilai -> jangan proses lagi
+            if (isRevertingBranch) {
+                return;
+            }
+
+            var newBranch = $(this).val();
+
+            if (String(newBranch) === String(lastBranchCode)) {
+                return;
+            }
+
+            // Belum ada detail -> langsung terima perubahan branch
+            if ($('#detailTableBody tr').length === 0) {
+                lastBranchCode = newBranch;
+                return;
+            }
+
+            // Sudah ada detail -> konfirmasi dulu
+            Swal.fire({
+                title: 'Change Branch?',
+                text: 'Are you sure to change branch? Existing detail data will be cleared.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+                    cancelButton: 'btn btn-outline-secondary waves-effect'
+                },
+                buttonsStyling: false
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    // Ya -> hapus semua detail dan kosongkan tabel
+                    clearAllDetailRows();
+                    lastBranchCode = newBranch;
+                } else {
+                    // Batal -> kembalikan branch ke nilai sebelumnya
+                    isRevertingBranch = true;
+                    $('#BranchCode').val(lastBranchCode).trigger('change');
+                    isRevertingBranch = false;
+                }
+            });
+        });
 
         // Load product list dari controller
         function loadProductList(callback) {
@@ -382,6 +499,13 @@
                             <span class="view-remark d-none"></span>
                         </td>
 
+                        <td class="to-branch-cell d-none">
+                            <select class="form-select form-select-sm to-branch">
+                                ${getBranchOptions('', $('#BranchCode').val())}
+                            </select>
+                            <span class="view-tobranch d-none"></span>
+                        </td>
+
                         <td class="text-center">
                             <button type="button"
                                     class="btn btn-sm btn-success btn-save"
@@ -427,10 +551,24 @@
             var qtyValue = row.find('.qty-input').val();
             var qty = Number(qtyValue);
             var remark = row.find('.remark-input').val();
+            var toBranchSelect = row.find('.to-branch');
+            var toBranch = toBranchSelect.val();
 
             if(prodCode==""||qtyValue==""){
                 alert("Please fill all field!");
                 return;
+            }
+
+            // Validasi To Branch khusus Stock Transfer
+            if ($("#TransCode").val() === "STKTF") {
+                if (!toBranch) {
+                    alert('Please select To Branch.');
+                    return;
+                }
+                if (String(toBranch) === String($('#BranchCode').val())) {
+                    alert('To Branch cannot be the same as source Branch.');
+                    return;
+                }
             }
             // Validasi produk
             if (!prodCode) {
@@ -457,6 +595,7 @@
             row.find('.view-prod').text(productText);
             row.find('.view-qty').text(qty);
             row.find('.view-remark').text(remark);
+            row.find('.view-tobranch').text(toBranchSelect.find('option:selected').text() || '');
 
             // Nonaktifkan dan sembunyikan dropdown
             row.find('.prod-code')
@@ -467,12 +606,12 @@
             row.find('.select2-container').addClass('d-none');
 
             // Nonaktifkan dan sembunyikan input lainnya
-            row.find('.qty-input, .remark-input')
+            row.find('.qty-input, .remark-input, .to-branch')
                 .prop('disabled', true)
                 .addClass('d-none');
 
             // Tampilkan teks view
-            row.find('.view-prod, .view-qty, .view-remark')
+            row.find('.view-prod, .view-qty, .view-remark, .view-tobranch')
                 .removeClass('d-none');
 
             // Ubah tombol
@@ -498,12 +637,12 @@
             row.find('.select2-container').removeClass('d-none');
 
             // Aktifkan input lainnya
-            row.find('.qty-input, .remark-input')
+            row.find('.qty-input, .remark-input, .to-branch')
                 .prop('disabled', false)
                 .removeClass('d-none');
 
             // Sembunyikan teks view
-            row.find('.view-prod, .view-qty, .view-remark')
+            row.find('.view-prod, .view-qty, .view-remark, .view-tobranch')
                 .addClass('d-none');
 
             // Ubah tombol
@@ -546,6 +685,8 @@
 
             $('#emptyDetailMessage').toggle(isEmpty);
             $('#detailTable').toggle(!isEmpty);
+
+            toggleToBranchColumn();
         }
 
         function getTransactionData() {
@@ -559,6 +700,7 @@
                 var qtyValue = row.find('.qty-input').val();
                 var qty = Number(qtyValue);
                 var remark = row.find('.remark-input').val();
+                var toBranch = row.find('.to-branch').val() || '';
 
                 if (!prodCode) {
                     alert('Please select a product on row ' + (index + 1));
@@ -578,11 +720,32 @@
                     return false;
                 }
 
+                if ($("#TransCode").val() === "STKTF") {
+                    if (!toBranch) {
+                        alert('Please select To Branch on row ' + (index + 1));
+                        isValid = false;
+                        return false;
+                    }
+
+                    if (String(toBranch) === String($('#BranchCode').val())) {
+                        alert('To Branch cannot be the same as source Branch on row ' + (index + 1));
+                        isValid = false;
+                        return false;
+                    }
+
+                    if (!(qty > 0)) {
+                        alert('Transfer quantity must be greater than zero on row ' + (index + 1));
+                        isValid = false;
+                        return false;
+                    }
+                }
+
                 details.push({
                     SeqNo: index + 1,
                     ProdCode: prodCode,
                     Qty: qty,
-                    Remark: remark
+                    Remark: remark,
+                    ToBranch: $("#TransCode").val() === "STKTF" ? toBranch : null
                 });
             });
 
@@ -642,6 +805,7 @@
                         formData[`StockTransactionDetails[${index}].ProdCode`] = item.ProdCode;
                         formData[`StockTransactionDetails[${index}].Qty`] = item.Qty;
                         formData[`StockTransactionDetails[${index}].Remark`] = item.Remark;
+                        formData[`StockTransactionDetails[${index}].ToBranch`] = item.ToBranch;
                     });
 
                     $.ajax({
@@ -715,6 +879,13 @@
                                        value="${item.Remark ?? ''}"
                                        disabled />
                                 <span class="view-remark">${item.Remark ?? ''}</span>
+                            </td>
+
+                            <td class="to-branch-cell d-none">
+                                <select class="form-select form-select-sm to-branch d-none" disabled>
+                                    ${getBranchOptions(item.ToBranch, $('#BranchCode').val())}
+                                </select>
+                                <span class="view-tobranch">${escapeHtml(item.ToBranch ?? '')}</span>
                             </td>
 
                             <td class="text-center">

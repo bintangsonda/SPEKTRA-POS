@@ -30,6 +30,40 @@
     <div class="card">
         <div class="card-header border-bottom">
             <div class="row g-2 align-items-end">
+                <!-- FROM DATE -->
+            <div class="col-6 col-md-2">
+                <div class="form-floating form-floating-outline">
+                    @Html.TextBox(
+                        "FromDate",
+                        new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
+                                .ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                            new {
+                                id = "txtFromDate",
+                                @class = "form-control form-control-sm",
+                                type = "text",
+                                placeholder = "dd/mmm/yyyy"
+                        }
+                    )
+                    <label for="txtFromDate">From</label>
+                </div>
+            </div>
+
+            <!-- TO DATE -->
+            <div class="col-6 col-md-2">
+                <div class="form-floating form-floating-outline">
+                    @Html.TextBox(
+                        "ToDate",
+                        DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                        new {
+                            id = "txtToDate",
+                            @class = "form-control form-control-sm",
+                            type = "text",
+                            placeholder = "dd/mmm/yyyy"
+                        }
+                    )
+                    <label for="txtToDate">To</label>
+                </div>
+            </div>
                 <!-- Cabang -->
                 <div class="col-sm-4">
                     <div class="form-floating form-floating-outline">
@@ -123,6 +157,16 @@
         $('.select2').select2();
 
         $(document).ready(function () {
+            flatpickr("#txtFromDate", {
+                dateFormat: "d/M/Y",
+                disableMobile: true,
+                static: true,
+            });
+            flatpickr("#txtToDate", {
+                dateFormat: "d/M/Y",
+                disableMobile: true,
+                static: true,
+            });
             table = getData();
 
             $('#Cabang').select2({
@@ -145,6 +189,8 @@
                     dataType: "JSON",
                     data: function (d) {
                         d.Branch = $('#Cabang').val();
+                        d.DateFrom = $('#txtFromDate').val();
+                        d.DateTo = $('#txtToDate').val();
                     }
                 },
                 columns: [

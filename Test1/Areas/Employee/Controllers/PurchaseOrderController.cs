@@ -26,7 +26,7 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
             _env = env;
         }
 
-        public JsonResult GetData(string Branch)
+        public JsonResult GetData(string Branch,string DateFrom,string DateTo)
         {
             if (sUser == null)
                 throw new Exception("You do not have access to access this page");
@@ -48,7 +48,9 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
                 int totalRecords = 0; // Total keseluruhan data
                 int totalRecordsShowing = 0; // Total data setelah filter / search
 
-                List<PurchaseOrderH> datalist = PurchaseOrderH.GetData(Branch);
+                DateTime DtFrom = Convert.ToDateTime(DateFrom);
+                DateTime DtTo = Convert.ToDateTime(DateTo);
+                List<PurchaseOrderH> datalist = PurchaseOrderH.GetData(Branch, DtFrom, DtTo);
                 if (datalist != null)
                 {
                     totalRecords = datalist.Count;
@@ -109,8 +111,23 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
             ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
             ViewData["FormAction"] = 1;
 
-            ViewData["BranchList"] = new SelectList(IDS.GeneralTable.Branch.GetBranchForDatasource(), "Value", "Text", sBranchCode.ToString());
+            var branchCode = sBranchCode;
 
+            var branchList = IDS.GeneralTable.Branch.GetBranchForDatasource();
+
+            if (sUserGroup != "SuAd")
+            {
+                branchList = branchList
+                    .Where(x => x.Value == branchCode)
+                    .ToList();
+            }
+
+            ViewData["BranchList"] = new SelectList(
+                branchList,
+                "Value",
+                "Text",
+                branchCode
+            );
             ViewBag.UserMenu = MainMenu;
 
             return View();
@@ -167,7 +184,23 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
                     return RedirectToAction("Index", "PurchaseOrder", new { Area = "Employee" });
             }
 
-            ViewData["BranchList"] = new SelectList(IDS.GeneralTable.Branch.GetBranchForDatasource(), "Value", "Text", model.BranchCode);
+            var branchCode = sBranchCode;
+
+            var branchList = IDS.GeneralTable.Branch.GetBranchForDatasource();
+
+            if (sUserGroup != "SuAd")
+            {
+                branchList = branchList
+                    .Where(x => x.Value == branchCode)
+                    .ToList();
+            }
+
+            ViewData["BranchList"] = new SelectList(
+                branchList,
+                "Value",
+                "Text",
+                branchCode
+            );
             ViewData["ProdCodeList"] = new SelectList(General.Catalog.Product.GetProductListForPO(string.IsNullOrEmpty(model.BranchCode) ? sBranchCode : model.BranchCode), "Value", "Text");
 
             ViewBag.UserMenu = MainMenu;

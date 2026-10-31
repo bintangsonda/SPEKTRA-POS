@@ -48,6 +48,7 @@ namespace General.Catalog
                                         FROM Product
                                         WHERE Branch LIKE '%' + ISNULL(@Branchs,'') + '%'
                                            AND CategoriesCode LIKE '%' + ISNULL(@Category,'') + '%'
+                                        and itemtype='SAL'
                                           
                                     ";
                 }
@@ -59,6 +60,7 @@ namespace General.Catalog
                                         WHERE Branch LIKE '%' + ISNULL(@Branchs,'') + '%'
                                            AND CategoriesCode LIKE '%' + ISNULL(@Category,'') + '%'
                                           AND prodname LIKE '%' + ISNULL(@SearchMenu,'') + '%'
+                                            and itemtype='SAL'
                                     ";
                     db.AddParameter("@SearchMenu", SqlDbType.VarChar, SearchMenu);
 
@@ -570,6 +572,7 @@ namespace General.Catalog
             return list;
         }
 
+
         public static List<SelectListItem> GetBranchCode()
         {
             List<SelectListItem> list = new List<SelectListItem>();
@@ -679,6 +682,40 @@ namespace General.Catalog
             using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
             {
                 db.CommandText = "select ProdCode,ProdName,UOM from Product where status=1 and branch=@Branch and ItemType in('RAW','SYR')";
+                db.AddParameter("@Branch", SqlDbType.VarChar, Branch);
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            SelectListItem spacc = new SelectListItem();
+                            spacc.Value = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            spacc.Text = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]) + " - " + IDS.Tool.GeneralHelper.NullToString(dr["UOM"]);
+
+                            list.Add(spacc);
+                        }
+                    }
+                }
+
+                db.Close();
+            }
+
+            return list;
+        }
+
+        public static List<SelectListItem> GetProductListForTransactionDetail(string Branch)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+
+            using (IDS.DataAccess.SqlServer db = new IDS.DataAccess.SqlServer())
+            {
+                db.CommandText = "select ProdCode,ProdName,UOM from Product where status=1 and branch=@Branch and ItemType in('RAW','SYR','PKG')";
                 db.AddParameter("@Branch", SqlDbType.VarChar, Branch);
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();

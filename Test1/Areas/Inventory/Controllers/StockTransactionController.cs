@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SPOS.Inventory.Stock;
+using System.Collections;
 using System.Linq.Dynamic.Core;
 using Transaction.Employee;
 
@@ -159,7 +160,7 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
             ViewData["FormAction"] = 1;
             ViewData["SelectListWh"] = new SelectList(SPOS.Inventory.Stock.Warehouse.GetWareHouseForDataSource(), "Value", "Text");
-            ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text", "All");
+            ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductListForDetail(sBranchCode), "Value", "Text", "All");
             ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCodeSpecific(), "Value", "Text", sBranchCode);
             ViewBag.UserMenu = MainMenu;
 
@@ -171,7 +172,7 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
         [HttpGet]
         public JsonResult GetProductList(string Branch)
         {
-            var products = Product.GetProductList(Branch);
+            var products = Product.GetProductListForTransactionDetail(Branch);
 
             return Json(products);
         }
@@ -244,7 +245,7 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             ViewData["Page.Delete"] = AccessLevel.DeleteAccess;
             ViewData["SelectListWh"] = new SelectList(SPOS.Inventory.Stock.Warehouse.GetWareHouseForDataSource(), "Value", "Text");
             ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text", "All");
-            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text", "All");
+            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text");
             ViewData["FormAction"] = 2;
             ViewBag.UserMenu = MainMenu;
             ViewBag.UserLogin = sUser.ToString();
@@ -268,7 +269,8 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
                 });
             }
             int result = 0;
-            result = SPOS.Inventory.Stock.StockTransactionH.ProcessStock(transNos,processType);
+            string msg = "";
+            result = SPOS.Inventory.Stock.StockTransactionH.ProcessStock(transNos,processType,ref msg);
             if (result > 0)
             {
                 return Json(new
@@ -279,10 +281,14 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             }
             else
             {
+                if (msg == "")
+                {
+                    msg ="Stock Transactions processed failed.";
+                }
                 return Json(new
                 {
-                    success = false,
-                    message = "Stock Transactions processed failed."
+                    message= msg,
+                    success = false
                 });
             }
             

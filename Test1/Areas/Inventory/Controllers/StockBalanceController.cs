@@ -142,7 +142,23 @@ namespace SPOS.Web.UI.Areas.Inventory.Controllers
             ViewData["SelectListWh"] = new SelectList(SPOS.Inventory.Stock.Warehouse.GetWareHouseForDataSource(), "Value", "Text");
             ViewData["ProdTypeList"] = new SelectList(IDS.GeneralTable.ItemType.GetCboItemType(), "Value", "Text");
             ViewData["SelectListProdCode"] = new SelectList(General.Catalog.Product.GetProductForDataSource(), "Value", "Text","All");
-            ViewData["SelectListBranchCode"] = new SelectList(General.Catalog.Product.GetBranchCode(), "Value", "Text","All");
+            var branchCode = sBranchCode;
+
+            var branchList = IDS.GeneralTable.Branch.GetBranchForDatasource();
+
+            if (sUserGroup != "SuAd")
+            {
+                branchList = branchList
+                    .Where(x => x.Value == branchCode)
+                    .ToList();
+            }
+
+            ViewData["SelectListBranchCode"] = new SelectList(
+                branchList,
+                "Value",
+                "Text",
+                branchCode
+            );
             ViewBag.UserMenu = MainMenu;
             ViewBag.UserLogin = sUser.ToString();
 

@@ -1,6 +1,8 @@
 ﻿using General.Catalog;
 using IDS.DataAccess;
+using IDS.GeneralTable;
 using Microsoft.Data.SqlClient;
+using Microsoft.Office.Interop.Excel;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections;
@@ -8,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SPOS.Inventory.Stock
 {
@@ -148,6 +151,8 @@ namespace SPOS.Inventory.Stock
                             cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, data.ProdCode);
                             cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, data.Qty);
                             cmd.AddParameter("@Remark", System.Data.SqlDbType.VarChar, data.Remark);
+                            cmd.AddParameter("@ToBranch", System.Data.SqlDbType.VarChar,
+                                string.IsNullOrWhiteSpace(data.ToBranch) ? (object)DBNull.Value : data.ToBranch);
                             result = cmd.ExecuteNonQuery();
                             count++;
                         }
@@ -185,7 +190,7 @@ namespace SPOS.Inventory.Stock
 
 
         
-        public static int ProcessStock(List<string> transNos,int process)
+        public static int ProcessStock(List<string> transNos,int process,ref string msg)
         {
             int result = 0;
             DateTime today = DateTime.Now;
@@ -215,8 +220,9 @@ namespace SPOS.Inventory.Stock
                     {
                         string BranchCode = "";
                         string TransCode = "";
+                        DateTime TransDate = DateTime.Now;
                         List<StockTransactionD> listD = new List<StockTransactionD>();
-                        cmd.CommandText = "select stocktransH.Branch,stocktransH.TransCode,StockTransD.* from stocktransH inner join StockTransD on StockTransD.TransNo=StockTransH.TransNo where StockTransH.TransNo=@TransNo";
+                        cmd.CommandText = "select stocktransH.Branch,stocktransH.TransCode,stocktransH.TransDate,StockTransD.* from stocktransH inner join StockTransD on StockTransD.TransNo=StockTransH.TransNo where StockTransH.TransNo=@TransNo";
                         cmd.CommandType = System.Data.CommandType.Text;
                         cmd.ClearParameter();
                         cmd.AddParameter("@TransNo", System.Data.SqlDbType.VarChar, i);
@@ -230,7 +236,9 @@ namespace SPOS.Inventory.Stock
                                     StockTransactionD stockTransaction = new StockTransactionD();
                                     stockTransaction.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]); ;
                                     BranchCode = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
+                                    stockTransaction.ToBranch= IDS.Tool.GeneralHelper.NullToString(dr["ToBranch"]);
                                     TransCode = IDS.Tool.GeneralHelper.NullToString(dr["TransCode"]);
+                                    TransDate = IDS.Tool.GeneralHelper.NullToDateTime(dr["TransDate"],DateTime.Now);
                                     stockTransaction.Qty = IDS.Tool.GeneralHelper.NullToDecimal(dr["Qty"], 0);
                                     listD.Add(stockTransaction);
                                 }
@@ -241,20 +249,64 @@ namespace SPOS.Inventory.Stock
                         }
                         foreach(var a in listD)
                         {
+                            if(TransCode == "STKTF")
+                            {
+                                //cek dulu ada stocknya ga di db untuk transaksi ini 
+                                cmd.CommandText = "SELECT " +
+                                                    "ISNULL(QtyIn, 0) + " +
+                                                    "ISNULL(QtyOut, 0) + " +
+                                                    "ISNULL(QtyAdj, 0) AS EndBal,ProdName " +
+                                                    "FROM StockProduct " +
+                                                    "inner join product on product.ProdCode = stockproduct.ProdCode " +
+                                                    "WHERE[Date] = @StockDate " +
+                                                    "AND stockproduct.ProdCode = @ProdCode " +
+                                                    "AND stockproduct.Branch = @Branch ";
+                                cmd.CommandType = System.Data.CommandType.Text;
+                                cmd.ClearParameter();
+                                cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, a.ProdCode);
+                                cmd.AddParameter("@Branch", System.Data.SqlDbType.VarChar, BranchCode);
+                                cmd.AddParameter("@StockDate", System.Data.SqlDbType.DateTime, TransDate);
+                                object res = cmd.ExecuteScalar();
+
+                                decimal endBal = (res == null || res == DBNull.Value)
+                                    ? 0
+                                    : Convert.ToDecimal(res);
+
+                                if (endBal <= 0 || endBal<a.Qty)
+                                {
+                                    msg = "Stock End Bal untuk Product '" + a.ProdCode + "' kurang untuk di transfer, tolong cek kembali stock balance!";
+                                    result = 0;
+                                    cmd.RollbackTransaction();
+                                    return result;
+                                }
+                            }
+                           
+
+
                             cmd.CommandText = "AddQtyStock";
                             cmd.CommandType = System.Data.CommandType.StoredProcedure;
                             cmd.ClearParameter();
                             cmd.AddParameter("@ProdCode", System.Data.SqlDbType.VarChar, a.ProdCode);
                             cmd.AddParameter("@Qty", System.Data.SqlDbType.Decimal, a.Qty);
+                            cmd.AddParameter("@TransDate", System.Data.SqlDbType.DateTime, TransDate);
+
                             cmd.AddParameter("@Branch", System.Data.SqlDbType.VarChar, BranchCode);
                             if (TransCode == "STKIN")
                             {
                                 cmd.AddParameter("@Type", System.Data.SqlDbType.Int, 2);
+                                cmd.AddParameter("@ToBranch", System.Data.SqlDbType.VarChar, DBNull.Value);
                             }
                             else if (TransCode == "STKAD")
                             {
                                 cmd.AddParameter("@Type", System.Data.SqlDbType.Int, 3);
+                                cmd.AddParameter("@ToBranch", System.Data.SqlDbType.VarChar, DBNull.Value);
                             }
+                            else if (TransCode == "STKTF")
+                            {
+                                cmd.AddParameter("@Type", System.Data.SqlDbType.Int, 4);
+                                cmd.AddParameter("@ToBranch", System.Data.SqlDbType.VarChar, a.ToBranch);
+                            }
+                          
                             result = cmd.ExecuteNonQuery();
                             if (result < 0)
                             {
@@ -301,7 +353,7 @@ namespace SPOS.Inventory.Stock
             StockTransactionH Data1 = null;
             using (SqlServer db = new SqlServer())
             {
-                db.CommandText = "select StockTransH.*,StockTransD.ProdCode,StockTransD.SeqNo,StockTransD.Qty,StockTransD.Remark from StockTransH inner join stocktransD on StockTransD.TransNo=StockTransH.Transno where StockTransH.Transno=@TransNo";
+                db.CommandText = "select StockTransH.*,StockTransD.ProdCode,StockTransD.SeqNo,StockTransD.Qty,StockTransD.Remark,StockTransD.ToBranch from StockTransH inner join stocktransD on StockTransD.TransNo=StockTransH.Transno where StockTransH.Transno=@TransNo";
                 db.AddParameter("@TransNo", System.Data.SqlDbType.VarChar, TransNo);
                 db.CommandType = System.Data.CommandType.Text;
                 db.Open();
@@ -328,6 +380,7 @@ namespace SPOS.Inventory.Stock
                             details.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
                             details.Qty = IDS.Tool.GeneralHelper.NullToDecimal(dr["Qty"], 0);
                             details.Remark = IDS.Tool.GeneralHelper.NullToString(dr["Remark"]);
+                            details.ToBranch = IDS.Tool.GeneralHelper.NullToString(dr["ToBranch"]);
                             Data1.StockTransactionDetails.Add(details);
                         }
                     }
