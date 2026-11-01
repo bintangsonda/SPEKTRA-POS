@@ -1,0 +1,185 @@
+﻿@model List<SPOS.Inventory.Stock.StockReportBranch>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Stock Report";
+
+    DateTime reportDate = ViewBag.ReportDate != null ? (DateTime)ViewBag.ReportDate : DateTime.Today;
+    string reportBranch = ViewBag.ReportBranch as string ?? "All";
+
+    // Label judul: nama branch terpilih atau ALL OUTLET
+    string branchLabel = "ALL OUTLET";
+    if (reportBranch != "All" && Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].BranchName))
+    {
+        branchLabel = Model[0].BranchName;
+    }
+
+    string dayName = reportDate.ToString("dddd", new System.Globalization.CultureInfo("id-ID")).ToUpper();
+    string dateText = reportDate.ToString("dd MMM yy", System.Globalization.CultureInfo.InvariantCulture).ToUpper();
+    string reportTitle = "STOCK AKHIR " + branchLabel + " " + dayName + " " + dateText;
+
+    int branchCount = Model != null ? Model.Count : 0;
+    int colSpan = (branchCount > 0 ? branchCount : 1) * 3;
+    string selectedBranch = reportBranch == "All" ? "" : reportBranch;
+
+    // Panjang blok terpanjang
+    int maxRows = 0;
+    if (Model != null)
+    {
+        foreach (var b in Model)
+        {
+            if (b.Items.Count > maxRows)
+            {
+                maxRows = b.Items.Count;
+            }
+        }
+    }
+
+    string[] headerColors = new[] { "table-warning", "table-info" };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/assets/css/custom.css" />
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="card">
+
+        <!-- Header -->
+        <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-white">Stock Report — Stock Akhir</h5>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body mt-4">
+
+            <!-- Filter: Date + Branch + Refresh + Export -->
+            <form method="get"
+                  action="@Url.Action("Index", "ReportStock", new { area = "Reporting" })"
+                  class="row g-3 align-items-end">
+
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating form-floating-outline">
+                        <input type="text"
+                               id="reportDate"
+                               name="date"
+                               class="form-control flatpickr"
+                               value="@reportDate.ToString("yyyy-MM-dd")"
+                               placeholder="Date"
+                               autocomplete="off" />
+                        <label for="reportDate">Date</label>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating form-floating-outline">
+                        @Html.DropDownList(
+                            "branch",
+                            ViewData["SelectListBranchCode"] as SelectList,
+                            selectedBranch,
+                            new { @class = "form-control form-control-sm select2" })
+                        <label for="branch">Branch</label>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-6 d-flex flex-wrap justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ri ri-search-line me-1"></i> Refresh
+                    </button>
+                    <button type="submit"
+                            class="btn btn-success"
+                            formaction="@Url.Action("ExportExcel", "ReportStock", new { area = "Reporting" })">
+                        <i class="ri ri-file-excel-2-line me-1"></i> Export Excel
+                    </button>
+                </div>
+            </form>
+
+            <hr class="my-4" />
+
+            <!-- Hasil: blok per branch berdampingan -->
+            @if (branchCount == 0)
+            {
+                <div class="text-center text-muted py-4">
+                    No data for this filter.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle" id="reportTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th colspan="@colSpan" class="text-center">@reportTitle</th>
+                            </tr>
+                            <tr>
+                                @for (int b = 0; b < branchCount; b++)
+                                {
+                                    <th colspan="3" class="text-center @headerColors[b % headerColors.Length]">
+                                        @Model[b].BranchName
+                                    </th>
+                                }
+                            </tr>
+                            <tr>
+                                @for (int b = 0; b < branchCount; b++)
+                                {
+                                    <th style="width: auto;">BAHAN</th>
+                                    <th style="width: 80px;" class="text-end">AKHIR</th>
+                                    <th style="width: 60px;" class="text-end">SATUAN</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < maxRows; i++)
+                            {
+                                <tr>
+                                    @for (int b = 0; b < branchCount; b++)
+                                    {
+                                        if (i < Model[b].Items.Count)
+                                        {
+                                            var item = Model[b].Items[i];
+                                            <td>@item.ProdName</td>
+                                             <td class="text-end" style="width: 80px; white-space: nowrap;">
+                                                @item.EndBalance.ToString("#,##0.##")
+                                            </td>
+                                            <td class="text-end" style="width: 60px; white-space: nowrap;">
+                                                @item.UOM
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                            <td></td>
+                                             <td></td>
+                                        }
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/select2/select2.js"></script>
+    <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2').select2({
+                dropdownParent: $('#branch').closest('.card')
+            });
+
+            flatpickr("#reportDate", {
+                dateFormat: "Y-m-d",
+                disableMobile: true,
+                static: true
+            });
+        });
+    </script>
+}

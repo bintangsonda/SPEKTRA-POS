@@ -392,5 +392,183 @@ namespace SPOS.Inventory.Stock
             return Data1;
         }
 
+        // ==== Report Stock Akhir per Branch (modul Reporting/ReportStock) — METHOD BARU ====
+        public static List<StockReportBranch> GetStockReport(DateTime Date, string Branch)
+        {
+            List<StockReportBranch> report = new List<StockReportBranch>();
+            Dictionary<string, StockReportBranch> dicReport = new Dictionary<string, StockReportBranch>();
+            Dictionary<string, string> dicBranchName = new Dictionary<string, string>();
+            bool isAll = string.IsNullOrEmpty(Branch) || Branch == "All";
+
+            DateTime dateFrom = Date.Date;
+            DateTime dateTo = dateFrom.AddDays(1);
+
+            using (SqlServer db = new SqlServer())
+            {
+                db.Open();
+
+                // 1) Nama branch untuk label header
+                db.CommandText = "select BranchCode, BranchName from tblBranch";
+                db.CommandType = System.Data.CommandType.Text;
+                db.ClearParameter();
+                db.ExecuteReader();
+                using (SqlDataReader dr = db.DbDataReader as SqlDataReader)
+                {
+                    while (dr.Read())
+                    {
+                        string code = IDS.Tool.GeneralHelper.NullToString(dr["BranchCode"]);
+                        string name = IDS.Tool.GeneralHelper.NullToString(dr["BranchName"]);
+                        if (!string.IsNullOrEmpty(code) && !dicBranchName.ContainsKey(code))
+                            dicBranchName.Add(code, name);
+                    }
+
+                    if (!dr.IsClosed)
+                        dr.Close();
+                }
+
+                // 2) Data stok pada tanggal filter (join Product, sesuai query yang diminta)
+                db.CommandText =
+                    "select sp.ProdCode, sp.Branch, p.ProdName,p.UOM, " +
+                    "sum(isnull(sp.BeginBalance,0)) as BeginBalance, " +
+                    "sum(isnull(sp.QtyIn,0)) as QtyIn, " +
+                    "sum(isnull(sp.QtyOut,0)) as QtyOut, " +
+                    "sum(isnull(sp.QtyAdj,0)) as QtyAdj " +
+                    "from StockProduct sp " +
+                    "inner join Product p on p.ProdCode = sp.ProdCode and p.itemtype in ('RAW','PKG','SYR') and p.Branch=SP.Branch " +
+                    "where sp.[Date] >= @DateFrom and sp.[Date] < @DateTo " +
+                    (isAll ? "" : "and sp.Branch = @Branch ") +
+                    "group by sp.ProdCode, sp.Branch, p.ProdName, p.itemtype ,p.UOM " +
+                    "order by sp.Branch,p.itemtype, p.ProdName ";
+                db.CommandType = System.Data.CommandType.Text;
+                db.ClearParameter();
+                db.AddParameter("@DateFrom", System.Data.SqlDbType.DateTime, dateFrom);
+                db.AddParameter("@DateTo", System.Data.SqlDbType.DateTime, dateTo);
+                if (!isAll)
+                    db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, Branch);
+
+                db.ExecuteReader();
+                using (SqlDataReader dr = db.DbDataReader as SqlDataReader)
+                {
+                    while (dr.Read())
+                    {
+                        string code = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
+                        if (string.IsNullOrEmpty(code))
+                            continue;
+
+                        StockReportBranch group = GetOrCreateStockReportGroup(dicReport, code, dicBranchName);
+                        group.Items.Add(new StockReportItem
+                        {
+                            ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]),
+                            ProdName = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]),
+                            UOM = IDS.Tool.GeneralHelper.NullToString(dr["UOM"]),
+                            BeginBalance = IDS.Tool.GeneralHelper.NullToDecimal(dr["BeginBalance"], 0),
+                            QtyIn = IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyIn"], 0),
+                            QtyOut = IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyOut"], 0),
+                            QtyAdj = IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyAdj"], 0),
+                            EndBalance = IDS.Tool.GeneralHelper.NullToDecimal(dr["BeginBalance"], 0) + IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyIn"], 0) - IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyOut"], 0) + IDS.Tool.GeneralHelper.NullToDecimal(dr["QtyAdj"], 0)
+                        });
+                    }
+
+                    if (!dr.IsClosed)
+                        dr.Close();
+                }
+
+                // 3) Daftar produk per branch (pola GetProductList: Status=1 & Branch persis)
+                //    supaya produk yang belum punya baris stok di tanggal tsb tetap tampil dengan qty 0
+                db.CommandText =
+                    "select ProdCode, ProdName,UOM, Branch from Product where Status = 1 AND ITEMTYPE IN('RAW','PKG','SYR') " +
+                    (isAll ? "" : "and Branch = @Branch ") +
+                    "order by ITEMTYPE, ProdName";
+                db.CommandType = System.Data.CommandType.Text;
+                db.ClearParameter();
+                if (!isAll)
+                    db.AddParameter("@Branch", System.Data.SqlDbType.VarChar, Branch);
+
+                db.ExecuteReader();
+                using (SqlDataReader dr = db.DbDataReader as SqlDataReader)
+                {
+                    while (dr.Read())
+                    {
+                        string code = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
+                        if (string.IsNullOrEmpty(code))
+                            continue;
+
+                        StockReportBranch group = GetOrCreateStockReportGroup(dicReport, code, dicBranchName);
+                        string prodCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+
+                        // Sudah punya baris stok di tanggal filter -> tidak ditambah lagi
+                        if (group.Items.Any(x => x.ProdCode == prodCode))
+                            continue;
+
+                        group.Items.Add(new StockReportItem
+                        {
+                            ProdCode = prodCode,
+                            ProdName = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]),
+                            UOM = IDS.Tool.GeneralHelper.NullToString(dr["UOM"])
+                        });
+                    }
+
+                    if (!dr.IsClosed)
+                        dr.Close();
+                }
+
+                db.Close();
+            }
+
+            // Branch tunggal yang dipilih tetap ditampilkan walau tidak ada data sama sekali
+            if (!isAll && !dicReport.ContainsKey(Branch))
+                GetOrCreateStockReportGroup(dicReport, Branch, dicBranchName);
+
+            // Gabung: urut nama produk dalam tiap blok, urut nama branch antar blok
+            foreach (var group in dicReport.Values)
+            {
+                group.Items = group.Items.OrderBy(x => x.ProdName).ToList();
+                report.Add(group);
+            }
+
+            return report.OrderBy(x => x.BranchName).ThenBy(x => x.BranchCode).ToList();
+        }
+
+        private static StockReportBranch GetOrCreateStockReportGroup(
+            Dictionary<string, StockReportBranch> dicReport,
+            string branchCode,
+            Dictionary<string, string> dicBranchName)
+        {
+            if (!dicReport.ContainsKey(branchCode))
+            {
+                string branchName = branchCode;
+                if (dicBranchName.ContainsKey(branchCode) && !string.IsNullOrEmpty(dicBranchName[branchCode]))
+                    branchName = dicBranchName[branchCode];
+
+                dicReport.Add(branchCode, new StockReportBranch
+                {
+                    BranchCode = branchCode,
+                    BranchName = branchName
+                });
+            }
+
+            return dicReport[branchCode];
+        }
+
+    }
+
+    // ==== Model untuk Report Stock Akhir ====
+    public class StockReportItem
+    {
+        public string ProdCode { get; set; }
+        public string ProdName { get; set; }
+        public string UOM { get; set; }
+        public decimal BeginBalance { get; set; }
+        public decimal QtyIn { get; set; }
+        public decimal QtyOut { get; set; }
+        public decimal QtyAdj { get; set; }
+        public decimal EndBalance { get; set; }
+    }
+
+    public class StockReportBranch
+    {
+        public string BranchCode { get; set; }
+        public string BranchName { get; set; }
+        public List<StockReportItem> Items { get; set; } = new List<StockReportItem>();
     }
 }
