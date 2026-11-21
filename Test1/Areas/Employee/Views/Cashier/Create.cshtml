@@ -15,13 +15,14 @@
 <div class="trans-header d-flex flex-column flex-lg-row gap-2 align-items-lg-center justify-content-between">
 
     <!-- LEFT : TRANSACTION ID -->
-    <div class="trans-id">
-        ID: <span class="TransactionCode">@Model.TransCode</span>
+    <div class="trans-id d-flex flex-column">
+        <span>ID: <span class="TransactionCode">@Model.TransCode</span></span>
+        <span>Customer: <span class="CustomerName">-</span></span>
     </div>
 
     <!-- RIGHT : ACTION BUTTONS -->
     <div class="d-flex gap-2 flex-wrap justify-content-start justify-content-md-end">
-        <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-warning btn-sm" onclick="ShowCustomerInput()">
             <i class="ri ri-user-line me-1 icon-18px"></i>
             <span class="d-none d-sm-inline">Customer</span>
         </button>
@@ -61,7 +62,7 @@
 <div class="row g-2 mt-3 cart-action">
 
     <div class="col-6 col-md-4">
-        <button class="btn btn-dark w-100">
+        <button class="btn btn-dark w-100" onclick="PrintThermalReceipt()">
             <i class="ri ri-printer-line me-1 icon-fixed"></i> Print
         </button>
     </div>

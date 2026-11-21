@@ -946,6 +946,7 @@
     <script src="~/assets/vendor/libs/bloodhound/bloodhound.js"></script>
     <script src="~/assets/vendor/libs/flatpickr/flatpickr.js"></script>
     <script src="~/assets/js/generalscript.js"></script>
+    <script src="~/assets/js/bluetooth-printer.js"></script>
     <script type="text/javascript">
         const token = $('input[name="__RequestVerificationToken"]').val();
         const getDataUrl = '@Url.Action("GetData", "Categories", new { area = "Catalog" })';
@@ -1441,6 +1442,33 @@
             DataMenu.length = 0;   // kosongkan array
             renderBill();          // refresh tampilan
             CalculateTotal();         // reset total (kalau ada)
+            $(".CustomerName").text('-');   // reset nama customer
+        }
+
+        // Input nama customer (tidak disimpan ke DB, hanya untuk tampilan & struk print)
+        function ShowCustomerInput(){
+            let current = $(".CustomerName").first().text().trim();
+            if (current === "-") current = "";
+
+            Swal.fire({
+                title: 'Customer',
+                input: 'text',
+                inputValue: current,
+                inputPlaceholder: 'Nama customer (opsional)',
+                showCancelButton: true,
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+                    cancelButton: 'btn btn-outline-secondary waves-effect'
+                },
+                buttonsStyling: false
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    let name = (result.value || '').trim();
+                    $(".CustomerName").text(name ? name : '-');
+                }
+            });
         }
 
         $(document).on("click", ".btn-delete", function () {
