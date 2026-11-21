@@ -48,7 +48,7 @@ namespace General.Catalog
                                         FROM Product
                                         WHERE Branch LIKE '%' + ISNULL(@Branchs,'') + '%'
                                            AND CategoriesCode LIKE '%' + ISNULL(@Category,'') + '%'
-                                        and itemtype='SAL'
+                                        
                                           
                                     ";
                 }
@@ -60,7 +60,7 @@ namespace General.Catalog
                                         WHERE Branch LIKE '%' + ISNULL(@Branchs,'') + '%'
                                            AND CategoriesCode LIKE '%' + ISNULL(@Category,'') + '%'
                                           AND prodname LIKE '%' + ISNULL(@SearchMenu,'') + '%'
-                                            and itemtype='SAL'
+                                           
                                     ";
                     db.AddParameter("@SearchMenu", SqlDbType.VarChar, SearchMenu);
 
@@ -104,6 +104,91 @@ namespace General.Catalog
                             sourceCode.Description = IDS.Tool.GeneralHelper.NullToString(dr["Description"]);
                             sourceCode.Status = IDS.Tool.GeneralHelper.NullToBool(dr["Status"],false);
                             sourceCode.Harga = IDS.Tool.GeneralHelper.NullToDecimal(dr["Harga"],0);
+                            sourceCode.Image = IDS.Tool.GeneralHelper.NullToString(dr["Image"]);
+                            sourceCode.OperatorID = IDS.Tool.GeneralHelper.NullToString(dr["OperatorID"]);
+                            sourceCode.LastUpdate = IDS.Tool.GeneralHelper.NullToDateTime(dr["LastUpdate"], DateTime.Now);
+
+                            list.Add(sourceCode);
+                        }
+                    }
+                    if (!dr.IsClosed)
+                        dr.Close();
+                }
+                db.Close();
+            }
+            return list;
+        }
+
+        public static List<Product> GetDataforSales(string Branch, string Category, string SearchMenu)
+        {
+            List<Product> list = null;
+
+            using (SqlServer db = new SqlServer())
+            {
+                if (string.IsNullOrEmpty(SearchMenu))
+                {
+                    db.CommandText = @"
+                                        SELECT *
+                                        FROM Product
+                                        WHERE Branch LIKE '%' + ISNULL(@Branchs,'') + '%'
+                                           AND CategoriesCode LIKE '%' + ISNULL(@Category,'') + '%'
+                                           AND ItemType='SAL'
+                                          
+                                    ";
+                }
+                else
+                {
+                    db.CommandText = @"
+                                        SELECT *
+                                        FROM Product
+                                        WHERE Branch LIKE '%' + ISNULL(@Branchs,'') + '%'
+                                          AND CategoriesCode LIKE '%' + ISNULL(@Category,'') + '%'
+                                          AND prodname LIKE '%' + ISNULL(@SearchMenu,'') + '%'
+                                          AND ItemType='SAL'
+                                           
+                                    ";
+                    db.AddParameter("@SearchMenu", SqlDbType.VarChar, SearchMenu);
+
+                }
+                if (string.IsNullOrEmpty(Category) || Category == "All")
+                {
+                    db.AddParameter("@Category", SqlDbType.VarChar, DBNull.Value);
+                }
+                else
+                {
+                    db.AddParameter("@Category", SqlDbType.VarChar, Category);
+                }
+                if (string.IsNullOrEmpty(Branch))
+                {
+                    db.AddParameter("@Branchs", SqlDbType.VarChar, DBNull.Value);
+                }
+                else
+                {
+                    db.AddParameter("@Branchs", SqlDbType.VarChar, Branch);
+                }
+
+
+                db.CommandType = System.Data.CommandType.Text;
+                db.Open();
+
+                db.ExecuteReader();
+
+                using (Microsoft.Data.SqlClient.SqlDataReader dr = db.DbDataReader as Microsoft.Data.SqlClient.SqlDataReader)
+                {
+                    if (dr.HasRows)
+                    {
+                        list = new List<Product>();
+
+                        while (dr.Read())
+                        {
+                            Product sourceCode = new Product();
+                            sourceCode.ProdCode = IDS.Tool.GeneralHelper.NullToString(dr["ProdCode"]);
+                            sourceCode.Branch = IDS.Tool.GeneralHelper.NullToString(dr["Branch"]);
+                            sourceCode.CategoriesCode = IDS.Tool.GeneralHelper.NullToString(dr["CategoriesCode"]);
+                            sourceCode.ProdName = IDS.Tool.GeneralHelper.NullToString(dr["ProdName"]);
+                            sourceCode.Description = IDS.Tool.GeneralHelper.NullToString(dr["Description"]);
+                            sourceCode.Status = IDS.Tool.GeneralHelper.NullToBool(dr["Status"], false);
+                            sourceCode.Harga = IDS.Tool.GeneralHelper.NullToDecimal(dr["Harga"], 0);
                             sourceCode.Image = IDS.Tool.GeneralHelper.NullToString(dr["Image"]);
                             sourceCode.OperatorID = IDS.Tool.GeneralHelper.NullToString(dr["OperatorID"]);
                             sourceCode.LastUpdate = IDS.Tool.GeneralHelper.NullToDateTime(dr["LastUpdate"], DateTime.Now);

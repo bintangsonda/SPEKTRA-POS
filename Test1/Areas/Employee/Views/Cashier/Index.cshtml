@@ -895,8 +895,12 @@
 
                 </div>
                 <!-- Button -->
-                <div class="text-center">
-                    <button type="button" class="btn btn-success btn-sm w-50 text-center" onclick="ProcessPayment()">
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-dark w-50 text-center" onclick="PrintThermalReceipt()">
+                        <i class="ri ri-printer-line me-1 icon-18px"></i>
+                        Print
+                    </button>
+                    <button type="button" class="btn btn-success w-50 text-center" onclick="ProcessPayment()">
                         <i class="ri ri-refund-2-line me-1 icon-18px"></i>
                         Process
                     </button>
@@ -1072,10 +1076,12 @@
         }
 
         function ShowModalMobile(){
-            let modal = new bootstrap.Modal(document.getElementById('ModalMobile'));
+            // focus:false -> matikan focus trap Bootstrap, supaya input di SweetAlert
+            // (misal input nama Customer) bisa di-fokus / di-tap di HP
+            let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('ModalMobile'), { focus: false });
             modal.show();
             renderBill()
-            
+
         }
 
         function CloseModalMobile(){
@@ -1677,7 +1683,8 @@
 
         function ListBill(){//open modal list bill
              CloseModalMobile()
-            let modal = new bootstrap.Modal(document.getElementById('ModalViewBill'));
+            // focus:false -> matikan focus trap Bootstrap, supaya Swal Customer bisa diinput
+            let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('ModalViewBill'), { focus: false });
             modal.show();
             renderTransaction();
         }
@@ -1747,7 +1754,7 @@
                     }
                     if (window.matchMedia("(max-width: 767.98px)").matches) {
                         const modalMobileEl = document.getElementById('ModalMobile');
-                        const modalMobile = bootstrap.Modal.getOrCreateInstance(modalMobileEl);
+                        const modalMobile = bootstrap.Modal.getOrCreateInstance(modalMobileEl, { focus: false });
                         modalMobile.show();
                     }
                 },

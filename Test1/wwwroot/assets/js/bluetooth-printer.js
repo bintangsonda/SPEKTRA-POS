@@ -280,6 +280,17 @@
                     });
                 });
             }
+
+            // tipe pesanan & bungkus/makan di sini
+            var salesText = '';
+            if (item.salesType === 'on') salesText = 'Bungkus';
+            else if (item.salesType === 'off') salesText = 'Makan di sini';
+            var typeText = [item.orderType, salesText].filter(Boolean).join(' | ');
+            if (typeText) {
+                wrapText('  [' + typeText + ']', WIDTH).forEach(function (l) {
+                    push(l + '\n');
+                });
+            }
         });
 
         push('--------------------------------\n');
@@ -333,7 +344,7 @@
 
         var now = new Date();
         var data = {
-            header: 'SPEKTRA POS',  // TODO: ganti dengan nama outlet/branch
+            header: 'RIBWRAP',
             transCode: 'No: ' + transCode,
             dateTime: now.toLocaleString('id-ID'),
             customer: customer,

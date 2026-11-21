@@ -65,7 +65,7 @@ namespace SPOS.Web.UI.Areas.Employee.Controllers
             {
                 return RedirectToAction("Index", "Main", new { Area = "" });
             }
-            var products = General.Catalog.Product.GetData(BranchCode, Categories, SearchMenu) ?? new List<General.Catalog.Product>();
+            var products = General.Catalog.Product.GetDataforSales(BranchCode, Categories, SearchMenu) ?? new List<General.Catalog.Product>();
 
             var data = products
                 .Where(p=>p.Status==true)
